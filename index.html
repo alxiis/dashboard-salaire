@@ -10,84 +10,142 @@
             background-color: #121212; 
             color: #ffffff; 
             display: flex; 
-            flex-direction: column; 
             align-items: center; 
             justify-content: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             margin: 0;
         }
         .container {
             background-color: #1e1e1e;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
             text-align: center;
-            width: 350px;
+            width: 340px;
         }
-        .titre { font-size: 1.2em; color: #aaaaaa; margin-top: 20px; }
-        .valeur { font-size: 2.5em; font-weight: bold; color: #4caf50; margin-bottom: 10px; }
-        .valeur.petit { font-size: 1.8em; color: #81c784; }
+        .statut {
+            font-size: 0.85em;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .en-poste { background-color: #1b5e20; color: #a5d6a7; }
+        .hors-poste { background-color: #37474f; color: #b0bec5; }
+        .titre { font-size: 1.1em; color: #aaaaaa; margin-top: 15px; }
+        .valeur { font-size: 2.4em; font-weight: bold; color: #4caf50; margin-bottom: 5px; }
+        .valeur.petit { font-size: 1.6em; color: #81c784; }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div id="statutBadge" class="statut hors-poste">Hors horaires de travail</div>
+
         <div class="titre">Gagné aujourd'hui</div>
         <div class="valeur" id="jour">0.0000 €</div>
 
         <div class="titre">Ce mois-ci</div>
         <div class="valeur petit" id="mois">0.00 €</div>
 
-        <div class="titre">Total depuis le début</div>
+        <div class="titre">Total contrat</div>
         <div class="valeur petit" id="total">0.00 €</div>
     </div>
 
     <script>
-        // Taux net par seconde (basé sur 7,89 € / heure)
-        const tauxParSeconde = 7.89 / 3600;
+        // Paramètres du contrat
+        const TAUX_HORAIRE_NET = 7.89;
+        const TAUX_SECONDE = TAUX_HORAIRE_NET / 3600;
+        const DATE_DEBUT_CONTRAT = new Date(2026, 8, 14, 8, 30, 0); // 14 septembre 2026 à 08h30
 
-        // Récupération des données sauvegardées ou initialisation à zéro
-        let stats = JSON.parse(localStorage.getItem('salaireStats')) || {
-            allTime: 0,
-            moisEnCours: 0,
-            jourEnCours: 0,
-            dateEnregistree: new Date().toLocaleDateString(),
-            moisEnregistre: new Date().getMonth()
-        };
+        // Plages de travail quotidiennes en minutes depuis minuit (08h30-12h30 et 13h30-16h30 = 7h)
+        const PLAGES = [
+            { debut: 8 * 60 + 30, fin: 12 * 60 + 30 },
+            { debut: 13 * 60 + 30, fin: 16 * 60 + 30 }
+        ];
 
-        function verifierChangementDate() {
-            let dateActuelle = new Date();
-            
-            // Si on est un nouveau jour
-            if (stats.dateEnregistree !== dateActuelle.toLocaleDateString()) {
-                stats.jourEnCours = 0; // Remise à zéro du compteur journalier
-                stats.dateEnregistree = dateActuelle.toLocaleDateString();
-            }
-            
-            // Si on est un nouveau mois
-            if (stats.moisEnregistre !== dateActuelle.getMonth()) {
-                stats.moisEnCours = 0; // Remise à zéro du compteur mensuel
-                stats.moisEnregistre = dateActuelle.getMonth();
-            }
+        function estJourOuvre(date) {
+            const jour = date.getDay();
+            return jour >= 1 && jour <= 5; // Lundi à Vendredi
         }
 
-        // Mise à jour toutes les secondes
-        setInterval(() => {
-            verifierChangementDate();
+        // Calcule le nombre de secondes travaillées sur une journée donnée jusqu'à une date précise
+        function getSecondesJournee(dateCible) {
+            if (!estJourOuvre(dateCible)) return 0;
 
-            // On ajoute l'argent gagné sur la dernière seconde
-            stats.jourEnCours += tauxParSeconde;
-            stats.moisEnCours += tauxParSeconde;
-            stats.allTime += tauxParSeconde;
+            const minutesActuelles = dateCible.getHours() * 60 + dateCible.getMinutes() + dateCible.getSeconds() / 60;
+            let totalSecondes = 0;
 
-            // Sauvegarde dans le navigateur
-            localStorage.setItem('salaireStats', JSON.stringify(stats));
+            for (const plage of PLAGES) {
+                if (minutesActuelles > plage.debut) {
+                    const finEffective = Math.min(minutesActuelles, plage.fin);
+                    totalSecondes += (finEffective - plage.debut) * 60;
+                }
+            }
+            return totalSecondes;
+        }
 
-            // Affichage avec le bon nombre de décimales
-            document.getElementById('jour').innerText = stats.jourEnCours.toFixed(4) + ' €';
-            document.getElementById('mois').innerText = stats.moisEnCours.toFixed(2) + ' €';
-            document.getElementById('total').innerText = stats.allTime.toFixed(2) + ' €';
-        }, 1000);
+        // Calcule le cumul de secondes entre deux dates
+        function calculerSecondesPeriode(debut, fin) {
+            if (fin < debut) return 0;
+            let cumulSecondes = 0;
+            let curseur = new Date(debut.getTime());
+
+            while (curseur <= fin) {
+                if (estJourOuvre(curseur)) {
+                    const estMemeJourFin = curseur.toDateString() === fin.toDateString();
+                    if (estMemeJourFin) {
+                        cumulSecondes += getSecondesJournee(fin);
+                    } else {
+                        // Journée complète passée (7 heures = 25 200 s)
+                        cumulSecondes += 7 * 3600;
+                    }
+                }
+                curseur.setDate(curseur.getDate() + 1);
+                curseur.setHours(0, 0, 0, 0);
+            }
+            return cumulSecondes;
+        }
+
+        function mettreAJour() {
+            const maintenant = new Date();
+
+            // 1. Aujourd'hui
+            const secondesAujourdhui = getSecondesJournee(maintenant);
+            const gagneAujourdhui = secondesAujourdhui * TAUX_SECONDE;
+
+            // 2. Ce mois-ci
+            const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1, 0, 0, 0);
+            const debutMoisEffectif = debutMois < DATE_DEBUT_CONTRAT ? DATE_DEBUT_CONTRAT : debutMois;
+            const secondesMois = calculerSecondesPeriode(debutMoisEffectif, maintenant);
+            const gagneMois = secondesMois * TAUX_SECONDE;
+
+            // 3. Total contrat
+            const secondesTotal = calculerSecondesPeriode(DATE_DEBUT_CONTRAT, maintenant);
+            const gagneTotal = secondesTotal * TAUX_SECONDE;
+
+            // Statut en direct
+            const minutes = maintenant.getHours() * 60 + maintenant.getMinutes();
+            const enPoste = estJourOuvre(maintenant) && PLAGES.some(p => minutes >= p.debut && minutes < p.fin);
+
+            const badge = document.getElementById('statutBadge');
+            if (enPoste) {
+                badge.className = 'statut en-poste';
+                badge.innerText = 'En poste (compteur actif)';
+            } else {
+                badge.className = 'statut hors-poste';
+                badge.innerText = 'Hors horaires de travail';
+            }
+
+            // Affichage
+            document.getElementById('jour').innerText = gagneAujourdhui.toFixed(4) + ' €';
+            document.getElementById('mois').innerText = gagneMois.toFixed(2) + ' €';
+            document.getElementById('total').innerText = gagneTotal.toFixed(2) + ' €';
+        }
+
+        mettreAJour();
+        setInterval(mettreAJour, 1000);
     </script>
 
 </body>
