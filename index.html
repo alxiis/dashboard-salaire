@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Salaire</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #121212; 
+            color: #ffffff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 350px;
+        }
+        .titre { font-size: 1.2em; color: #aaaaaa; margin-top: 20px; }
+        .valeur { font-size: 2.5em; font-weight: bold; color: #4caf50; margin-bottom: 10px; }
+        .valeur.petit { font-size: 1.8em; color: #81c784; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="titre">Gagné aujourd'hui</div>
+        <div class="valeur" id="jour">0.0000 €</div>
+
+        <div class="titre">Ce mois-ci</div>
+        <div class="valeur petit" id="mois">0.00 €</div>
+
+        <div class="titre">Total depuis le début</div>
+        <div class="valeur petit" id="total">0.00 €</div>
+    </div>
+
+    <script>
+        // Taux net par seconde (basé sur 7,89 € / heure)
+        const tauxParSeconde = 7.89 / 3600;
+
+        // Récupération des données sauvegardées ou initialisation à zéro
+        let stats = JSON.parse(localStorage.getItem('salaireStats')) || {
+            allTime: 0,
+            moisEnCours: 0,
+            jourEnCours: 0,
+            dateEnregistree: new Date().toLocaleDateString(),
+            moisEnregistre: new Date().getMonth()
+        };
+
+        function verifierChangementDate() {
+            let dateActuelle = new Date();
+            
+            // Si on est un nouveau jour
+            if (stats.dateEnregistree !== dateActuelle.toLocaleDateString()) {
+                stats.jourEnCours = 0; // Remise à zéro du compteur journalier
+                stats.dateEnregistree = dateActuelle.toLocaleDateString();
+            }
+            
+            // Si on est un nouveau mois
+            if (stats.moisEnregistre !== dateActuelle.getMonth()) {
+                stats.moisEnCours = 0; // Remise à zéro du compteur mensuel
+                stats.moisEnregistre = dateActuelle.getMonth();
+            }
+        }
+
+        // Mise à jour toutes les secondes
+        setInterval(() => {
+            verifierChangementDate();
+
+            // On ajoute l'argent gagné sur la dernière seconde
+            stats.jourEnCours += tauxParSeconde;
+            stats.moisEnCours += tauxParSeconde;
+            stats.allTime += tauxParSeconde;
+
+            // Sauvegarde dans le navigateur
+            localStorage.setItem('salaireStats', JSON.stringify(stats));
+
+            // Affichage avec le bon nombre de décimales
+            document.getElementById('jour').innerText = stats.jourEnCours.toFixed(4) + ' €';
+            document.getElementById('mois').innerText = stats.moisEnCours.toFixed(2) + ' €';
+            document.getElementById('total').innerText = stats.allTime.toFixed(2) + ' €';
+        }, 1000);
+    </script>
+
+</body>
+</html>
