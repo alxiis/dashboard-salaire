@@ -1,152 +1,202 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Salaire</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #121212; 
-            color: #ffffff; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-            margin: 0;
-        }
-        .container {
-            background-color: #1e1e1e;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-            text-align: center;
-            width: 340px;
-        }
-        .statut {
-            font-size: 0.85em;
-            padding: 5px 12px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        .en-poste { background-color: #1b5e20; color: #a5d6a7; }
-        .hors-poste { background-color: #37474f; color: #b0bec5; }
-        .titre { font-size: 1.1em; color: #aaaaaa; margin-top: 15px; }
-        .valeur { font-size: 2.4em; font-weight: bold; color: #4caf50; margin-bottom: 5px; }
-        .valeur.petit { font-size: 1.6em; color: #81c784; }
-    </style>
+    <title>Dashboard Salaire • FinTech Intelligence</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div class="container">
-        <div id="statutBadge" class="statut hors-poste">Hors horaires de travail</div>
-
-        <div class="titre">Gagné aujourd'hui</div>
-        <div class="valeur" id="jour">0.0000 €</div>
-
-        <div class="titre">Ce mois-ci</div>
-        <div class="valeur petit" id="mois">0.00 €</div>
-
-        <div class="titre">Total contrat</div>
-        <div class="valeur petit" id="total">0.00 €</div>
+    <div class="ambient-mesh" aria-hidden="true">
+        <div class="glow-orb-1"></div>
+        <div class="glow-orb-2"></div>
     </div>
 
-    <script>
-        // Paramètres du contrat
-        const TAUX_HORAIRE_NET = 7.89;
-        const TAUX_SECONDE = TAUX_HORAIRE_NET / 3600;
-        const DATE_DEBUT_CONTRAT = new Date(2026, 8, 14, 8, 30, 0); // 14 septembre 2026 à 08h30
+    <div class="dashboard-wrapper">
+        <header class="header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>SALARY PULSE <span class="brand-badge">PREMIUM</span></h1>
+                    <p id="liveDateDisplay">Synchronisation...</p>
+                </div>
+            </div>
 
-        // Plages de travail quotidiennes en minutes depuis minuit (08h30-12h30 et 13h30-16h30 = 7h)
-        const PLAGES = [
-            { debut: 8 * 60 + 30, fin: 12 * 60 + 30 },
-            { debut: 13 * 60 + 30, fin: 16 * 60 + 30 }
-        ];
+            <div id="statutBadge" class="status-pill hors-poste">
+                <span class="status-dot"></span>
+                <span id="statutTexte">Hors horaires de travail</span>
+            </div>
+        </header>
 
-        function estJourOuvre(date) {
-            const jour = date.getDay();
-            return jour >= 1 && jour <= 5; // Lundi à Vendredi
-        }
+        <section class="glass-card hero-card" id="mainHeroCard">
+            <div class="hero-eyebrow">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Gagné aujourd'hui en temps réel</span>
+            </div>
 
-        // Calcule le nombre de secondes travaillées sur une journée donnée jusqu'à une date précise
-        function getSecondesJournee(dateCible) {
-            if (!estJourOuvre(dateCible)) return 0;
+            <div class="balance-viewport" id="balanceViewport">
+                <div class="hero-value">
+                    <span id="jour">0.0000</span>
+                    <span class="hero-currency">€</span>
+                </div>
 
-            const minutesActuelles = dateCible.getHours() * 60 + dateCible.getMinutes() + dateCible.getSeconds() / 60;
-            let totalSecondes = 0;
+                <div class="floating-gain-container" id="floatingGainAnchor"></div>
+            </div>
 
-            for (const plage of PLAGES) {
-                if (minutesActuelles > plage.debut) {
-                    const finEffective = Math.min(minutesActuelles, plage.fin);
-                    totalSecondes += (finEffective - plage.debut) * 60;
-                }
-            }
-            return totalSecondes;
-        }
+            <div class="hero-progress-section">
+                <div class="progress-header">
+                    <span>Progression journalière (7h)</span>
+                    <span class="target-info" id="progressionPourcent">0.0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                </div>
 
-        // Calcule le cumul de secondes entre deux dates
-        function calculerSecondesPeriode(debut, fin) {
-            if (fin < debut) return 0;
-            let cumulSecondes = 0;
-            let curseur = new Date(debut.getTime());
+                <div class="cadence-meta">
+                    <div class="cadence-pill">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                        <span>+0.1315 € / min</span>
+                    </div>
+                    <div class="cadence-pill">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 10"></polyline></svg>
+                        <span>7.89 € / heure</span>
+                    </div>
+                    <div class="cadence-pill">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span>Max jour : 55.23 €</span>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            while (curseur <= fin) {
-                if (estJourOuvre(curseur)) {
-                    const estMemeJourFin = curseur.toDateString() === fin.toDateString();
-                    if (estMemeJourFin) {
-                        cumulSecondes += getSecondesJournee(fin);
-                    } else {
-                        // Journée complète passée (7 heures = 25 200 s)
-                        cumulSecondes += 7 * 3600;
-                    }
-                }
-                curseur.setDate(curseur.getDate() + 1);
-                curseur.setHours(0, 0, 0, 0);
-            }
-            return cumulSecondes;
-        }
+        <div class="metrics-grid">
+            <div class="glass-card metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Ce mois-ci</span>
+                    <div class="metric-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <div class="metric-value">
+                        <span id="mois">0.00</span>
+                        <span class="unit">€</span>
+                    </div>
+                    <div class="metric-sub">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span id="moisHeures">Cumul net mensuel</span>
+                    </div>
+                </div>
+            </div>
 
-        function mettreAJour() {
-            const maintenant = new Date();
+            <div class="glass-card metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Total Contrat</span>
+                    <div class="metric-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            <line x1="12" y1="11" x2="12" y2="17"></line>
+                            <line x1="9" y1="14" x2="15" y2="14"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <div class="metric-value">
+                        <span id="total">0.00</span>
+                        <span class="unit">€</span>
+                    </div>
+                    <div class="metric-sub">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        <span>Depuis le 14/09/2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            // 1. Aujourd'hui
-            const secondesAujourdhui = getSecondesJournee(maintenant);
-            const gagneAujourdhui = secondesAujourdhui * TAUX_SECONDE;
+        <section class="glass-card contract-card">
+            <div class="metric-header" style="margin-bottom: 0;">
+                <span class="metric-title">Cadence & Paramètres du Contrat</span>
+                <div class="metric-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                </div>
+            </div>
 
-            // 2. Ce mois-ci
-            const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1, 0, 0, 0);
-            const debutMoisEffectif = debutMois < DATE_DEBUT_CONTRAT ? DATE_DEBUT_CONTRAT : debutMois;
-            const secondesMois = calculerSecondesPeriode(debutMoisEffectif, maintenant);
-            const gagneMois = secondesMois * TAUX_SECONDE;
+            <div class="contract-info-grid">
+                <div class="contract-stat">
+                    <div class="contract-stat-label">Taux horaire net</div>
+                    <div class="contract-stat-val">7.89 € / heure</div>
+                </div>
+                <div class="contract-stat">
+                    <div class="contract-stat-label">Plages de travail (7h/j)</div>
+                    <div class="contract-stat-val">08:30-12:30 & 13:30-16:30</div>
+                </div>
+                <div class="contract-stat">
+                    <div class="contract-stat-label">Gain par seconde</div>
+                    <div class="contract-stat-val">≈ 0.00219 € / s</div>
+                </div>
+                <div class="contract-stat">
+                    <div class="contract-stat-label">Objectif jour complet</div>
+                    <div class="contract-stat-val">55.23 € net</div>
+                </div>
+            </div>
+        </section>
 
-            // 3. Total contrat
-            const secondesTotal = calculerSecondesPeriode(DATE_DEBUT_CONTRAT, maintenant);
-            const gagneTotal = secondesTotal * TAUX_SECONDE;
+        <div class="actions-bar">
+            <button class="btn-simulate" id="btnSimulerGain" title="Simuler l'animation de gain pour 1 minute">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <span>Simuler gain (+1 min)</span>
+            </button>
 
-            // Statut en direct
-            const minutes = maintenant.getHours() * 60 + maintenant.getMinutes();
-            const enPoste = estJourOuvre(maintenant) && PLAGES.some(p => minutes >= p.debut && minutes < p.fin);
+            <button class="audio-toggle-btn" id="btnDemoToggle" title="Activer le mode démonstration pour voir le compteur défiler et les gains tomber en continu">
+                <svg id="demoIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                </svg>
+                <span id="demoLabel">Démo live : Inactive</span>
+            </button>
 
-            const badge = document.getElementById('statutBadge');
-            if (enPoste) {
-                badge.className = 'statut en-poste';
-                badge.innerText = 'En poste (compteur actif)';
-            } else {
-                badge.className = 'statut hors-poste';
-                badge.innerText = 'Hors horaires de travail';
-            }
+            <button class="audio-toggle-btn" id="btnAudioToggle" title="Activer/Désactiver le son discret lors des gains">
+                <svg id="audioIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                    <line x1="23" y1="9" x2="17" y2="15"></line>
+                    <line x1="17" y1="9" x2="23" y2="15"></line>
+                </svg>
+                <span id="audioLabel">Son : Désactivé</span>
+            </button>
+        </div>
 
-            // Affichage
-            document.getElementById('jour').innerText = gagneAujourdhui.toFixed(4) + ' €';
-            document.getElementById('mois').innerText = gagneMois.toFixed(2) + ' €';
-            document.getElementById('total').innerText = gagneTotal.toFixed(2) + ' €';
-        }
+        <footer class="footer">
+            <span class="sync-dot"></span>
+            <span>Synchronisation temps réel à la seconde • Moteur FinTech haute précision</span>
+        </footer>
+    </div>
 
-        mettreAJour();
-        setInterval(mettreAJour, 1000);
-    </script>
-
+    <script src="script.js" defer></script>
 </body>
 </html>
