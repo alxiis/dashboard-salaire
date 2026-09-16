@@ -3,18 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SALARY PULSE // P5R EDITION — Dashboard Salaire</title>
+    <title>SALARY PULSE // P5R ROYALE — Système de Suivi Salarial</title>
 
-    <!-- Google Fonts : Bebas Neue (titres & chiffres géants), Barlow Semi Condensed (textes & labels), JetBrains Mono (monétaire) -->
+    <!-- Google Fonts : Bebas Neue (titres & chiffres monumentaux), Barlow Semi Condensed (textes & HUD), JetBrains Mono (monétaire tabulaire) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Bebas+Neue&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700;1,900&family=Bebas+Neue&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="state-working">
 
-    <!-- Arrière-plan graphique Persona 5 : Trame Halftone & Diagonales d'action -->
+    <!-- ====================================================================
+         ÉCRAN DE CHARGEMENT ÉCLAIR (P5R BOOT SEQUENCE - 500MS)
+         ==================================================================== -->
+    <div id="p5BootScreen" class="p5-boot-screen" aria-hidden="true">
+        <div class="boot-content">
+            <div class="boot-logo">
+                <span class="boot-star">★</span>
+                <span class="boot-title">SALARY PULSE</span>
+            </div>
+            <div class="boot-progress-line">
+                <div class="boot-progress-bar"></div>
+            </div>
+            <div class="boot-status" id="bootStatusText">INITIALIZING SYSTEM...</div>
+        </div>
+        <div class="boot-scanlines"></div>
+    </div>
+
+    <!-- Arrière-plan graphique Persona 5 : Halftone Dots, Slashes & Hazard Tape -->
     <div class="p5-bg-overlay" aria-hidden="true">
         <div class="p5-halftone"></div>
         <div class="p5-action-slash slash-1"></div>
@@ -22,13 +39,14 @@
         <div class="p5-stripe-band"></div>
     </div>
 
-    <!-- Conteneur principal de l'application -->
+    <!-- Conteneur principal (Largeur 1200px aérée) -->
     <div class="p5-dashboard-container">
 
         <!-- ====================================================================
-             1. HEADER ASYMÉTRIQUE & RUBAN D'ÉTAT
+             1. HEADER ASYMÉTRIQUE & HUD TEMPOREL PERSONA 5 ROYAL
              ==================================================================== -->
         <header class="p5-header" id="sectionHeader">
+            <!-- Marque & Identité -->
             <div class="p5-brand-block">
                 <div class="p5-logo-icon">
                     <span class="p5-star">★</span>
@@ -39,28 +57,39 @@
                         <span class="title-sub">PULSE</span>
                     </div>
                     <div class="p5-tag-ribbon">
-                        <span class="p5-pill-black">SYSTEM // ACTIVE</span>
+                        <span class="p5-pill-black">SYSTEM // V2.5</span>
                         <span class="p5-pill-red">P5R ROYALE</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Horloge & État d'infiltration -->
-            <div class="p5-header-right">
-                <div class="p5-clock-box">
-                    <div class="p5-clock-label">// HEURE SYSTÈME</div>
-                    <div class="p5-clock-val" id="liveDateDisplay">CHARGEMENT...</div>
+            <!-- HUD Temporel Inspiré de Persona 5 Royal -->
+            <div class="p5-temporal-hud" id="temporalHUD">
+                <div class="hud-calendar-card">
+                    <div class="hud-day-name" id="hudDayName">WEDNESDAY</div>
+                    <div class="hud-full-date" id="hudFullDate">16 SEPTEMBER 2026</div>
+                    <div class="hud-clock-row">
+                        <span class="hud-clock-icon">◷</span>
+                        <span class="hud-time-val" id="hudTimeDisplay">16:32:00</span>
+                    </div>
                 </div>
 
-                <div id="statutBadge" class="p5-status-badge hors-poste">
-                    <span class="p5-status-icon">◆</span>
-                    <span id="statutTexte">HORS HORAIRES</span>
+                <!-- Badge de Statut Connecté aux Horaires Réels -->
+                <div class="hud-status-wrapper">
+                    <div id="statutBadge" class="p5-status-badge status-working">
+                        <span class="p5-status-radar">◆</span>
+                        <div class="p5-status-text-block">
+                            <span class="status-prefix">STATUS //</span>
+                            <span id="statutTexte" class="status-main">WORKING</span>
+                        </div>
+                    </div>
+                    <div class="hud-status-caption" id="statutDescription">Compteur actif en direct</div>
                 </div>
             </div>
         </header>
 
         <!-- ====================================================================
-             2. NAVIGATION EN ONGLETS BISEAUTÉS (P5 STYLE)
+             2. NAVIGATION EN ONGLETS BISEAUTÉS (JRPG TABS)
              ==================================================================== -->
         <nav class="p5-nav-tabs" aria-label="Navigation du dashboard">
             <button class="p5-tab-btn active" data-target="sectionOverview">
@@ -73,47 +102,51 @@
             </button>
             <button class="p5-tab-btn" data-target="sectionContrat">
                 <span class="tab-index">03</span>
-                <span class="tab-label">CONTRAT & CRÉNEAUX</span>
+                <span class="tab-label">DONNÉES DU CONTRAT</span>
             </button>
             <button class="p5-tab-btn" data-target="sectionActions">
                 <span class="tab-index">04</span>
-                <span class="tab-label">INTERACTIONS</span>
+                <span class="tab-label">ACTIONS & DÉMO</span>
             </button>
         </nav>
 
         <!-- ====================================================================
-             3. SECTION OVERVIEW : HERO DU JOUR (COMPTEUR GÉANT)
+             3. SECTION 01 // OVERVIEW : HERO DU SALAIRE (MONUMENTAL)
              ==================================================================== -->
         <section class="p5-section" id="sectionOverview">
             
             <div class="p5-hero-card" id="mainHeroCard">
-                <!-- En-tête biseauté de la carte -->
+                <!-- En-tête biseauté de la carte maîtresse -->
                 <div class="p5-hero-banner">
                     <div class="p5-cut-ribbon">
-                        <span class="ribbon-text">// EXTRACTION EN TEMPS RÉEL — AUJOURD'HUI</span>
+                        <span class="ribbon-icon">▶</span>
+                        <span class="ribbon-text">// GAGNÉ AUJOURD'HUI — EXTRACTION EN TEMPS RÉEL</span>
                     </div>
-                    <div class="p5-card-code">CODE: REWARD-DAILY</div>
+                    <div class="p5-card-code">CODE // 09-14-ACTIVE</div>
                 </div>
 
-                <!-- Zone principale du compteur avec ancrage de notification -->
+                <!-- Zone du compteur colossal avec devise et badge flottant -->
                 <div class="p5-hero-viewport" id="balanceViewport">
-                    <div class="p5-currency-tag">EUR</div>
+                    <div class="p5-currency-badge">
+                        <span class="badge-sub">NET</span>
+                        <span class="badge-curr">EUR</span>
+                    </div>
                     
-                    <div class="p5-main-amount">
+                    <div class="p5-main-amount-wrap" id="mainAmountWrap">
                         <span id="jour" class="p5-huge-digits">0.0000</span>
                         <span class="p5-euro-sym">€</span>
                     </div>
 
-                    <!-- Ancrage dynamique pour le badge jaillissant (+X.XXXX €) -->
+                    <!-- Point d'ancrage dynamique pour l'effet de gain jaillissant (+0.1315 €) -->
                     <div class="p5-floating-anchor" id="floatingGainAnchor"></div>
                 </div>
 
-                <!-- Jauge de progression stylisée P5 (segments obliques) -->
+                <!-- Jauge de progression vivante (animation lumineuse & chevrons) -->
                 <div class="p5-progress-block">
                     <div class="p5-progress-meta">
                         <div class="p5-progress-title">
                             <span class="p5-yellow-star">★</span>
-                            <span>PROGRESSION DE MISSION JOURNALIÈRE (7H)</span>
+                            <span>PROGRESSION DE LA JOURNÉE (7H EFFECTIVES)</span>
                         </div>
                         <div class="p5-progress-badge">
                             <span id="progressionPourcent">0.0 %</span>
@@ -122,7 +155,9 @@
                     </div>
 
                     <div class="p5-gauge-track">
-                        <div class="p5-gauge-fill" id="progressBarFill"></div>
+                        <div class="p5-gauge-fill" id="progressBarFill">
+                            <div class="p5-gauge-sweep-light"></div>
+                        </div>
                         <div class="p5-gauge-stripes"></div>
                     </div>
                 </div>
@@ -130,46 +165,46 @@
                 <!-- Puces de Cadence & Rythme financier -->
                 <div class="p5-cadence-grid">
                     <div class="p5-chip chip-red">
-                        <span class="chip-label">GAIN MINUTE</span>
+                        <span class="chip-label">CADENCE / MINUTE</span>
                         <span class="chip-val" id="gainMinute">+0.1315 € / min</span>
                     </div>
                     <div class="p5-chip chip-black">
-                        <span class="chip-label">TAUX HORAIRE</span>
+                        <span class="chip-label">TAUX HORAIRE NET</span>
                         <span class="chip-val" id="tauxHoraire">7.89 € / heure</span>
                     </div>
                     <div class="p5-chip chip-yellow">
-                        <span class="chip-label">MAXIMUM JOUR</span>
-                        <span class="chip-val" id="objectifJour">55.23 €</span>
+                        <span class="chip-label">OBJECTIF JOUR COMPLET</span>
+                        <span class="chip-val" id="objectifJour">55.23 € net</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Grille des Panneaux de Métriques (Game Panels) -->
+            <!-- Grille KPI Desktop Élargie (4 Panneaux Asymétriques) -->
             <div class="p5-panels-grid">
                 
-                <!-- Panel 1 : Ce mois-ci -->
+                <!-- KPI 1 : Ce mois-ci -->
                 <div class="p5-game-panel panel-month" id="panelMois">
                     <div class="panel-header">
                         <div class="panel-badge-red">01 // MENSUEL</div>
                         <span class="panel-icon-star">★</span>
                     </div>
                     <div class="panel-body">
-                        <div class="panel-label">CUMUL DU MOIS EN COURS</div>
+                        <div class="panel-label">CUMUL CE MOIS-CI</div>
                         <div class="panel-value">
                             <span id="mois">0.00</span>
                             <span class="panel-unit">€</span>
                         </div>
                         <div class="panel-sub-label">
                             <span class="p5-tag-inline">VALIDÉ</span>
-                            <span>Cumul net effectif</span>
+                            <span>Total net perçu ce mois</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Panel 2 : Total Contrat -->
+                <!-- KPI 2 : Total Contrat -->
                 <div class="p5-game-panel panel-total" id="panelTotal">
                     <div class="panel-header">
-                        <div class="panel-badge-yellow">02 // HISTORIQUE</div>
+                        <div class="panel-badge-yellow">02 // CONTRAT</div>
                         <span class="panel-icon-star">★</span>
                     </div>
                     <div class="panel-body">
@@ -180,15 +215,15 @@
                         </div>
                         <div class="panel-sub-label">
                             <span class="p5-tag-inline tag-yellow">DEPUIS</span>
-                            <span>14/09/2026 (08:30)</span>
+                            <span>14/09/2026 à 08h30</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Panel 3 : Rythme Seconde -->
+                <!-- KPI 3 : Rythme Seconde -->
                 <div class="p5-game-panel panel-tempo">
                     <div class="panel-header">
-                        <div class="panel-badge-black">03 // CADENCE</div>
+                        <div class="panel-badge-black">03 // VITESSE</div>
                         <span class="panel-icon-star">⚡</span>
                     </div>
                     <div class="panel-body">
@@ -198,25 +233,25 @@
                             <span class="panel-unit">€ / s</span>
                         </div>
                         <div class="panel-sub-label">
-                            <span>Flux continu garanti</span>
+                            <span>Flux financier en temps réel</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Panel 4 : Objectif Jour Complet -->
+                <!-- KPI 4 : Objectif Journalier -->
                 <div class="p5-game-panel panel-target">
                     <div class="panel-header">
-                        <div class="panel-badge-red">04 // OBJECTIF</div>
+                        <div class="panel-badge-red">04 // PALIER</div>
                         <span class="panel-icon-star">🎯</span>
                     </div>
                     <div class="panel-body">
-                        <div class="panel-label">OBJECTIF JOUR COMPLET</div>
+                        <div class="panel-label">OBJECTIF JOUR MAX</div>
                         <div class="panel-value panel-medium">
                             <span>55.23</span>
                             <span class="panel-unit">€ NET</span>
                         </div>
                         <div class="panel-sub-label">
-                            <span>7h travaillées = 25 200 s</span>
+                            <span>Équivalent 7h = 25 200 s</span>
                         </div>
                     </div>
                 </div>
@@ -225,87 +260,84 @@
         </section>
 
         <!-- ====================================================================
-             4. SECTION ANALYSE DU SALAIRE (GRAPHIQUE & TIMELINE P5)
+             4. SECTION 02 // ANALYSE DU SALAIRE (TIMELINE & COURBE SVG)
              ==================================================================== -->
         <section class="p5-section p5-analysis-section" id="sectionAnalyse">
             <div class="p5-section-title-wrap">
                 <h2 class="p5-section-title">
                     <span class="title-bg-red">02 // ANALYSE DU SALAIRE</span>
-                    <span class="title-sub-text">CHRONOLOGIE DE LA JOURNÉE & COURBE D'EXTRACTION</span>
+                    <span class="title-sub-text">COURBE D'ÉVOLUTION DE LA JOURNÉE & SUIVI DES CRÉNEAUX</span>
                 </h2>
                 <div class="p5-deco-line"></div>
             </div>
 
             <div class="p5-analysis-card">
-                <!-- Graphique SVG personnalisé & dynamique -->
                 <div class="p5-chart-header">
                     <div class="chart-legend">
                         <span class="legend-box red-box"></span>
-                        <span>PROGRESSION DU SALAIRE HEURE PAR HEURE</span>
+                        <span>PROGRESSION DU SALAIRE EN DIRECT DE 08H30 À 16H30</span>
                     </div>
                     <div class="chart-target-badge">
-                        <span>PALIER MAX : 55.23 €</span>
+                        <span>PALIER FINAL : 55.23 €</span>
                     </div>
                 </div>
 
-                <!-- Graphique SVG stylisé avec jalons horaires -->
+                <!-- Graphique SVG Dynamique en Pleine Largeur -->
                 <div class="p5-svg-chart-wrapper">
-                    <svg viewBox="0 0 700 240" class="p5-svg-canvas" preserveAspectRatio="none">
+                    <svg viewBox="0 0 800 240" class="p5-svg-canvas" preserveAspectRatio="none" id="salarySvgChart">
                         <defs>
                             <linearGradient id="p5RedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#E50914" stop-opacity="0.8" />
-                                <stop offset="70%" stop-color="#8F0008" stop-opacity="0.25" />
+                                <stop offset="0%" stop-color="#E50914" stop-opacity="0.75" />
+                                <stop offset="60%" stop-color="#8F0008" stop-opacity="0.25" />
                                 <stop offset="100%" stop-color="#050505" stop-opacity="0" />
                             </linearGradient>
                             <pattern id="p5HalftoneChart" width="8" height="8" patternUnits="userSpaceOnUse">
-                                <circle cx="2" cy="2" r="1" fill="rgba(245, 213, 71, 0.2)" />
+                                <circle cx="2" cy="2" r="1.2" fill="rgba(245, 213, 71, 0.25)" />
                             </pattern>
                         </defs>
 
-                        <!-- Grille d'arrière-plan -->
-                        <line x1="50" y1="30" x2="670" y2="30" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
-                        <line x1="50" y1="80" x2="670" y2="80" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
-                        <line x1="50" y1="130" x2="670" y2="130" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
-                        <line x1="50" y1="180" x2="670" y2="180" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
+                        <!-- Lignes de grille de référence -->
+                        <line x1="60" y1="35" x2="760" y2="35" stroke="rgba(245, 213, 71, 0.3)" stroke-width="1.5" stroke-dasharray="6,4" />
+                        <text x="690" y="28" fill="#F5D547" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700">OBJECTIF 55.23€</text>
 
-                        <!-- Ligne objectif 55.23 € -->
-                        <line x1="50" y1="35" x2="670" y2="35" stroke="#F5D547" stroke-width="2" stroke-dasharray="6,3" />
-                        <text x="610" y="28" fill="#F5D547" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700">MAX 55.23€</text>
+                        <line x1="60" y1="85" x2="760" y2="85" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4,4" />
+                        <line x1="60" y1="135" x2="760" y2="135" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4,4" />
+                        <line x1="60" y1="185" x2="760" y2="185" stroke="rgba(255,255,255,0.12)" />
 
-                        <!-- Ligne de pause déjeuner (12:30 -> 13:30) -->
-                        <rect x="360" y="30" width="60" height="150" fill="rgba(229, 9, 20, 0.08)" />
-                        <text x="365" y="105" fill="#888" font-family="'Barlow Semi Condensed', sans-serif" font-size="10" font-weight="700" transform="rotate(-90 365 105)">PAUSE 12h30-13h30</text>
+                        <!-- Zone grisée de la Pause Déjeuner (12:30 -> 13:30) -->
+                        <rect x="410" y="35" width="70" height="150" fill="rgba(229, 9, 20, 0.08)" stroke="rgba(229, 9, 20, 0.25)" stroke-dasharray="3,3" />
+                        <text x="420" y="115" fill="#888" font-family="'Barlow Semi Condensed', sans-serif" font-size="11" font-weight="700" transform="rotate(-90 420 115)">PAUSE 12:30-13:30</text>
 
-                        <!-- Surface et Courbe théorique de gain -->
-                        <!-- Points: (50,180) -> 08:30=0€ ; (205,108) -> 10:30=15.78€ ; (360,35) -> 12:30=31.56€ ; (420,35) -> 13:30=31.56€ ; (545,-10) -> 15:00=43.40€ ; (670,-55 relative to max) -> 16:30=55.23€ -->
-                        <path d="M 50,180 L 150,135 L 250,90 L 360,40 L 420,40 L 540,-20 L 670,-80 L 670,180 Z" fill="none" />
-                        
-                        <!-- Remplissage progressif sous la courbe (coordonnées normalisées 0..180 en Y) -->
-                        <polygon points="50,180 205,123 360,66 420,66 545,33 670,0 670,180 50,180" fill="url(#p5RedGradient)" />
-                        <polygon points="50,180 205,123 360,66 420,66 545,33 670,0 670,180 50,180" fill="url(#p5HalftoneChart)" />
-                        
-                        <!-- Ligne de courbe rouge principale -->
-                        <polyline points="50,180 205,123 360,66 420,66 545,33 670,0" fill="none" stroke="#E50914" stroke-width="4" stroke-linecap="square" />
+                        <!-- Polygone rempli sous la courbe -->
+                        <polygon points="60,185 235,125 410,65 480,65 620,35 760,0 760,185 60,185" fill="url(#p5RedGradient)" />
+                        <polygon points="60,185 235,125 410,65 480,65 620,35 760,0 760,185 60,185" fill="url(#p5HalftoneChart)" />
 
-                        <!-- Points jalons interactifs -->
-                        <circle cx="50" cy="180" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
-                        <circle cx="205" cy="123" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
-                        <circle cx="360" cy="66" r="6" fill="#F5D547" stroke="#E50914" stroke-width="3" />
-                        <circle cx="420" cy="66" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
-                        <circle cx="545" cy="33" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
-                        <circle cx="670" cy="0" r="7" fill="#F5D547" stroke="#000" stroke-width="3" />
+                        <!-- Ligne principale de progression du salaire -->
+                        <polyline points="60,185 235,125 410,65 480,65 620,35 760,0" fill="none" stroke="#E50914" stroke-width="4" stroke-linecap="square" />
 
-                        <!-- Axe des X : Heures -->
-                        <text x="35" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">08:30 (0€)</text>
-                        <text x="185" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">10:30 (15.78€)</text>
-                        <text x="335" y="205" fill="#F5D547" font-family="'Bebas Neue', sans-serif" font-size="13">12:30 (31.56€)</text>
-                        <text x="405" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">13:30</text>
-                        <text x="525" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">15:00 (43.40€)</text>
-                        <text x="640" y="205" fill="#E50914" font-family="'Bebas Neue', sans-serif" font-size="13">16:30 (55.23€)</text>
+                        <!-- Ligne dynamique du curseur temps réel (Heure actuelle) -->
+                        <line id="svgLiveCursor" x1="60" y1="10" x2="60" y2="195" stroke="#F5D547" stroke-width="2.5" stroke-dasharray="4,2" />
+                        <circle id="svgLiveDot" cx="60" cy="185" r="6" fill="#F5D547" stroke="#000" stroke-width="2.5" />
+
+                        <!-- Points jalons réguliers -->
+                        <circle cx="60" cy="185" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="235" cy="125" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="410" cy="65" r="6" fill="#F5D547" stroke="#E50914" stroke-width="3" />
+                        <circle cx="480" cy="65" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="620" cy="35" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="760" cy="0" r="7" fill="#F5D547" stroke="#000" stroke-width="3" />
+
+                        <!-- Étiquettes de l'axe des X -->
+                        <text x="45" y="210" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="14">08:30 (0€)</text>
+                        <text x="210" y="210" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="14">10:30 (15.78€)</text>
+                        <text x="385" y="210" fill="#F5D547" font-family="'Bebas Neue', sans-serif" font-size="14">12:30 (31.56€)</text>
+                        <text x="465" y="210" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="14">13:30</text>
+                        <text x="600" y="210" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="14">15:00 (43.40€)</text>
+                        <text x="730" y="210" fill="#E50914" font-family="'Bebas Neue', sans-serif" font-size="14">16:30 (55.23€)</text>
                     </svg>
                 </div>
 
-                <!-- Décomposition des créneaux (Matin vs Après-midi) -->
+                <!-- Analyse des Sessions de Travail (Matin vs Après-midi) -->
                 <div class="p5-slots-analysis-grid">
                     <div class="slot-card slot-morning">
                         <div class="slot-header">
@@ -316,6 +348,7 @@
                         <div class="slot-progress-wrap">
                             <div class="slot-bar" id="slotBarMorning"></div>
                         </div>
+                        <div class="slot-footer-text" id="slotMorningText">Calcul en direct...</div>
                     </div>
 
                     <div class="slot-card slot-afternoon">
@@ -327,19 +360,20 @@
                         <div class="slot-progress-wrap">
                             <div class="slot-bar" id="slotBarAfternoon"></div>
                         </div>
+                        <div class="slot-footer-text" id="slotAfternoonText">Calcul en direct...</div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ====================================================================
-             5. SECTION CONTRAT & CRÉNEAUX
+             5. SECTION 03 // DONNÉES DU CONTRAT (PANNEAU TECHNIQUE)
              ==================================================================== -->
         <section class="p5-section" id="sectionContrat">
             <div class="p5-section-title-wrap">
                 <h2 class="p5-section-title">
-                    <span class="title-bg-black">03 // PARAMÈTRES DU CONTRAT</span>
-                    <span class="title-sub-text">SPÉCIFICATIONS LÉGALES & CONDITIONS D'ACTIVITÉ</span>
+                    <span class="title-bg-black">03 // DONNÉES DU CONTRAT</span>
+                    <span class="title-sub-text">SPÉCIFICATIONS LÉGALES & PARAMÈTRES STATIQUES</span>
                 </h2>
                 <div class="p5-deco-line"></div>
             </div>
@@ -347,56 +381,56 @@
             <div class="p5-contract-card">
                 <div class="p5-contract-grid">
                     <div class="p5-contract-cell">
-                        <div class="cell-tag">TAUX HORAIRE FIXE</div>
+                        <div class="cell-tag">TAUX HORAIRE NET</div>
                         <div class="cell-highlight">7.89 € / HEURE</div>
-                        <div class="cell-desc">Net calculé à la seconde</div>
+                        <div class="cell-desc">Net payé à la seconde (≈ 0.00219 €/s)</div>
                     </div>
 
                     <div class="p5-contract-cell">
-                        <div class="cell-tag">JOURNÉE LÉGALE</div>
+                        <div class="cell-tag">DURÉE QUOTIDIENNE</div>
                         <div class="cell-highlight">7 HEURES / JOUR</div>
-                        <div class="cell-desc">Du Lundi au Vendredi (ouvré)</div>
+                        <div class="cell-desc">Du Lundi au Vendredi (jours ouvrés)</div>
                     </div>
 
                     <div class="p5-contract-cell">
-                        <div class="cell-tag">HORAIRES EN POSTE</div>
+                        <div class="cell-tag">PLAGES DE TRAVAIL</div>
                         <div class="cell-highlight">08:30-12:30 & 13:30-16:30</div>
-                        <div class="cell-desc">Pause méridienne : 1h00</div>
+                        <div class="cell-desc">Pause déjeuner méridienne : 1h00</div>
                     </div>
 
                     <div class="p5-contract-cell">
-                        <div class="cell-tag">DEBUT DU CONTRAT</div>
+                        <div class="cell-tag">DATE DE PRISE D'EFFET</div>
                         <div class="cell-highlight">14 SEPTEMBRE 2026</div>
-                        <div class="cell-desc">Heure de prise de poste : 08h30</div>
+                        <div class="cell-desc">Début effectif de mission : 08h30</div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- ====================================================================
-             6. SECTION INTERACTIONS & CONTRÔLES P5R
+             6. SECTION 04 // ACTIONS & CONTRÔLES INTERACTIFS
              ==================================================================== -->
         <section class="p5-section" id="sectionActions">
             <div class="p5-section-title-wrap">
                 <h2 class="p5-section-title">
                     <span class="title-bg-yellow">04 // ACTIONS & CONTRÔLES</span>
-                    <span class="title-sub-text">SIMULATION TEMPS RÉEL & EXPÉRIENCE IMMERSIVE</span>
+                    <span class="title-sub-text">SIMULATION TEMPS RÉEL, DÉMO & EXPÉRIENCE AUDIO</span>
                 </h2>
                 <div class="p5-deco-line"></div>
             </div>
 
             <div class="p5-actions-panel">
-                <!-- Bouton principal agressif P5R -->
-                <button class="p5-btn-action" id="btnSimulerGain" title="Simuler l'extraction d'une minute de salaire">
-                    <span class="btn-skew-bg"></span>
+                <!-- Bouton principal agressif (Simuler gain +1 min avec vibration) -->
+                <button class="p5-btn-action" id="btnSimulerGain" title="Simuler l'extraction d'une minute de travail">
                     <span class="btn-icon">⚡</span>
-                    <span class="btn-text">SIMULER GAIN (+1 MIN)</span>
-                    <span class="btn-sub">[ +0.1315 € ]</span>
+                    <div class="btn-text-group">
+                        <span class="btn-main-text">SIMULER GAIN (+1 MIN)</span>
+                        <span class="btn-sub-text">AJOUTE +0.1315 € IMMÉDIATEMENT</span>
+                    </div>
                 </button>
 
                 <!-- Bouton Démo Live -->
                 <button class="p5-btn-toggle" id="btnDemoToggle" title="Activer la simulation continue en temps réel">
-                    <span class="toggle-skew-bg"></span>
                     <span class="toggle-icon">▶</span>
                     <div class="toggle-text-block">
                         <span class="toggle-title">DÉMO EN CONTINU</span>
@@ -405,8 +439,7 @@
                 </button>
 
                 <!-- Bouton Audio SFX JRPG -->
-                <button class="p5-btn-toggle" id="btnAudioToggle" title="Activer les effets sonores de menu JRPG">
-                    <span class="toggle-skew-bg"></span>
+                <button class="p5-btn-toggle" id="btnAudioToggle" title="Activer les effets sonores de menu Persona">
                     <span class="toggle-icon" id="audioIcon">♪</span>
                     <div class="toggle-text-block">
                         <span class="toggle-title">AUDIO SFX P5</span>
@@ -417,14 +450,15 @@
         </section>
 
         <!-- ====================================================================
-             7. FOOTER PERSONA 5 ROYAL
+             7. FOOTER / BARRE D'ÉTAT SYSTÈME
              ==================================================================== -->
         <footer class="p5-footer">
             <div class="p5-footer-badge">TAKE YOUR TIME</div>
             <div class="p5-footer-text">
-                SALARY PULSE SYSTEM // MOTORISÉ PAR JAVASCRIPT HAUTE PRÉCISION • DESIGN INSPIRÉ DE PERSONA 5 ROYAL
+                <span class="footer-live-dot"></span>
+                <span>SYSTEM STATUS // ONLINE • MOTEUR SALARIAL HAUTE PRÉCISION TEMPS RÉEL</span>
             </div>
-            <div class="p5-footer-version">V2.0-ROYALE</div>
+            <div class="p5-footer-version">P5R-V2.5-ROYALE</div>
         </footer>
 
     </div>

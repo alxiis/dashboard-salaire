@@ -1,18 +1,23 @@
 /* ==========================================================================
-   PERSONA 5 ROYAL THEME STYLESHEET (P5R × FINTECH SALARY TRACKER)
-   AESTHETIC: JRPG / PUNK / COMIC / HIGH-CONTRAST / BOLD & AUDACIOUS
+   PERSONA 5 ROYAL // STYLESHEET (P5R × FINTECH SALARY TRACKER)
+   DIRECTION ARTISTIQUE : JRPG PUNK / COMIC / HIGH CONTRAST / GAME HUD
    ========================================================================== */
 
+/* ==========================================================================
+   1. VARIABLES & CHARTE CHROMATIQUE
+   ========================================================================== */
 :root {
-    /* Palette Principale Persona 5 Royal */
     --p5-black: #050505;
-    --p5-dark: #111111;
+    --p5-dark: #0f0f0f;
     --p5-card-bg: #141414;
+    --p5-card-hover: #1c1c1c;
     --p5-white: #F5F5F0;
-    --p5-offwhite: #E0E0DB;
+    --p5-offwhite: #DCDCD7;
     --p5-red: #E50914;
     --p5-red-dark: #8F0008;
+    --p5-red-glow: rgba(229, 9, 20, 0.45);
     --p5-yellow: #F5D547;
+    --p5-yellow-dark: #D4B022;
     --p5-gray: #777777;
     --p5-dark-gray: #242424;
 
@@ -24,7 +29,7 @@
     /* Ombres dures Comic Book (Hard Drop Shadows) */
     --shadow-red: 5px 5px 0px var(--p5-red);
     --shadow-black: 6px 6px 0px #000000;
-    --shadow-p5-combo: 5px 5px 0px var(--p5-red), 10px 10px 0px #000000;
+    --shadow-p5-combo: 6px 6px 0px var(--p5-red), 12px 12px 0px #000000;
     --shadow-yellow: 5px 5px 0px var(--p5-yellow);
 
     /* Transitions nerveuses */
@@ -32,12 +37,18 @@
     --p5-cut: 0.12s ease-out;
 }
 
-/* Reset & Box-sizing */
+/* ==========================================================================
+   2. RESET & BASE
+   ========================================================================== */
 *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     -webkit-font-smoothing: antialiased;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -47,13 +58,113 @@ body {
     min-height: 100vh;
     position: relative;
     overflow-x: hidden;
-    padding: 30px 16px 60px;
+    padding: 30px 20px 60px;
     display: flex;
     justify-content: center;
 }
 
 /* ==========================================================================
-   ARRIÈRE-PLAN DYNAMIQUE : HALFTONE DOTS & DIAGONAL ACTION SLASHES
+   3. ÉCRAN DE BOOT ÉCLAIR (P5R INITIALIZING SEQUENCE - 500MS)
+   ========================================================================== */
+.p5-boot-screen {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
+}
+
+.p5-boot-screen.boot-done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.boot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+    transform: rotate(-2deg);
+}
+
+.boot-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.boot-star {
+    font-size: 2.4rem;
+    color: var(--p5-yellow);
+    animation: p5StarSpin 1.2s infinite ease-in-out;
+}
+
+@keyframes p5StarSpin {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.25) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}
+
+.boot-title {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    letter-spacing: 0.08em;
+    color: var(--p5-white);
+    text-shadow: 4px 4px 0px var(--p5-red);
+}
+
+.boot-progress-line {
+    width: 260px;
+    height: 6px;
+    background: #222;
+    border: 1px solid var(--p5-white);
+    overflow: hidden;
+}
+
+.boot-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: var(--p5-red);
+    animation: p5BootBar 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes p5BootBar {
+    0% { width: 0%; }
+    50% { width: 65%; }
+    100% { width: 100%; }
+}
+
+.boot-status {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--p5-yellow);
+    letter-spacing: 0.1em;
+}
+
+.boot-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0, 0, 0, 0.4) 50%,
+        rgba(0, 0, 0, 0.4)
+    );
+    background-size: 100% 4px;
+    opacity: 0.6;
+}
+
+/* ==========================================================================
+   4. ARRIÈRE-PLAN DYNAMIQUE : HALFTONE, SLASHES & HAZARD STRIPES
    ========================================================================== */
 .p5-bg-overlay {
     position: fixed;
@@ -63,19 +174,17 @@ body {
     overflow: hidden;
 }
 
-/* Trame de demi-teinte (Halftone Manga Pattern) */
 .p5-halftone {
     position: absolute;
     inset: 0;
-    background-image: radial-gradient(circle, rgba(229, 9, 20, 0.12) 1.8px, transparent 1.8px);
-    background-size: 20px 20px;
+    background-image: radial-gradient(circle, rgba(229, 9, 20, 0.14) 1.8px, transparent 1.8px);
+    background-size: 22px 22px;
     opacity: 0.85;
 }
 
-/* Bandes obliques stylisées type affiche / magazine P5 */
 .p5-action-slash {
     position: absolute;
-    background: linear-gradient(135deg, rgba(229, 9, 20, 0.18) 0%, rgba(143, 0, 8, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.22) 0%, rgba(143, 0, 8, 0.05) 100%);
     transform: rotate(-14deg) skewX(-15deg);
     pointer-events: none;
 }
@@ -83,52 +192,53 @@ body {
 .p5-action-slash.slash-1 {
     top: -15%;
     right: -10%;
-    width: 60vw;
-    height: 120vh;
-    border-left: 3px solid rgba(229, 9, 20, 0.4);
+    width: 65vw;
+    height: 125vh;
+    border-left: 4px solid rgba(229, 9, 20, 0.45);
 }
 
 .p5-action-slash.slash-2 {
     bottom: -20%;
     left: -15%;
-    width: 50vw;
-    height: 80vh;
-    border-right: 3px solid rgba(245, 213, 71, 0.25);
+    width: 55vw;
+    height: 85vh;
+    border-right: 3px solid rgba(245, 213, 71, 0.28);
 }
 
-/* Ruban hachuré de sécurité (Hazard Warning Tape) */
 .p5-stripe-band {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 6px;
+    height: 7px;
     background: repeating-linear-gradient(
         -45deg,
         var(--p5-yellow),
-        var(--p5-yellow) 12px,
-        var(--p5-black) 12px,
-        var(--p5-black) 24px
+        var(--p5-yellow) 14px,
+        var(--p5-black) 14px,
+        var(--p5-black) 28px
     );
     z-index: 100;
 }
 
-/* Conteneur principal */
+/* ==========================================================================
+   5. CONTENEUR PRINCIPAL ÉLARGI (MAX-WIDTH 1200PX SUR DESKTOP)
+   ========================================================================== */
 .p5-dashboard-container {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 780px;
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 32px;
     animation: p5IntroPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes p5IntroPop {
     0% {
         opacity: 0;
-        transform: scale(0.96) translateY(24px) rotate(-1deg);
+        transform: scale(0.97) translateY(24px) rotate(-0.5deg);
     }
     100% {
         opacity: 1;
@@ -137,29 +247,29 @@ body {
 }
 
 /* ==========================================================================
-   1. HEADER ASYMÉTRIQUE PERSONA 5
+   6. HEADER & HUD TEMPOREL JRPG PERSONA
    ========================================================================== */
 .p5-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 16px;
-    padding: 12px 16px;
+    gap: 20px;
+    padding: 18px 24px;
     background: var(--p5-dark);
     border: 3px solid var(--p5-white);
     box-shadow: var(--shadow-red);
     position: relative;
-    transform: rotate(-0.5deg);
+    transform: rotate(-0.6deg);
 }
 
 .p5-header::before {
     content: '';
     position: absolute;
-    top: -6px;
-    left: -6px;
-    width: 14px;
-    height: 14px;
+    top: -8px;
+    left: -8px;
+    width: 18px;
+    height: 18px;
     background: var(--p5-yellow);
     clip-path: polygon(0 0, 100% 0, 0 100%);
 }
@@ -167,22 +277,21 @@ body {
 .p5-brand-block {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 }
 
 .p5-logo-icon {
-    width: 44px;
-    height: 44px;
+    width: 50px;
+    height: 50px;
     background: var(--p5-red);
     color: var(--p5-white);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem;
-    font-weight: bold;
-    border: 2px solid var(--p5-white);
-    transform: rotate(-5deg);
-    box-shadow: 3px 3px 0px #000;
+    font-size: 1.8rem;
+    border: 3px solid var(--p5-white);
+    transform: rotate(-6deg);
+    box-shadow: 4px 4px 0px #000;
 }
 
 .p5-star {
@@ -193,122 +302,213 @@ body {
 
 .p5-brand-title {
     font-family: var(--font-display);
-    font-size: 1.85rem;
-    line-height: 0.95;
+    font-size: 2.4rem;
+    line-height: 0.92;
     letter-spacing: 0.04em;
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 8px;
 }
 
 .p5-brand-title .title-main {
     color: var(--p5-white);
-    text-shadow: 2px 2px 0px var(--p5-red);
+    text-shadow: 3px 3px 0px var(--p5-red);
 }
 
 .p5-brand-title .title-sub {
     color: var(--p5-yellow);
     background: #000;
-    padding: 1px 6px;
+    padding: 2px 8px;
     transform: skewX(-10deg);
 }
 
 .p5-tag-ribbon {
     display: flex;
-    gap: 6px;
-    margin-top: 4px;
+    gap: 8px;
+    margin-top: 6px;
 }
 
 .p5-pill-black {
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     background: #000;
     color: var(--p5-white);
-    padding: 2px 7px;
+    padding: 3px 8px;
     border: 1px solid var(--p5-gray);
-    transform: skewX(-8deg);
+    transform: skewX(-10deg);
 }
 
 .p5-pill-red {
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     background: var(--p5-red);
     color: var(--p5-white);
-    padding: 2px 7px;
-    transform: skewX(-8deg);
+    padding: 3px 8px;
+    transform: skewX(-10deg);
 }
 
-/* Clock & Status badge */
-.p5-header-right {
+/* HUD Temporel Stylisé (Calendrier + Horloge + Statut) */
+.p5-temporal-hud {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 20px;
     flex-wrap: wrap;
 }
 
-.p5-clock-box {
+.hud-calendar-card {
+    background: #000000;
+    border: 2px solid var(--p5-white);
+    padding: 8px 18px;
+    transform: skewX(-12deg);
+    box-shadow: 4px 4px 0px #000000;
     text-align: right;
+    border-left: 5px solid var(--p5-red);
 }
 
-.p5-clock-label {
-    font-size: 0.65rem;
-    font-weight: 800;
-    color: var(--p5-yellow);
-    letter-spacing: 0.06em;
-}
-
-.p5-clock-val {
+.hud-day-name {
     font-family: var(--font-display);
-    font-size: 1.1rem;
+    font-size: 1.5rem;
+    color: var(--p5-yellow);
+    letter-spacing: 0.08em;
+    line-height: 1;
+}
+
+.hud-full-date {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--p5-white);
+    letter-spacing: 0.06em;
+    margin-top: 2px;
+}
+
+.hud-clock-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.hud-clock-icon {
+    color: var(--p5-red);
+    font-size: 0.9rem;
+}
+
+.hud-time-val {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 800;
     color: var(--p5-white);
     letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Statut de Mission Connecté aux Horaires */
+.hud-status-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
 }
 
 .p5-status-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 7px 14px;
-    font-size: 0.8rem;
-    font-weight: 900;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    transform: skewX(-10deg);
-    border: 2px solid var(--p5-white);
-    box-shadow: 3px 3px 0px #000;
+    gap: 10px;
+    padding: 8px 18px;
+    border: 3px solid var(--p5-white);
+    box-shadow: 4px 4px 0px #000;
+    transform: skewX(-12deg);
     transition: var(--p5-snap);
 }
 
-.p5-status-badge.en-poste {
-    background: var(--p5-red);
-    color: var(--p5-white);
-    animation: p5BadgePulse 2s infinite ease-in-out;
-}
-
-.p5-status-badge.hors-poste {
-    background: #242424;
-    color: var(--p5-offwhite);
-    border-color: #555;
-}
-
-.p5-status-icon {
-    font-size: 0.9rem;
+.p5-status-radar {
+    font-size: 1rem;
     color: var(--p5-yellow);
 }
 
-@keyframes p5BadgePulse {
-    0%, 100% { box-shadow: 3px 3px 0px #000; }
-    50% { box-shadow: 0 0 14px var(--p5-red), 4px 4px 0px #000; }
+.p5-status-text-block {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.status-prefix {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    opacity: 0.8;
+}
+
+.status-main {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.06em;
+}
+
+.hud-status-caption {
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--p5-gray);
+    letter-spacing: 0.04em;
 }
 
 /* ==========================================================================
-   2. NAVIGATION EN ONGLETS BISEAUTÉS (JRPG TABS)
+   7. THÉMATISATION DES 4 ÉTATS DU TRAVAIL
+   ========================================================================== */
+/* ÉTAT 1 : WORKING (En mission) */
+.status-working {
+    background: var(--p5-red);
+    color: var(--p5-white);
+    animation: p5StatusPulseRed 2s infinite ease-in-out;
+}
+@keyframes p5StatusPulseRed {
+    0%, 100% { box-shadow: 4px 4px 0px #000; }
+    50% { box-shadow: 0 0 16px var(--p5-red-glow), 5px 5px 0px #000; }
+}
+
+/* ÉTAT 2 : BREAK (Pause méridienne) */
+.status-break {
+    background: var(--p5-yellow);
+    color: var(--p5-black);
+    border-color: #000000;
+    animation: p5StatusPulseYellow 2.2s infinite ease-in-out;
+}
+.status-break .p5-status-radar {
+    color: var(--p5-red);
+}
+@keyframes p5StatusPulseYellow {
+    0%, 100% { box-shadow: 4px 4px 0px #000; }
+    50% { box-shadow: 0 0 16px rgba(245, 213, 71, 0.6), 5px 5px 0px #000; }
+}
+
+/* ÉTAT 3 : DAY COMPLETE (Mission du jour accomplie) */
+.status-complete {
+    background: #000000;
+    color: var(--p5-yellow);
+    border-color: var(--p5-yellow);
+    box-shadow: 4px 4px 0px var(--p5-red);
+}
+
+/* ÉTAT 4 : OFF DUTY (Hors horaires / Week-end) */
+.status-offduty {
+    background: #222222;
+    color: var(--p5-offwhite);
+    border-color: #555555;
+}
+.status-offduty .p5-status-radar {
+    color: #888888;
+}
+
+/* ==========================================================================
+   8. NAVIGATION EN ONGLETS BISEAUTÉS (JRPG TABS)
    ========================================================================== */
 .p5-nav-tabs {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     overflow-x: auto;
     padding-bottom: 4px;
     scrollbar-width: none;
@@ -316,17 +516,17 @@ body {
 .p5-nav-tabs::-webkit-scrollbar { display: none; }
 
 .p5-tab-btn {
-    background: #111;
+    background: #111111;
     color: var(--p5-white);
-    border: 2px solid #333;
-    padding: 8px 14px;
+    border: 2px solid #333333;
+    padding: 10px 18px;
     font-family: var(--font-display);
-    font-size: 1.05rem;
-    letter-spacing: 0.04em;
+    font-size: 1.15rem;
+    letter-spacing: 0.05em;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     transform: skewX(-12deg);
     transition: var(--p5-snap);
     white-space: nowrap;
@@ -334,40 +534,40 @@ body {
 
 .p5-tab-btn .tab-index {
     color: var(--p5-yellow);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
 }
 
 .p5-tab-btn:hover {
     background: var(--p5-dark-gray);
     border-color: var(--p5-red);
-    transform: skewX(-12deg) translateY(-2px);
+    transform: skewX(-12deg) translateY(-3px);
 }
 
 .p5-tab-btn.active {
     background: var(--p5-red);
     color: var(--p5-white);
     border-color: var(--p5-white);
-    box-shadow: 4px 4px 0px #000;
+    box-shadow: 5px 5px 0px #000;
 }
 
 .p5-tab-btn.active .tab-index {
     color: var(--p5-black);
     background: var(--p5-yellow);
-    padding: 1px 4px;
-    font-weight: 800;
+    padding: 1px 6px;
+    font-weight: 900;
 }
 
 /* ==========================================================================
-   3. HERO CARD : SOLDE GÉANT & COMPTEUR TEMPS RÉEL (STYLE P5R)
+   9. HERO CARD : SOLDE GÉANT & COMPTEUR TEMPS RÉEL (MONUMENTAL)
    ========================================================================== */
 .p5-hero-card {
     background: var(--p5-card-bg);
     border: 4px solid var(--p5-white);
     box-shadow: var(--shadow-p5-combo);
-    padding: 28px 24px;
+    padding: 36px 36px 32px;
     position: relative;
-    transform: rotate(-0.7deg);
-    transition: transform var(--p5-snap), border-color var(--p5-snap);
+    transform: rotate(-0.5deg);
+    transition: transform var(--p5-snap), border-color var(--p5-snap), box-shadow var(--p5-snap);
     overflow: hidden;
 }
 
@@ -375,15 +575,15 @@ body {
     transform: rotate(-0.2deg) translateY(-4px);
 }
 
-/* Flash rouge/jaune énergique lors du gain d'une minute */
+/* Flash rouge/jaune énergique lors du gain */
 .p5-hero-card.p5-gain-flash {
-    animation: p5HeroFlash 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: p5HeroFlash 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes p5HeroFlash {
     0% {
         border-color: var(--p5-yellow);
-        box-shadow: 0 0 35px var(--p5-red), 8px 8px 0px var(--p5-yellow);
+        box-shadow: 0 0 45px var(--p5-red), 10px 10px 0px var(--p5-yellow);
         background: #250305;
     }
     100% {
@@ -393,25 +593,32 @@ body {
     }
 }
 
-/* Ruban supérieur biseauté */
 .p5-hero-banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 24px;
 }
 
 .p5-cut-ribbon {
     background: var(--p5-red);
     color: var(--p5-white);
-    padding: 5px 14px;
+    padding: 6px 18px;
     font-weight: 900;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     letter-spacing: 0.08em;
     transform: skewX(-14deg);
-    box-shadow: 3px 3px 0px #000;
+    box-shadow: 4px 4px 0px #000;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.p5-cut-ribbon .ribbon-icon {
+    color: var(--p5-yellow);
+    font-size: 0.85rem;
 }
 
 .p5-cut-ribbon .ribbon-text {
@@ -421,66 +628,106 @@ body {
 
 .p5-card-code {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     color: var(--p5-yellow);
     letter-spacing: 0.1em;
     font-weight: 700;
+    background: #000;
+    padding: 3px 10px;
+    border: 1px solid #333;
 }
 
-/* Zone du solde principal */
+/* Viewport du montant principal */
 .p5-hero-viewport {
     position: relative;
-    display: inline-flex;
-    align-items: baseline;
+    display: flex;
+    align-items: center;
     justify-content: center;
     width: 100%;
-    margin: 8px 0 24px;
+    margin: 12px 0 28px;
     padding: 10px 0;
 }
 
-.p5-currency-tag {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    color: var(--p5-yellow);
-    background: #000;
-    border: 2px solid var(--p5-white);
-    padding: 2px 8px;
-    margin-right: 12px;
-    transform: skewX(-10deg) rotate(-4deg);
+.p5-currency-badge {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%) skewX(-12deg) rotate(-4deg);
+    background: #000000;
+    border: 3px solid var(--p5-white);
+    padding: 4px 12px;
+    text-align: center;
+    box-shadow: 4px 4px 0px var(--p5-red);
 }
 
-.p5-main-amount {
+.p5-currency-badge .badge-sub {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: var(--p5-yellow);
+    letter-spacing: 0.08em;
+}
+
+.p5-currency-badge .badge-curr {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--p5-white);
+    line-height: 0.9;
+}
+
+@media (max-width: 768px) {
+    .p5-currency-badge {
+        position: static;
+        transform: skewX(-12deg);
+        margin-bottom: 12px;
+    }
+    .p5-hero-viewport {
+        flex-direction: column;
+    }
+}
+
+.p5-main-amount-wrap {
     display: inline-flex;
     align-items: baseline;
     font-family: var(--font-mono);
     user-select: none;
+    transition: transform 0.15s ease-out;
+}
+
+.p5-main-amount-wrap.nudge {
+    animation: p5NumberNudge 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes p5NumberNudge {
+    0% { transform: scale(1) translateY(0); }
+    40% { transform: scale(1.04) translateY(-4px); }
+    100% { transform: scale(1) translateY(0); }
 }
 
 .p5-huge-digits {
-    font-size: clamp(3.2rem, 9vw, 5.2rem);
+    font-size: clamp(3.8rem, 8.5vw, 6.8rem);
     font-weight: 800;
     letter-spacing: -0.04em;
-    line-height: 0.9;
+    line-height: 0.88;
     font-variant-numeric: tabular-nums;
     color: var(--p5-white);
-    text-shadow: 4px 4px 0px var(--p5-red), 8px 8px 0px #000;
+    text-shadow: 5px 5px 0px var(--p5-red), 10px 10px 0px #000;
 }
 
 .p5-euro-sym {
     font-family: var(--font-display);
-    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    font-size: clamp(2.8rem, 6vw, 4.6rem);
     color: var(--p5-yellow);
-    margin-left: 8px;
-    text-shadow: 3px 3px 0px #000;
+    margin-left: 10px;
+    text-shadow: 4px 4px 0px #000;
 }
 
-/* ==========================================================================
-   NOTIFICATION FLOTTANTE DE GAIN P5 (+X.XXXX €)
-   ========================================================================== */
+/* Notification de gain jaillissante (+X.XXXX €) */
 .p5-floating-anchor {
     position: absolute;
-    top: -24px;
-    right: 5%;
+    top: -28px;
+    right: 4%;
     pointer-events: none;
     z-index: 20;
 }
@@ -492,48 +739,48 @@ body {
     background: var(--p5-yellow);
     color: var(--p5-black);
     font-family: var(--font-display);
-    font-size: 1.3rem;
-    letter-spacing: 0.04em;
-    padding: 6px 16px;
+    font-size: 1.45rem;
+    letter-spacing: 0.05em;
+    padding: 7px 18px;
     border: 3px solid #000;
-    box-shadow: 4px 4px 0px var(--p5-red);
-    transform: rotate(-6deg) skewX(-10deg);
+    box-shadow: 5px 5px 0px var(--p5-red), 9px 9px 0px #000;
+    transform: rotate(-6deg) skewX(-12deg);
     animation: p5FloatSlash 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     white-space: nowrap;
 }
 
 .p5-badge-slash-icon {
     color: var(--p5-red);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 @keyframes p5FloatSlash {
     0% {
         opacity: 0;
-        transform: scale(0.4) translateY(24px) rotate(-18deg);
+        transform: scale(0.35) translateY(28px) rotate(-20deg);
     }
     18% {
         opacity: 1;
-        transform: scale(1.18) translateY(-6px) rotate(-6deg);
+        transform: scale(1.15) translateY(-6px) rotate(-6deg);
     }
     35% {
         transform: scale(1.0) translateY(-12px) rotate(-4deg);
     }
     75% {
         opacity: 1;
-        transform: scale(1.0) translateY(-36px) rotate(-2deg);
+        transform: scale(1.0) translateY(-38px) rotate(-2deg);
     }
     100% {
         opacity: 0;
-        transform: scale(0.85) translateY(-58px) rotate(4deg);
+        transform: scale(0.85) translateY(-62px) rotate(4deg);
     }
 }
 
-/* Jauge de progression style P5 (barre à découpes et chevrons) */
+/* Barre de progression Persona 5 (avec balayage lumineux) */
 .p5-progress-block {
-    margin-top: 8px;
-    padding-top: 18px;
-    border-top: 2px dashed rgba(255, 255, 255, 0.15);
+    margin-top: 10px;
+    padding-top: 22px;
+    border-top: 2px dashed rgba(255, 255, 255, 0.2);
 }
 
 .p5-progress-meta {
@@ -541,51 +788,51 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 10px;
+    margin-bottom: 12px;
 }
 
 .p5-progress-title {
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     color: var(--p5-offwhite);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
 }
 
 .p5-yellow-star {
     color: var(--p5-yellow);
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 .p5-progress-badge {
     background: #000;
     border: 2px solid var(--p5-yellow);
-    padding: 3px 10px;
+    padding: 4px 12px;
     transform: skewX(-10deg);
     font-family: var(--font-mono);
-    font-weight: 700;
-    font-size: 0.88rem;
+    font-weight: 800;
+    font-size: 0.95rem;
     color: var(--p5-yellow);
 }
 
 .p5-progress-badge .sub-hours {
     color: var(--p5-white);
-    font-size: 0.78rem;
-    margin-left: 6px;
+    font-size: 0.82rem;
+    margin-left: 8px;
 }
 
 .p5-gauge-track {
     width: 100%;
-    height: 18px;
+    height: 22px;
     background: #000;
-    border: 2px solid var(--p5-white);
+    border: 3px solid var(--p5-white);
     position: relative;
     overflow: hidden;
-    transform: skewX(-10deg);
-    box-shadow: 3px 3px 0px #000;
+    transform: skewX(-12deg);
+    box-shadow: 4px 4px 0px #000;
 }
 
 .p5-gauge-fill {
@@ -594,6 +841,22 @@ body {
     background: linear-gradient(90deg, var(--p5-red-dark) 0%, var(--p5-red) 70%, var(--p5-yellow) 100%);
     transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
+    overflow: hidden;
+}
+
+/* Balayage lumineux périodique sur la jauge */
+.p5-gauge-sweep-light {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+    animation: p5LightSweep 3.5s infinite ease-in-out;
+}
+
+@keyframes p5LightSweep {
+    0% { transform: translateX(-100%); }
+    60%, 100% { transform: translateX(1200px); }
 }
 
 .p5-gauge-stripes {
@@ -603,25 +866,25 @@ body {
     background: repeating-linear-gradient(
         90deg,
         transparent,
-        transparent 14px,
-        rgba(0, 0, 0, 0.45) 14px,
-        rgba(0, 0, 0, 0.45) 16px
+        transparent 16px,
+        rgba(0, 0, 0, 0.5) 16px,
+        rgba(0, 0, 0, 0.5) 18px
     );
 }
 
 /* Puces de cadence */
 .p5-cadence-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 12px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
 }
 
 .p5-chip {
-    padding: 10px 14px;
+    padding: 12px 18px;
     border: 2px solid var(--p5-white);
-    transform: skewX(-10deg);
-    box-shadow: 3px 3px 0px #000;
+    transform: skewX(-12deg);
+    box-shadow: 4px 4px 0px #000;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -629,7 +892,7 @@ body {
 }
 
 .p5-chip:hover {
-    transform: skewX(-10deg) translateY(-2px);
+    transform: skewX(-12deg) translateY(-3px);
 }
 
 .chip-red {
@@ -648,26 +911,32 @@ body {
 }
 
 .chip-label {
-    font-size: 0.68rem;
+    font-size: 0.72rem;
     font-weight: 900;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     opacity: 0.85;
 }
 
 .chip-val {
     font-family: var(--font-display);
-    font-size: 1.15rem;
+    font-size: 1.35rem;
     letter-spacing: 0.04em;
 }
 
 /* ==========================================================================
-   GAME PANELS (CARTES DÉCOUPÉES ASYMÉTRIQUES)
+   10. GRILLE KPI (4 MODULES ASYMÉTRIQUES ÉLARGIS)
    ========================================================================== */
 .p5-panels-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
-    margin-top: 4px;
+    margin-top: 6px;
+}
+
+@media (max-width: 1024px) {
+    .p5-panels-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 @media (max-width: 580px) {
@@ -680,41 +949,34 @@ body {
     background: var(--p5-card-bg);
     border: 3px solid var(--p5-white);
     box-shadow: var(--shadow-black);
-    padding: 20px 18px;
+    padding: 24px 20px;
     position: relative;
-    transition: transform var(--p5-snap), box-shadow var(--p5-snap);
+    transition: transform var(--p5-snap), box-shadow var(--p5-snap), border-color var(--p5-snap);
 }
 
 .p5-game-panel:hover {
-    transform: translate(-3px, -3px);
+    transform: translate(-4px, -4px) rotate(-0.5deg);
     box-shadow: var(--shadow-red);
+    border-color: var(--p5-yellow);
 }
 
-.panel-month {
-    transform: rotate(-1deg);
-}
-.panel-total {
-    transform: rotate(1deg);
-}
-.panel-tempo {
-    transform: rotate(0.8deg);
-}
-.panel-target {
-    transform: rotate(-0.8deg);
-}
+.panel-month { transform: rotate(-1deg); }
+.panel-total { transform: rotate(1deg); }
+.panel-tempo { transform: rotate(0.8deg); }
+.panel-target { transform: rotate(-0.8deg); }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
 }
 
 .panel-badge-red {
     background: var(--p5-red);
     color: var(--p5-white);
     font-family: var(--font-display);
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     letter-spacing: 0.06em;
     padding: 2px 10px;
     transform: skewX(-12deg);
@@ -724,7 +986,7 @@ body {
     background: var(--p5-yellow);
     color: var(--p5-black);
     font-family: var(--font-display);
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     letter-spacing: 0.06em;
     padding: 2px 10px;
     transform: skewX(-12deg);
@@ -735,19 +997,19 @@ body {
     color: var(--p5-white);
     border: 1px solid var(--p5-gray);
     font-family: var(--font-display);
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     letter-spacing: 0.06em;
     padding: 2px 10px;
     transform: skewX(-12deg);
 }
 
 .panel-icon-star {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: var(--p5-yellow);
 }
 
 .panel-label {
-    font-size: 0.76rem;
+    font-size: 0.8rem;
     font-weight: 800;
     letter-spacing: 0.06em;
     color: var(--p5-gray);
@@ -756,10 +1018,10 @@ body {
 
 .panel-value {
     font-family: var(--font-mono);
-    font-size: 2.1rem;
+    font-size: 2.3rem;
     font-weight: 800;
     color: var(--p5-white);
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
     display: flex;
     align-items: baseline;
@@ -767,19 +1029,19 @@ body {
 }
 
 .panel-value.panel-medium {
-    font-size: 1.6rem;
+    font-size: 1.85rem;
 }
 
 .panel-unit {
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     color: var(--p5-yellow);
 }
 
 .panel-sub-label {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--p5-offwhite);
-    margin-top: 8px;
+    margin-top: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -789,8 +1051,8 @@ body {
     background: var(--p5-red);
     color: var(--p5-white);
     font-weight: 900;
-    font-size: 0.65rem;
-    padding: 2px 6px;
+    font-size: 0.68rem;
+    padding: 2px 7px;
     transform: skewX(-10deg);
 }
 
@@ -800,10 +1062,10 @@ body {
 }
 
 /* ==========================================================================
-   4. SECTION ANALYSE DU SALAIRE (GRAPHIQUE & TIMELINE)
+   11. SECTION ANALYSE DU SALAIRE (TIMELINE & SVG)
    ========================================================================== */
 .p5-section-title-wrap {
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 
 .p5-section-title {
@@ -816,13 +1078,13 @@ body {
     background: var(--p5-red);
     color: var(--p5-white);
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     letter-spacing: 0.06em;
-    padding: 4px 14px;
+    padding: 4px 16px;
     display: inline-block;
     width: fit-content;
     transform: skewX(-12deg);
-    box-shadow: 3px 3px 0px #000;
+    box-shadow: 4px 4px 0px #000;
 }
 
 .title-bg-black {
@@ -830,30 +1092,30 @@ body {
     color: var(--p5-white);
     border: 2px solid var(--p5-white);
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     letter-spacing: 0.06em;
-    padding: 4px 14px;
+    padding: 4px 16px;
     display: inline-block;
     width: fit-content;
     transform: skewX(-12deg);
-    box-shadow: 3px 3px 0px var(--p5-red);
+    box-shadow: 4px 4px 0px var(--p5-red);
 }
 
 .title-bg-yellow {
     background: var(--p5-yellow);
     color: var(--p5-black);
     font-family: var(--font-display);
-    font-size: 1.4rem;
+    font-size: 1.6rem;
     letter-spacing: 0.06em;
-    padding: 4px 14px;
+    padding: 4px 16px;
     display: inline-block;
     width: fit-content;
     transform: skewX(-12deg);
-    box-shadow: 3px 3px 0px #000;
+    box-shadow: 4px 4px 0px #000;
 }
 
 .title-sub-text {
-    font-size: 0.78rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--p5-gray);
     letter-spacing: 0.05em;
@@ -865,18 +1127,18 @@ body {
     background: repeating-linear-gradient(
         90deg,
         var(--p5-red),
-        var(--p5-red) 16px,
-        transparent 16px,
-        transparent 24px
+        var(--p5-red) 18px,
+        transparent 18px,
+        transparent 26px
     );
-    margin-top: 8px;
+    margin-top: 10px;
 }
 
 .p5-analysis-card {
     background: var(--p5-card-bg);
     border: 3px solid var(--p5-white);
     box-shadow: var(--shadow-p5-combo);
-    padding: 22px 20px;
+    padding: 28px 24px;
     transform: rotate(0.4deg);
 }
 
@@ -885,22 +1147,22 @@ body {
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 16px;
 }
 
 .chart-legend {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.76rem;
+    gap: 10px;
+    font-size: 0.82rem;
     font-weight: 800;
     color: var(--p5-offwhite);
 }
 
 .legend-box.red-box {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     background: var(--p5-red);
     border: 1px solid var(--p5-white);
 }
@@ -909,8 +1171,8 @@ body {
     background: var(--p5-yellow);
     color: #000;
     font-family: var(--font-display);
-    font-size: 0.95rem;
-    padding: 2px 8px;
+    font-size: 1.05rem;
+    padding: 2px 10px;
     transform: skewX(-10deg);
     font-weight: 800;
 }
@@ -919,14 +1181,14 @@ body {
     width: 100%;
     background: #080808;
     border: 2px solid var(--p5-white);
-    padding: 12px 6px 4px;
+    padding: 14px 8px 6px;
     position: relative;
     overflow: hidden;
 }
 
 .p5-svg-canvas {
     width: 100%;
-    height: 220px;
+    height: 240px;
     display: block;
 }
 
@@ -934,11 +1196,11 @@ body {
 .p5-slots-analysis-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    margin-top: 18px;
+    gap: 18px;
+    margin-top: 22px;
 }
 
-@media (max-width: 540px) {
+@media (max-width: 640px) {
     .p5-slots-analysis-grid {
         grid-template-columns: 1fr;
     }
@@ -947,7 +1209,7 @@ body {
 .slot-card {
     background: #0d0d0d;
     border: 2px solid var(--p5-gray);
-    padding: 14px 16px;
+    padding: 16px 18px;
     transform: skewX(-6deg);
     transition: var(--p5-snap);
 }
@@ -966,27 +1228,27 @@ body {
 
 .slot-badge {
     font-family: var(--font-display);
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--p5-yellow);
 }
 
 .slot-time {
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-family: var(--font-mono);
     color: var(--p5-gray);
 }
 
 .slot-amount {
     font-family: var(--font-mono);
-    font-size: 1.3rem;
+    font-size: 1.45rem;
     font-weight: 800;
     color: var(--p5-white);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .slot-progress-wrap {
     width: 100%;
-    height: 8px;
+    height: 10px;
     background: #000;
     border: 1px solid #333;
     overflow: hidden;
@@ -999,118 +1261,142 @@ body {
     transition: width 0.6s ease;
 }
 
+.slot-footer-text {
+    font-size: 0.76rem;
+    color: var(--p5-gray);
+    margin-top: 8px;
+    font-family: var(--font-mono);
+}
+
 /* ==========================================================================
-   5. SECTION PARAMÈTRES DU CONTRAT
+   12. SECTION CONTRAT (PANNEAU TECHNIQUE)
    ========================================================================== */
 .p5-contract-card {
     background: var(--p5-card-bg);
     border: 3px solid var(--p5-white);
     box-shadow: var(--shadow-black);
-    padding: 22px;
-    transform: rotate(-0.5deg);
+    padding: 26px;
+    transform: rotate(-0.4deg);
 }
 
 .p5-contract-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
 }
 
 .p5-contract-cell {
     background: #0a0a0a;
     border: 2px solid #222;
-    padding: 14px 16px;
+    padding: 16px 18px;
     transform: skewX(-6deg);
     transition: var(--p5-snap);
 }
 
 .p5-contract-cell:hover {
     border-color: var(--p5-red);
-    transform: skewX(-6deg) translateY(-2px);
+    transform: skewX(-6deg) translateY(-3px);
 }
 
 .cell-tag {
-    font-size: 0.7rem;
+    font-size: 0.74rem;
     font-weight: 800;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: var(--p5-yellow);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .cell-highlight {
     font-family: var(--font-display);
-    font-size: 1.35rem;
+    font-size: 1.5rem;
     color: var(--p5-white);
     letter-spacing: 0.04em;
     margin-bottom: 4px;
 }
 
 .cell-desc {
-    font-size: 0.74rem;
+    font-size: 0.78rem;
     color: var(--p5-gray);
 }
 
 /* ==========================================================================
-   6. ACTIONS PANEL & CONTRÔLES INTERACTIFS
+   13. SECTION ACTIONS & CONTRÔLES (TACTILE FEEDBACK)
    ========================================================================== */
 .p5-actions-panel {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
-    gap: 16px;
+    gap: 18px;
     flex-wrap: wrap;
 }
 
-/* Bouton principal agressif (Simuler gain) */
+/* Bouton principal agressif (Simuler gain + vibration) */
 .p5-btn-action {
     position: relative;
     background: var(--p5-yellow);
     color: var(--p5-black);
     border: 3px solid #000;
-    padding: 16px 24px;
-    font-family: var(--font-display);
-    font-size: 1.3rem;
-    letter-spacing: 0.05em;
+    padding: 18px 28px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 6px 6px 0px var(--p5-red), 10px 10px 0px #000;
+    gap: 14px;
+    box-shadow: 6px 6px 0px var(--p5-red), 12px 12px 0px #000;
     transform: skewX(-12deg);
     transition: var(--p5-snap);
     outline: none;
-    flex: 1 1 280px;
+    flex: 2 1 340px;
 }
 
 .p5-btn-action .btn-icon {
-    font-size: 1.4rem;
+    font-size: 1.8rem;
     color: var(--p5-red);
     transition: transform 0.2s ease;
 }
 
-.p5-btn-action .btn-sub {
+.btn-text-group {
+    text-align: left;
+}
+
+.btn-main-text {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.05em;
+    display: block;
+    line-height: 1;
+}
+
+.btn-sub-text {
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.76rem;
     font-weight: 800;
     color: #000;
-    background: rgba(255, 255, 255, 0.6);
-    padding: 2px 6px;
-    margin-left: auto;
+    opacity: 0.85;
+    margin-top: 3px;
+    display: block;
 }
 
 .p5-btn-action:hover {
     transform: skewX(-12deg) translate(-4px, -4px);
-    box-shadow: 10px 10px 0px var(--p5-red), 14px 14px 0px #000;
+    box-shadow: 10px 10px 0px var(--p5-red), 16px 16px 0px #000;
     background: #ffea79;
 }
 
 .p5-btn-action:hover .btn-icon {
-    transform: rotate(20deg) scale(1.2);
+    transform: rotate(20deg) scale(1.25);
 }
 
-.p5-btn-action:active {
-    transform: skewX(-12deg) translate(2px, 2px);
-    box-shadow: 2px 2px 0px var(--p5-red);
+.p5-btn-action:active,
+.p5-btn-action.btn-vibrating {
+    animation: p5ButtonShake 0.35s ease-in-out;
+}
+
+@keyframes p5ButtonShake {
+    0%, 100% { transform: skewX(-12deg) translate(0, 0); }
+    20% { transform: skewX(-12deg) translate(-4px, 2px); }
+    40% { transform: skewX(-12deg) translate(4px, -2px); }
+    60% { transform: skewX(-12deg) translate(-2px, -1px); }
+    80% { transform: skewX(-12deg) translate(2px, 1px); }
 }
 
 /* Boutons Toggle (Démo & Audio) */
@@ -1118,26 +1404,26 @@ body {
     background: #111;
     color: var(--p5-white);
     border: 2px solid var(--p5-white);
-    padding: 12px 18px;
+    padding: 14px 20px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     transform: skewX(-10deg);
-    box-shadow: 4px 4px 0px #000;
+    box-shadow: 5px 5px 0px #000;
     transition: var(--p5-snap);
-    flex: 1 1 180px;
+    flex: 1 1 200px;
 }
 
 .p5-btn-toggle .toggle-icon {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     background: #000;
     border: 1px solid var(--p5-gray);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: 1rem;
     color: var(--p5-yellow);
 }
 
@@ -1147,14 +1433,14 @@ body {
 
 .toggle-title {
     font-family: var(--font-display);
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     display: block;
     line-height: 1;
 }
 
 .toggle-state {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     font-weight: 700;
     color: var(--p5-gray);
 }
@@ -1168,7 +1454,7 @@ body {
 .p5-btn-toggle.active {
     background: var(--p5-red);
     border-color: var(--p5-white);
-    box-shadow: 4px 4px 0px var(--p5-yellow);
+    box-shadow: 5px 5px 0px var(--p5-yellow);
 }
 
 .p5-btn-toggle.active .toggle-state {
@@ -1176,18 +1462,18 @@ body {
 }
 
 /* ==========================================================================
-   7. FOOTER PERSONA 5 ROYAL
+   14. FOOTER / BARRE D'ÉTAT SYSTÈME
    ========================================================================== */
 .p5-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 16px 20px;
+    gap: 14px;
+    padding: 18px 24px;
     background: #000;
     border: 2px solid var(--p5-gray);
-    margin-top: 10px;
+    margin-top: 12px;
     transform: skewX(-6deg);
 }
 
@@ -1195,47 +1481,79 @@ body {
     background: var(--p5-red);
     color: var(--p5-white);
     font-family: var(--font-display);
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     letter-spacing: 0.08em;
-    padding: 2px 10px;
+    padding: 3px 12px;
 }
 
 .p5-footer-text {
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 700;
     color: var(--p5-gray);
     letter-spacing: 0.04em;
-    text-align: center;
-    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.footer-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--p5-red);
+    box-shadow: 0 0 8px var(--p5-red);
+    display: inline-block;
+    animation: p5LiveDotPulse 1.5s infinite;
+}
+
+@keyframes p5LiveDotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
 }
 
 .p5-footer-version {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--p5-yellow);
 }
 
 /* ==========================================================================
-   8. RESPONSIVE & ACCESSIBILITÉ (PREFERS-REDUCED-MOTION)
+   15. RESPONSIVE & ACCESSIBILITÉ
    ========================================================================== */
-@media (max-width: 650px) {
-    body {
-        padding: 16px 10px 40px;
-    }
+@media (max-width: 900px) {
     .p5-header {
         flex-direction: column;
         align-items: flex-start;
     }
-    .p5-header-right {
+    .p5-temporal-hud {
         width: 100%;
         justify-content: space-between;
     }
+}
+
+@media (max-width: 650px) {
+    body {
+        padding: 14px 8px 40px;
+    }
+    .p5-temporal-hud {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .hud-calendar-card, .hud-status-wrapper {
+        width: 100%;
+        text-align: left;
+        align-items: flex-start;
+    }
+    .hud-clock-row {
+        justify-content: flex-start;
+    }
     .p5-huge-digits {
-        font-size: 3.2rem;
+        font-size: 3.4rem;
     }
     .p5-hero-card {
-        padding: 20px 14px;
+        padding: 22px 14px;
     }
     .p5-actions-panel {
         flex-direction: column;
@@ -1251,5 +1569,8 @@ body {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+    }
+    .p5-boot-screen {
+        display: none !important;
     }
 }
