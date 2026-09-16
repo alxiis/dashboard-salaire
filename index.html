@@ -1,202 +1,435 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html lang="fr" class="p5-theme">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Salaire • FinTech Intelligence</title>
+    <title>SALARY PULSE // P5R EDITION — Dashboard Salaire</title>
 
+    <!-- Google Fonts : Bebas Neue (titres & chiffres géants), Barlow Semi Condensed (textes & labels), JetBrains Mono (monétaire) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&family=Bebas+Neue&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div class="ambient-mesh" aria-hidden="true">
-        <div class="glow-orb-1"></div>
-        <div class="glow-orb-2"></div>
+    <!-- Arrière-plan graphique Persona 5 : Trame Halftone & Diagonales d'action -->
+    <div class="p5-bg-overlay" aria-hidden="true">
+        <div class="p5-halftone"></div>
+        <div class="p5-action-slash slash-1"></div>
+        <div class="p5-action-slash slash-2"></div>
+        <div class="p5-stripe-band"></div>
     </div>
 
-    <div class="dashboard-wrapper">
-        <header class="header">
-            <div class="brand">
-                <div class="brand-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
+    <!-- Conteneur principal de l'application -->
+    <div class="p5-dashboard-container">
+
+        <!-- ====================================================================
+             1. HEADER ASYMÉTRIQUE & RUBAN D'ÉTAT
+             ==================================================================== -->
+        <header class="p5-header" id="sectionHeader">
+            <div class="p5-brand-block">
+                <div class="p5-logo-icon">
+                    <span class="p5-star">★</span>
                 </div>
-                <div class="brand-text">
-                    <h1>SALARY PULSE <span class="brand-badge">PREMIUM</span></h1>
-                    <p id="liveDateDisplay">Synchronisation...</p>
+                <div class="p5-brand-text">
+                    <div class="p5-brand-title">
+                        <span class="title-main">SALARY</span>
+                        <span class="title-sub">PULSE</span>
+                    </div>
+                    <div class="p5-tag-ribbon">
+                        <span class="p5-pill-black">SYSTEM // ACTIVE</span>
+                        <span class="p5-pill-red">P5R ROYALE</span>
+                    </div>
                 </div>
             </div>
 
-            <div id="statutBadge" class="status-pill hors-poste">
-                <span class="status-dot"></span>
-                <span id="statutTexte">Hors horaires de travail</span>
+            <!-- Horloge & État d'infiltration -->
+            <div class="p5-header-right">
+                <div class="p5-clock-box">
+                    <div class="p5-clock-label">// HEURE SYSTÈME</div>
+                    <div class="p5-clock-val" id="liveDateDisplay">CHARGEMENT...</div>
+                </div>
+
+                <div id="statutBadge" class="p5-status-badge hors-poste">
+                    <span class="p5-status-icon">◆</span>
+                    <span id="statutTexte">HORS HORAIRES</span>
+                </div>
             </div>
         </header>
 
-        <section class="glass-card hero-card" id="mainHeroCard">
-            <div class="hero-eyebrow">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                <span>Gagné aujourd'hui en temps réel</span>
+        <!-- ====================================================================
+             2. NAVIGATION EN ONGLETS BISEAUTÉS (P5 STYLE)
+             ==================================================================== -->
+        <nav class="p5-nav-tabs" aria-label="Navigation du dashboard">
+            <button class="p5-tab-btn active" data-target="sectionOverview">
+                <span class="tab-index">01</span>
+                <span class="tab-label">VUE GLOBALE</span>
+            </button>
+            <button class="p5-tab-btn" data-target="sectionAnalyse">
+                <span class="tab-index">02</span>
+                <span class="tab-label">ANALYSE DU SALAIRE</span>
+            </button>
+            <button class="p5-tab-btn" data-target="sectionContrat">
+                <span class="tab-index">03</span>
+                <span class="tab-label">CONTRAT & CRÉNEAUX</span>
+            </button>
+            <button class="p5-tab-btn" data-target="sectionActions">
+                <span class="tab-index">04</span>
+                <span class="tab-label">INTERACTIONS</span>
+            </button>
+        </nav>
+
+        <!-- ====================================================================
+             3. SECTION OVERVIEW : HERO DU JOUR (COMPTEUR GÉANT)
+             ==================================================================== -->
+        <section class="p5-section" id="sectionOverview">
+            
+            <div class="p5-hero-card" id="mainHeroCard">
+                <!-- En-tête biseauté de la carte -->
+                <div class="p5-hero-banner">
+                    <div class="p5-cut-ribbon">
+                        <span class="ribbon-text">// EXTRACTION EN TEMPS RÉEL — AUJOURD'HUI</span>
+                    </div>
+                    <div class="p5-card-code">CODE: REWARD-DAILY</div>
+                </div>
+
+                <!-- Zone principale du compteur avec ancrage de notification -->
+                <div class="p5-hero-viewport" id="balanceViewport">
+                    <div class="p5-currency-tag">EUR</div>
+                    
+                    <div class="p5-main-amount">
+                        <span id="jour" class="p5-huge-digits">0.0000</span>
+                        <span class="p5-euro-sym">€</span>
+                    </div>
+
+                    <!-- Ancrage dynamique pour le badge jaillissant (+X.XXXX €) -->
+                    <div class="p5-floating-anchor" id="floatingGainAnchor"></div>
+                </div>
+
+                <!-- Jauge de progression stylisée P5 (segments obliques) -->
+                <div class="p5-progress-block">
+                    <div class="p5-progress-meta">
+                        <div class="p5-progress-title">
+                            <span class="p5-yellow-star">★</span>
+                            <span>PROGRESSION DE MISSION JOURNALIÈRE (7H)</span>
+                        </div>
+                        <div class="p5-progress-badge">
+                            <span id="progressionPourcent">0.0 %</span>
+                            <span class="sub-hours" id="heuresTravaillees">(0.0h / 7h)</span>
+                        </div>
+                    </div>
+
+                    <div class="p5-gauge-track">
+                        <div class="p5-gauge-fill" id="progressBarFill"></div>
+                        <div class="p5-gauge-stripes"></div>
+                    </div>
+                </div>
+
+                <!-- Puces de Cadence & Rythme financier -->
+                <div class="p5-cadence-grid">
+                    <div class="p5-chip chip-red">
+                        <span class="chip-label">GAIN MINUTE</span>
+                        <span class="chip-val" id="gainMinute">+0.1315 € / min</span>
+                    </div>
+                    <div class="p5-chip chip-black">
+                        <span class="chip-label">TAUX HORAIRE</span>
+                        <span class="chip-val" id="tauxHoraire">7.89 € / heure</span>
+                    </div>
+                    <div class="p5-chip chip-yellow">
+                        <span class="chip-label">MAXIMUM JOUR</span>
+                        <span class="chip-val" id="objectifJour">55.23 €</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="balance-viewport" id="balanceViewport">
-                <div class="hero-value">
-                    <span id="jour">0.0000</span>
-                    <span class="hero-currency">€</span>
-                </div>
-
-                <div class="floating-gain-container" id="floatingGainAnchor"></div>
-            </div>
-
-            <div class="hero-progress-section">
-                <div class="progress-header">
-                    <span>Progression journalière (7h)</span>
-                    <span class="target-info" id="progressionPourcent">0.0%</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="progressBarFill"></div>
-                </div>
-
-                <div class="cadence-meta">
-                    <div class="cadence-pill">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                        <span>+0.1315 € / min</span>
+            <!-- Grille des Panneaux de Métriques (Game Panels) -->
+            <div class="p5-panels-grid">
+                
+                <!-- Panel 1 : Ce mois-ci -->
+                <div class="p5-game-panel panel-month" id="panelMois">
+                    <div class="panel-header">
+                        <div class="panel-badge-red">01 // MENSUEL</div>
+                        <span class="panel-icon-star">★</span>
                     </div>
-                    <div class="cadence-pill">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#D4AF37" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 10"></polyline></svg>
-                        <span>7.89 € / heure</span>
-                    </div>
-                    <div class="cadence-pill">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <span>Max jour : 55.23 €</span>
+                    <div class="panel-body">
+                        <div class="panel-label">CUMUL DU MOIS EN COURS</div>
+                        <div class="panel-value">
+                            <span id="mois">0.00</span>
+                            <span class="panel-unit">€</span>
+                        </div>
+                        <div class="panel-sub-label">
+                            <span class="p5-tag-inline">VALIDÉ</span>
+                            <span>Cumul net effectif</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Panel 2 : Total Contrat -->
+                <div class="p5-game-panel panel-total" id="panelTotal">
+                    <div class="panel-header">
+                        <div class="panel-badge-yellow">02 // HISTORIQUE</div>
+                        <span class="panel-icon-star">★</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel-label">TOTAL CONTRAT CUMULÉ</div>
+                        <div class="panel-value">
+                            <span id="total">0.00</span>
+                            <span class="panel-unit">€</span>
+                        </div>
+                        <div class="panel-sub-label">
+                            <span class="p5-tag-inline tag-yellow">DEPUIS</span>
+                            <span>14/09/2026 (08:30)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 3 : Rythme Seconde -->
+                <div class="p5-game-panel panel-tempo">
+                    <div class="panel-header">
+                        <div class="panel-badge-black">03 // CADENCE</div>
+                        <span class="panel-icon-star">⚡</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel-label">GAIN PAR SECONDE</div>
+                        <div class="panel-value panel-medium">
+                            <span id="gainSeconde">≈ 0.00219</span>
+                            <span class="panel-unit">€ / s</span>
+                        </div>
+                        <div class="panel-sub-label">
+                            <span>Flux continu garanti</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel 4 : Objectif Jour Complet -->
+                <div class="p5-game-panel panel-target">
+                    <div class="panel-header">
+                        <div class="panel-badge-red">04 // OBJECTIF</div>
+                        <span class="panel-icon-star">🎯</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel-label">OBJECTIF JOUR COMPLET</div>
+                        <div class="panel-value panel-medium">
+                            <span>55.23</span>
+                            <span class="panel-unit">€ NET</span>
+                        </div>
+                        <div class="panel-sub-label">
+                            <span>7h travaillées = 25 200 s</span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
-        <div class="metrics-grid">
-            <div class="glass-card metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Ce mois-ci</span>
-                    <div class="metric-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                    </div>
-                </div>
-                <div>
-                    <div class="metric-value">
-                        <span id="mois">0.00</span>
-                        <span class="unit">€</span>
-                    </div>
-                    <div class="metric-sub">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span id="moisHeures">Cumul net mensuel</span>
-                    </div>
-                </div>
+        <!-- ====================================================================
+             4. SECTION ANALYSE DU SALAIRE (GRAPHIQUE & TIMELINE P5)
+             ==================================================================== -->
+        <section class="p5-section p5-analysis-section" id="sectionAnalyse">
+            <div class="p5-section-title-wrap">
+                <h2 class="p5-section-title">
+                    <span class="title-bg-red">02 // ANALYSE DU SALAIRE</span>
+                    <span class="title-sub-text">CHRONOLOGIE DE LA JOURNÉE & COURBE D'EXTRACTION</span>
+                </h2>
+                <div class="p5-deco-line"></div>
             </div>
 
-            <div class="glass-card metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Total Contrat</span>
-                    <div class="metric-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                            <line x1="12" y1="11" x2="12" y2="17"></line>
-                            <line x1="9" y1="14" x2="15" y2="14"></line>
-                        </svg>
+            <div class="p5-analysis-card">
+                <!-- Graphique SVG personnalisé & dynamique -->
+                <div class="p5-chart-header">
+                    <div class="chart-legend">
+                        <span class="legend-box red-box"></span>
+                        <span>PROGRESSION DU SALAIRE HEURE PAR HEURE</span>
+                    </div>
+                    <div class="chart-target-badge">
+                        <span>PALIER MAX : 55.23 €</span>
                     </div>
                 </div>
-                <div>
-                    <div class="metric-value">
-                        <span id="total">0.00</span>
-                        <span class="unit">€</span>
-                    </div>
-                    <div class="metric-sub">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        <span>Depuis le 14/09/2026</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <section class="glass-card contract-card">
-            <div class="metric-header" style="margin-bottom: 0;">
-                <span class="metric-title">Cadence & Paramètres du Contrat</span>
-                <div class="metric-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                <!-- Graphique SVG stylisé avec jalons horaires -->
+                <div class="p5-svg-chart-wrapper">
+                    <svg viewBox="0 0 700 240" class="p5-svg-canvas" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="p5RedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#E50914" stop-opacity="0.8" />
+                                <stop offset="70%" stop-color="#8F0008" stop-opacity="0.25" />
+                                <stop offset="100%" stop-color="#050505" stop-opacity="0" />
+                            </linearGradient>
+                            <pattern id="p5HalftoneChart" width="8" height="8" patternUnits="userSpaceOnUse">
+                                <circle cx="2" cy="2" r="1" fill="rgba(245, 213, 71, 0.2)" />
+                            </pattern>
+                        </defs>
+
+                        <!-- Grille d'arrière-plan -->
+                        <line x1="50" y1="30" x2="670" y2="30" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
+                        <line x1="50" y1="80" x2="670" y2="80" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
+                        <line x1="50" y1="130" x2="670" y2="130" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
+                        <line x1="50" y1="180" x2="670" y2="180" stroke="rgba(255,255,255,0.1)" stroke-dasharray="4,4" />
+
+                        <!-- Ligne objectif 55.23 € -->
+                        <line x1="50" y1="35" x2="670" y2="35" stroke="#F5D547" stroke-width="2" stroke-dasharray="6,3" />
+                        <text x="610" y="28" fill="#F5D547" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700">MAX 55.23€</text>
+
+                        <!-- Ligne de pause déjeuner (12:30 -> 13:30) -->
+                        <rect x="360" y="30" width="60" height="150" fill="rgba(229, 9, 20, 0.08)" />
+                        <text x="365" y="105" fill="#888" font-family="'Barlow Semi Condensed', sans-serif" font-size="10" font-weight="700" transform="rotate(-90 365 105)">PAUSE 12h30-13h30</text>
+
+                        <!-- Surface et Courbe théorique de gain -->
+                        <!-- Points: (50,180) -> 08:30=0€ ; (205,108) -> 10:30=15.78€ ; (360,35) -> 12:30=31.56€ ; (420,35) -> 13:30=31.56€ ; (545,-10) -> 15:00=43.40€ ; (670,-55 relative to max) -> 16:30=55.23€ -->
+                        <path d="M 50,180 L 150,135 L 250,90 L 360,40 L 420,40 L 540,-20 L 670,-80 L 670,180 Z" fill="none" />
+                        
+                        <!-- Remplissage progressif sous la courbe (coordonnées normalisées 0..180 en Y) -->
+                        <polygon points="50,180 205,123 360,66 420,66 545,33 670,0 670,180 50,180" fill="url(#p5RedGradient)" />
+                        <polygon points="50,180 205,123 360,66 420,66 545,33 670,0 670,180 50,180" fill="url(#p5HalftoneChart)" />
+                        
+                        <!-- Ligne de courbe rouge principale -->
+                        <polyline points="50,180 205,123 360,66 420,66 545,33 670,0" fill="none" stroke="#E50914" stroke-width="4" stroke-linecap="square" />
+
+                        <!-- Points jalons interactifs -->
+                        <circle cx="50" cy="180" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="205" cy="123" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="360" cy="66" r="6" fill="#F5D547" stroke="#E50914" stroke-width="3" />
+                        <circle cx="420" cy="66" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="545" cy="33" r="5" fill="#FFF" stroke="#E50914" stroke-width="3" />
+                        <circle cx="670" cy="0" r="7" fill="#F5D547" stroke="#000" stroke-width="3" />
+
+                        <!-- Axe des X : Heures -->
+                        <text x="35" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">08:30 (0€)</text>
+                        <text x="185" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">10:30 (15.78€)</text>
+                        <text x="335" y="205" fill="#F5D547" font-family="'Bebas Neue', sans-serif" font-size="13">12:30 (31.56€)</text>
+                        <text x="405" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">13:30</text>
+                        <text x="525" y="205" fill="#CCC" font-family="'Bebas Neue', sans-serif" font-size="13">15:00 (43.40€)</text>
+                        <text x="640" y="205" fill="#E50914" font-family="'Bebas Neue', sans-serif" font-size="13">16:30 (55.23€)</text>
                     </svg>
                 </div>
-            </div>
 
-            <div class="contract-info-grid">
-                <div class="contract-stat">
-                    <div class="contract-stat-label">Taux horaire net</div>
-                    <div class="contract-stat-val">7.89 € / heure</div>
-                </div>
-                <div class="contract-stat">
-                    <div class="contract-stat-label">Plages de travail (7h/j)</div>
-                    <div class="contract-stat-val">08:30-12:30 & 13:30-16:30</div>
-                </div>
-                <div class="contract-stat">
-                    <div class="contract-stat-label">Gain par seconde</div>
-                    <div class="contract-stat-val">≈ 0.00219 € / s</div>
-                </div>
-                <div class="contract-stat">
-                    <div class="contract-stat-label">Objectif jour complet</div>
-                    <div class="contract-stat-val">55.23 € net</div>
+                <!-- Décomposition des créneaux (Matin vs Après-midi) -->
+                <div class="p5-slots-analysis-grid">
+                    <div class="slot-card slot-morning">
+                        <div class="slot-header">
+                            <span class="slot-badge">SESSION 01 // MATIN</span>
+                            <span class="slot-time">08:30 → 12:30 (4H)</span>
+                        </div>
+                        <div class="slot-amount">31.56 € NET</div>
+                        <div class="slot-progress-wrap">
+                            <div class="slot-bar" id="slotBarMorning"></div>
+                        </div>
+                    </div>
+
+                    <div class="slot-card slot-afternoon">
+                        <div class="slot-header">
+                            <span class="slot-badge">SESSION 02 // APRÈS-MIDI</span>
+                            <span class="slot-time">13:30 → 16:30 (3H)</span>
+                        </div>
+                        <div class="slot-amount">23.67 € NET</div>
+                        <div class="slot-progress-wrap">
+                            <div class="slot-bar" id="slotBarAfternoon"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <div class="actions-bar">
-            <button class="btn-simulate" id="btnSimulerGain" title="Simuler l'animation de gain pour 1 minute">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
-                </svg>
-                <span>Simuler gain (+1 min)</span>
-            </button>
+        <!-- ====================================================================
+             5. SECTION CONTRAT & CRÉNEAUX
+             ==================================================================== -->
+        <section class="p5-section" id="sectionContrat">
+            <div class="p5-section-title-wrap">
+                <h2 class="p5-section-title">
+                    <span class="title-bg-black">03 // PARAMÈTRES DU CONTRAT</span>
+                    <span class="title-sub-text">SPÉCIFICATIONS LÉGALES & CONDITIONS D'ACTIVITÉ</span>
+                </h2>
+                <div class="p5-deco-line"></div>
+            </div>
 
-            <button class="audio-toggle-btn" id="btnDemoToggle" title="Activer le mode démonstration pour voir le compteur défiler et les gains tomber en continu">
-                <svg id="demoIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polygon points="10 8 16 12 10 16 10 8"></polygon>
-                </svg>
-                <span id="demoLabel">Démo live : Inactive</span>
-            </button>
+            <div class="p5-contract-card">
+                <div class="p5-contract-grid">
+                    <div class="p5-contract-cell">
+                        <div class="cell-tag">TAUX HORAIRE FIXE</div>
+                        <div class="cell-highlight">7.89 € / HEURE</div>
+                        <div class="cell-desc">Net calculé à la seconde</div>
+                    </div>
 
-            <button class="audio-toggle-btn" id="btnAudioToggle" title="Activer/Désactiver le son discret lors des gains">
-                <svg id="audioIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-                    <line x1="23" y1="9" x2="17" y2="15"></line>
-                    <line x1="17" y1="9" x2="23" y2="15"></line>
-                </svg>
-                <span id="audioLabel">Son : Désactivé</span>
-            </button>
-        </div>
+                    <div class="p5-contract-cell">
+                        <div class="cell-tag">JOURNÉE LÉGALE</div>
+                        <div class="cell-highlight">7 HEURES / JOUR</div>
+                        <div class="cell-desc">Du Lundi au Vendredi (ouvré)</div>
+                    </div>
 
-        <footer class="footer">
-            <span class="sync-dot"></span>
-            <span>Synchronisation temps réel à la seconde • Moteur FinTech haute précision</span>
+                    <div class="p5-contract-cell">
+                        <div class="cell-tag">HORAIRES EN POSTE</div>
+                        <div class="cell-highlight">08:30-12:30 & 13:30-16:30</div>
+                        <div class="cell-desc">Pause méridienne : 1h00</div>
+                    </div>
+
+                    <div class="p5-contract-cell">
+                        <div class="cell-tag">DEBUT DU CONTRAT</div>
+                        <div class="cell-highlight">14 SEPTEMBRE 2026</div>
+                        <div class="cell-desc">Heure de prise de poste : 08h30</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================================================================
+             6. SECTION INTERACTIONS & CONTRÔLES P5R
+             ==================================================================== -->
+        <section class="p5-section" id="sectionActions">
+            <div class="p5-section-title-wrap">
+                <h2 class="p5-section-title">
+                    <span class="title-bg-yellow">04 // ACTIONS & CONTRÔLES</span>
+                    <span class="title-sub-text">SIMULATION TEMPS RÉEL & EXPÉRIENCE IMMERSIVE</span>
+                </h2>
+                <div class="p5-deco-line"></div>
+            </div>
+
+            <div class="p5-actions-panel">
+                <!-- Bouton principal agressif P5R -->
+                <button class="p5-btn-action" id="btnSimulerGain" title="Simuler l'extraction d'une minute de salaire">
+                    <span class="btn-skew-bg"></span>
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">SIMULER GAIN (+1 MIN)</span>
+                    <span class="btn-sub">[ +0.1315 € ]</span>
+                </button>
+
+                <!-- Bouton Démo Live -->
+                <button class="p5-btn-toggle" id="btnDemoToggle" title="Activer la simulation continue en temps réel">
+                    <span class="toggle-skew-bg"></span>
+                    <span class="toggle-icon">▶</span>
+                    <div class="toggle-text-block">
+                        <span class="toggle-title">DÉMO EN CONTINU</span>
+                        <span class="toggle-state" id="demoLabel">INACTIVE</span>
+                    </div>
+                </button>
+
+                <!-- Bouton Audio SFX JRPG -->
+                <button class="p5-btn-toggle" id="btnAudioToggle" title="Activer les effets sonores de menu JRPG">
+                    <span class="toggle-skew-bg"></span>
+                    <span class="toggle-icon" id="audioIcon">♪</span>
+                    <div class="toggle-text-block">
+                        <span class="toggle-title">AUDIO SFX P5</span>
+                        <span class="toggle-state" id="audioLabel">DÉSACTIVÉ</span>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- ====================================================================
+             7. FOOTER PERSONA 5 ROYAL
+             ==================================================================== -->
+        <footer class="p5-footer">
+            <div class="p5-footer-badge">TAKE YOUR TIME</div>
+            <div class="p5-footer-text">
+                SALARY PULSE SYSTEM // MOTORISÉ PAR JAVASCRIPT HAUTE PRÉCISION • DESIGN INSPIRÉ DE PERSONA 5 ROYAL
+            </div>
+            <div class="p5-footer-version">V2.0-ROYALE</div>
         </footer>
+
     </div>
 
+    <!-- Script principal de calcul & d'animation -->
     <script src="script.js" defer></script>
 </body>
 </html>
