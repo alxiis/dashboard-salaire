@@ -45,7 +45,9 @@ function getWorkStatus(date) {
             desc: 'DÉMO ACTIVE // FLUX EN CONTINU',
             badgeClass: 'status-working',
             bodyClass: 'state-working',
-            enPoste: true
+            enPoste: true,
+            contextText: 'DEMO MODE',
+            contextClass: 'context-working'
         };
     }
 
@@ -56,7 +58,9 @@ function getWorkStatus(date) {
             desc: 'WEEK-END // SYSTÈME EN VEILLE',
             badgeClass: 'status-offduty',
             bodyClass: 'state-offduty',
-            enPoste: false
+            enPoste: false,
+            contextText: 'OFF DUTY',
+            contextClass: 'context-offduty'
         };
     }
 
@@ -70,7 +74,9 @@ function getWorkStatus(date) {
             desc: 'HORS HORAIRES // DÉBUT À 08H30',
             badgeClass: 'status-offduty',
             bodyClass: 'state-offduty',
-            enPoste: false
+            enPoste: false,
+            contextText: 'OFF DUTY',
+            contextClass: 'context-offduty'
         };
     }
 
@@ -82,7 +88,9 @@ function getWorkStatus(date) {
             desc: 'SESSION 01 // MATIN ACTIF',
             badgeClass: 'status-working',
             bodyClass: 'state-working',
-            enPoste: true
+            enPoste: true,
+            contextText: 'WORKING',
+            contextClass: 'context-working'
         };
     }
 
@@ -94,7 +102,9 @@ function getWorkStatus(date) {
             desc: 'PAUSE MÉRIDIENNE // REPRISE À 13H30',
             badgeClass: 'status-break',
             bodyClass: 'state-break',
-            enPoste: false
+            enPoste: false,
+            contextText: 'LUNCH BREAK',
+            contextClass: 'context-break'
         };
     }
 
@@ -106,18 +116,22 @@ function getWorkStatus(date) {
             desc: 'SESSION 02 // APRÈS-MIDI ACTIF',
             badgeClass: 'status-working',
             bodyClass: 'state-working',
-            enPoste: true
+            enPoste: true,
+            contextText: 'WORKING',
+            contextClass: 'context-working'
         };
     }
 
-    // Après 16h30 (Journée terminée)
+    // Après 16h30 (Journée terminée) -> AFTER WORK (correspond à l'image de référence)
     return {
         status: 'DAY COMPLETE',
         label: 'DAY COMPLETE',
         desc: 'MISSION ACCOMPLIE // 7H EFFECTUÉES',
         badgeClass: 'status-complete',
         bodyClass: 'state-complete',
-        enPoste: false
+        enPoste: false,
+        contextText: 'AFTER WORK',
+        contextClass: 'context-afterwork'
     };
 }
 
@@ -382,6 +396,7 @@ function mettreAJourDateHUD(date, statusInfo) {
 
     const jourNom = joursAnglais[date.getDay()];
     const jourNum = String(date.getDate()).padStart(2, '0');
+    const moisNum = String(date.getMonth() + 1).padStart(2, '0');
     const moisNom = moisAnglais[date.getMonth()];
     const annee = date.getFullYear();
 
@@ -389,7 +404,28 @@ function mettreAJourDateHUD(date, statusInfo) {
     const mm = String(date.getMinutes()).padStart(2, '0');
     const ss = String(date.getSeconds()).padStart(2, '0');
 
-    // Injection dans le HUD
+    // 1. HUD Temporel Sticker Persona 5 Royal (Top-Left)
+    const hudBigDay = document.getElementById('hudBigDay');
+    const hudMonthNum = document.getElementById('hudMonthNum');
+    const hudMonthName = document.getElementById('hudMonthName');
+    const hudWeekdayText = document.getElementById('hudWeekdayText');
+    const hudContextPill = document.getElementById('hudContextPill');
+    const hudContextText = document.getElementById('hudContextText');
+    const hudLiveClock = document.getElementById('hudLiveClock');
+    const hudYearVal = document.getElementById('hudYearVal');
+
+    if (hudBigDay) hudBigDay.innerText = jourNum;
+    if (hudMonthNum) hudMonthNum.innerText = moisNum;
+    if (hudMonthName) hudMonthName.innerText = moisNom;
+    if (hudWeekdayText) hudWeekdayText.innerText = jourNom;
+    if (hudContextText && statusInfo.contextText) hudContextText.innerText = statusInfo.contextText;
+    if (hudContextPill && statusInfo.contextClass) {
+        hudContextPill.className = `sticker-context-pill ${statusInfo.contextClass}`;
+    }
+    if (hudLiveClock) hudLiveClock.innerText = `${hh}:${mm}:${ss}`;
+    if (hudYearVal) hudYearVal.innerText = annee;
+
+    // 2. Rétrocompatibilité éventuelle
     const hudDayName = document.getElementById('hudDayName');
     const hudFullDate = document.getElementById('hudFullDate');
     const hudTimeDisplay = document.getElementById('hudTimeDisplay');
@@ -398,7 +434,7 @@ function mettreAJourDateHUD(date, statusInfo) {
     if (hudFullDate) hudFullDate.innerText = `${jourNum} ${moisNom} ${annee}`;
     if (hudTimeDisplay) hudTimeDisplay.innerText = `${hh}:${mm}:${ss}`;
 
-    // Statut connecté au contrat
+    // 3. Statut connecté au contrat (Header droit)
     const badge = document.getElementById('statutBadge');
     const texteStatut = document.getElementById('statutTexte');
     const descStatut = document.getElementById('statutDescription');
@@ -409,7 +445,7 @@ function mettreAJourDateHUD(date, statusInfo) {
         descStatut.innerText = statusInfo.desc;
     }
 
-    // Application de la classe de thème sur le <body>
+    // 4. Application de la classe de thème sur le <body>
     document.body.className = statusInfo.bodyClass;
 }
 

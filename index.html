@@ -43,38 +43,61 @@
     <div class="p5-dashboard-container">
 
         <!-- ====================================================================
-             1. HEADER ASYMÉTRIQUE & HUD TEMPOREL PERSONA 5 ROYAL
+             1. HEADER ASYMÉTRIQUE & HUD TEMPOREL PERSONA 5 ROYAL (STICKER TOP-LEFT)
              ==================================================================== -->
         <header class="p5-header" id="sectionHeader">
-            <!-- Marque & Identité -->
-            <div class="p5-brand-block">
-                <div class="p5-logo-icon">
-                    <span class="p5-star">★</span>
-                </div>
-                <div class="p5-brand-text">
-                    <div class="p5-brand-title">
-                        <span class="title-main">SALARY</span>
-                        <span class="title-sub">PULSE</span>
+            <!-- HUD Temporel Collage Persona 5 Royal (Top-Left Sticker Multi-Couches) -->
+            <div class="p5-date-hud-sticker" id="p5DateSticker">
+                <!-- Calque 1 : Cartouche Numérique Principal (Jour & Mois) -->
+                <div class="hud-sticker-daybox">
+                    <div class="sticker-pin">★</div>
+                    <div class="sticker-num-row">
+                        <span class="sticker-big-day" id="hudBigDay">16</span>
+                        <span class="sticker-month-tag" id="hudMonthNum">09</span>
                     </div>
-                    <div class="p5-tag-ribbon">
-                        <span class="p5-pill-black">SYSTEM // V2.5</span>
-                        <span class="p5-pill-red">P5R ROYALE</span>
+                    <div class="sticker-month-name" id="hudMonthName">SEPTEMBER</div>
+                </div>
+
+                <!-- Calque 2 & 3 : Bandeau du jour de la semaine & Statut contextuel -->
+                <div class="hud-sticker-slash-group">
+                    <div class="sticker-weekday-banner" id="hudWeekdayBanner">
+                        <span class="weekday-text" id="hudWeekdayText">WEDNESDAY</span>
+                    </div>
+
+                    <!-- Calque 3 : Étiquette contextuelle d'état (AFTER WORK, WORKING, LUNCH BREAK, OFF DUTY) -->
+                    <div class="sticker-context-pill context-afterwork" id="hudContextPill">
+                        <span class="context-dot">◆</span>
+                        <span class="context-text" id="hudContextText">AFTER WORK</span>
+                    </div>
+
+                    <!-- Calque 4 : Horloge temps réel & Année -->
+                    <div class="sticker-time-tag">
+                        <span class="time-clock-icon">◷</span>
+                        <span class="time-clock-val" id="hudLiveClock">16:32:00</span>
+                        <span class="time-year-val" id="hudYearVal">2026</span>
                     </div>
                 </div>
             </div>
 
-            <!-- HUD Temporel Inspiré de Persona 5 Royal -->
-            <div class="p5-temporal-hud" id="temporalHUD">
-                <div class="hud-calendar-card">
-                    <div class="hud-day-name" id="hudDayName">WEDNESDAY</div>
-                    <div class="hud-full-date" id="hudFullDate">16 SEPTEMBER 2026</div>
-                    <div class="hud-clock-row">
-                        <span class="hud-clock-icon">◷</span>
-                        <span class="hud-time-val" id="hudTimeDisplay">16:32:00</span>
+            <!-- Marque & Statut Général du Système (Côté Droit du Header) -->
+            <div class="p5-header-right-group">
+                <div class="p5-brand-block">
+                    <div class="p5-logo-icon">
+                        <span class="p5-star">★</span>
+                    </div>
+                    <div class="p5-brand-text">
+                        <div class="p5-brand-title">
+                            <span class="title-main">SALARY</span>
+                            <span class="title-sub">PULSE</span>
+                        </div>
+                        <div class="p5-tag-ribbon">
+                            <span class="p5-pill-black">SYSTEM // V2.5</span>
+                            <span class="p5-pill-red">P5R ROYALE</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Badge de Statut Connecté aux Horaires Réels -->
+                <!-- Badge de Statut Complémentaire -->
                 <div class="hud-status-wrapper">
                     <div id="statutBadge" class="p5-status-badge status-working">
                         <span class="p5-status-radar">◆</span>
