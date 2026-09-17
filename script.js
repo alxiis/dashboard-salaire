@@ -10,6 +10,7 @@ const TAUX_HORAIRE_NET = 7.89;
 const TAUX_SECONDE = TAUX_HORAIRE_NET / 3600;
 const TAUX_MINUTE = TAUX_HORAIRE_NET / 60; // ≈ 0.1315 €
 const GAIN_JOUR_MAX = 7 * TAUX_HORAIRE_NET; // 55.23 €
+const MAX_MINUTES_JOUR = 420; // 7h * 60 = 420 minutes
 const DATE_DEBUT_CONTRAT = new Date(2026, 8, 14, 8, 30, 0); // 14 septembre 2026 à 08h30
 
 // Plages quotidiennes (08h30-12h30 = 240 min ; 13h30-16h30 = 180 min => 7h = 420 min)
@@ -18,11 +19,14 @@ const PLAGES = [
     { debut: 13 * 60 + 30, fin: 16 * 60 + 30, dureeSec: 3 * 3600, maxGain: 23.67 }  // Session Après-midi (3h)
 ];
 
-// 2. ÉTATS GLOBAUX
+// 2. ÉTATS GLOBAUX DU SYSTÈME (HORLOGE DISCRÈTE)
 let audioActif = false;
 let modeDemo = false;
-let bonusSimule = 0; // Minutes simulées ajoutées manuellement
-let dernierMinuteEnregistree = -1;
+let demoInterval = null;
+let creditedMinutesAujourdhui = 0; // Minutes de travail réelles déjà créditées aujourd'hui
+let bonusSimuleMinutes = 0;        // Minutes simulées manuellement ou via mode démo
+let dateDernierCalculJour = null;   // Détection du changement de jour (minuit)
+let isInitialBoot = true;          // Flag pour affichage instantané sans animation au boot
 let audioCtx = null;
 
 /**
@@ -61,6 +65,20 @@ function getWorkStatus(date) {
             enPoste: false,
             contextText: 'OFF DUTY',
             contextClass: 'context-offduty'
+        };
+    }
+
+    // Plafond journalier atteint (420 minutes = 55.23 €)
+    if ((creditedMinutesAujourdhui + bonusSimuleMinutes) >= MAX_MINUTES_JOUR) {
+        return {
+            status: 'DAY COMPLETE',
+            label: 'DAY COMPLETE',
+            desc: 'MISSION ACCOMPLIE // 7H EFFECTUÉES',
+            badgeClass: 'status-complete',
+            bodyClass: 'state-complete',
+            enPoste: false,
+            contextText: 'AFTER WORK',
+            contextClass: 'context-afterwork'
         };
     }
 
@@ -136,7 +154,7 @@ function getWorkStatus(date) {
 }
 
 /**
- * Calcule le nombre de secondes travaillées aujourd'hui
+ * Calcule le nombre de secondes travaillées aujourd'hui (plafonnées à 25 200 s = 7h)
  */
 function getSecondesJournee(dateCible) {
     if (!estJourOuvre(dateCible)) return 0;
@@ -150,7 +168,14 @@ function getSecondesJournee(dateCible) {
             totalSecondes += (finEffective - plage.debut) * 60;
         }
     }
-    return totalSecondes;
+    return Math.min(MAX_MINUTES_JOUR * 60, totalSecondes);
+}
+
+/**
+ * Calcule le nombre de minutes entières de travail complétées aujourd'hui
+ */
+function getMinutesTravailleesAujourdhui(dateCible) {
+    return Math.floor(getSecondesJournee(dateCible) / 60);
 }
 
 /**
@@ -179,24 +204,20 @@ function getSecondesParCreneau(dateCible) {
 }
 
 /**
- * Calcule le cumul de secondes entre deux dates historiques
+ * Calcule le cumul de secondes pour les jours passés (strictement avant aujourd'hui)
  */
-function calculerSecondesPeriode(debut, fin) {
-    if (fin < debut) return 0;
-    let cumulSecondes = 0;
-    let curseur = new Date(debut.getTime());
+function calculerSecondesJoursPrecedents(debut, dateCourante) {
+    if (dateCourante < debut) return 0;
 
-    while (curseur <= fin) {
+    let cumulSecondes = 0;
+    const curseur = new Date(debut.getFullYear(), debut.getMonth(), debut.getDate(), 0, 0, 0);
+    const limiteJour = new Date(dateCourante.getFullYear(), dateCourante.getMonth(), dateCourante.getDate(), 0, 0, 0);
+
+    while (curseur < limiteJour) {
         if (estJourOuvre(curseur)) {
-            const estMemeJourFin = curseur.toDateString() === fin.toDateString();
-            if (estMemeJourFin) {
-                cumulSecondes += getSecondesJournee(fin);
-            } else {
-                cumulSecondes += 7 * 3600; // Journée complète = 25 200 s
-            }
+            cumulSecondes += MAX_MINUTES_JOUR * 60; // 7h complètes par jour ouvré passé (25 200 s = 55.23 €)
         }
         curseur.setDate(curseur.getDate() + 1);
-        curseur.setHours(0, 0, 0, 0);
     }
     return cumulSecondes;
 }
@@ -281,108 +302,170 @@ function emettreSonGain() {
 
 /**
  * ==========================================================================
- * ANIMATION DU COMPTEUR (TICKER FLUIDE & MICRO-REBOND)
+ * ANIMATION DU GAIN (P5R 400MS : BADGE FLOTTANT, REBOND & FLASH)
  * ==========================================================================
  */
-function animerValeur(element, debut, fin, duree, decimales = 4) {
-    if (!element) return;
-    const debutTemps = performance.now();
-
-    // Ajoute un micro-sursaut visuel lors des montées
-    const wrap = document.getElementById('mainAmountWrap');
-    if (wrap) {
-        wrap.classList.remove('nudge');
-        void wrap.offsetWidth;
-        wrap.classList.add('nudge');
-    }
-
-    function tick(tempsActuel) {
-        const ecoule = tempsActuel - debutTemps;
-        const progression = Math.min(ecoule / duree, 1);
-        
-        // Amortissement easeOutCubic
-        const facteur = 1 - Math.pow(1 - progression, 3);
-        const valeurCourante = debut + (fin - debut) * facteur;
-
-        element.innerText = valeurCourante.toFixed(decimales);
-
-        if (progression < 1) {
-            requestAnimationFrame(tick);
-        } else {
-            element.innerText = fin.toFixed(decimales);
-        }
-    }
-
-    requestAnimationFrame(tick);
-}
 
 /**
- * Déclenche la notification visuelle de gain (+X.XXXX €)
- * avec pop-up oblique, flash héroïque et carillon sonore
+ * Déclenche l'animation visuelle et sonore du gain de minute
+ * - Pop-up "+0.1315 €" avec envol rapide (850ms)
+ * - Micro-rebond JRPG sur le montant principal (scale-up, déplacement vertical, rotation ~420ms)
+ * - Flash héroïque rouge/jaune sur la carte principale
+ * - Carillon d'or triomphant (Web Audio API)
  */
-function declencherNotificationGain(montant = TAUX_MINUTE, estSimulation = false) {
+function declencherAnimationGain(montant = TAUX_MINUTE, estSimulation = false) {
     const anchor = document.getElementById('floatingGainAnchor');
     const heroCard = document.getElementById('mainHeroCard');
-    const jourEl = document.getElementById('jour');
-    const moisEl = document.getElementById('mois');
-    const totalEl = document.getElementById('total');
+    const amountWrap = document.getElementById('mainAmountWrap');
     const btnSimuler = document.getElementById('btnSimulerGain');
 
-    if (!anchor || !heroCard) return;
-
-    // 1. Feedback tactile/vibratoire sur le bouton
+    // 1. Feedback tactile sur le bouton de simulation
     if (estSimulation && btnSimuler) {
         btnSimuler.classList.remove('btn-vibrating');
         void btnSimuler.offsetWidth;
         btnSimuler.classList.add('btn-vibrating');
+        setTimeout(() => {
+            if (btnSimuler) btnSimuler.classList.remove('btn-vibrating');
+        }, 400);
     }
 
-    // 2. Création du badge flottant pop-up
-    const badge = document.createElement('div');
-    badge.className = 'p5-floating-badge';
+    // 2. Création du badge pop-up flottant "+0.1315 €"
+    if (anchor) {
+        const badge = document.createElement('div');
+        badge.className = 'p5-floating-badge';
+        const montantFormatte = montant.toFixed(4);
+        badge.innerHTML = `
+            <span class="p5-badge-slash-icon">★</span>
+            <span>+${montantFormatte} €</span>
+        `;
+        anchor.appendChild(badge);
 
-    const montantFormatte = montant.toFixed(4);
-    badge.innerHTML = `
-        <span class="p5-badge-slash-icon">★</span>
-        <span>+${montantFormatte} €</span>
-    `;
-
-    anchor.appendChild(badge);
-
-    // 3. Flash d'action rouge/jaune sur la carte principale
-    heroCard.classList.remove('p5-gain-flash');
-    void heroCard.offsetWidth;
-    heroCard.classList.add('p5-gain-flash');
-
-    // 4. Roulement fluide du compteur principal
-    if (jourEl) {
-        const valActuelle = parseFloat(jourEl.innerText) || 0;
-        const nouvValeur = valActuelle + montant;
-        animerValeur(jourEl, valActuelle, nouvValeur, 650, 4);
+        // Nettoyage garanti dans le DOM après l'animation rapide (850ms)
+        setTimeout(() => {
+            if (badge.parentNode) {
+                badge.parentNode.removeChild(badge);
+            }
+        }, 850);
     }
 
-    // Impact sur les totaux mensuel et contrat si simulation
-    if (estSimulation) {
-        bonusSimule += montant;
-        if (moisEl) {
-            const moisVal = parseFloat(moisEl.innerText) || 0;
-            animerValeur(moisEl, moisVal, moisVal + montant, 650, 2);
-        }
-        if (totalEl) {
-            const totalVal = parseFloat(totalEl.innerText) || 0;
-            animerValeur(totalEl, totalVal, totalVal + montant, 650, 2);
-        }
+    // 3. Micro-rebond dynamique sur le montant principal (#mainAmountWrap)
+    if (amountWrap) {
+        amountWrap.classList.remove('minute-tick');
+        void amountWrap.offsetWidth; // Force reflow
+        amountWrap.classList.add('minute-tick');
+        setTimeout(() => {
+            if (amountWrap) amountWrap.classList.remove('minute-tick');
+        }, 450);
     }
 
-    // 5. Carillon sonore
+    // 4. Flash héroïque bref sur la carte principale (#mainHeroCard)
+    if (heroCard) {
+        heroCard.classList.remove('p5-gain-flash');
+        void heroCard.offsetWidth; // Force reflow
+        heroCard.classList.add('p5-gain-flash');
+        setTimeout(() => {
+            if (heroCard) heroCard.classList.remove('p5-gain-flash');
+        }, 450);
+    }
+
+    // 5. Carillon sonore P5R
     emettreSonGain();
+}
 
-    // 6. Nettoyage du badge dans le DOM
-    setTimeout(() => {
-        if (badge.parentNode) {
-            badge.parentNode.removeChild(badge);
-        }
-    }, 2200);
+/**
+ * ==========================================================================
+ * GESTION DU CRÉDIT DES MINUTES & SYNCHRONISATION DES COMPTEURS
+ * ==========================================================================
+ */
+
+/**
+ * Crédite un nombre donné de minutes complètes de salaire
+ * Applique strictement le plafond journalier de 420 minutes (55.23 €)
+ * Déclenche l'animation et met à jour immédiatement l'UI
+ */
+function crediterMinutes(nbMinutes = 1, estSimulation = false) {
+    const totalActuel = creditedMinutesAujourdhui + bonusSimuleMinutes;
+    if (totalActuel >= MAX_MINUTES_JOUR) return;
+
+    const minutesRestantes = MAX_MINUTES_JOUR - totalActuel;
+    const minutesACrediter = Math.min(nbMinutes, minutesRestantes);
+    if (minutesACrediter <= 0) return;
+
+    if (estSimulation) {
+        bonusSimuleMinutes += minutesACrediter;
+    } else {
+        creditedMinutesAujourdhui += minutesACrediter;
+    }
+
+    const gain = minutesACrediter * TAUX_MINUTE;
+    declencherAnimationGain(gain, estSimulation);
+    rafraichirAffichageMontants(new Date());
+}
+
+/**
+ * Rétrocompatibilité : fonction passerelle
+ */
+function declencherNotificationGain(montant = TAUX_MINUTE, estSimulation = false) {
+    crediterMinutes(1, estSimulation);
+}
+
+/**
+ * Met à jour l'affichage de tous les montants et indicateurs (synchrone et cohérent)
+ */
+function rafraichirAffichageMontants(maintenant) {
+    const totalMinutesAujourdhui = Math.min(MAX_MINUTES_JOUR, creditedMinutesAujourdhui + bonusSimuleMinutes);
+    const gagneAujourdhui = totalMinutesAujourdhui * TAUX_MINUTE;
+
+    // Calcul des totaux mensuel et contrat synchronisés avec le jour
+    const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1, 0, 0, 0);
+    const debutMoisEffectif = debutMois < DATE_DEBUT_CONTRAT ? DATE_DEBUT_CONTRAT : debutMois;
+    const secondesPasseesMois = calculerSecondesJoursPrecedents(debutMoisEffectif, maintenant);
+    const gagneMois = (secondesPasseesMois * TAUX_SECONDE) + gagneAujourdhui;
+
+    const secondesPasseesTotal = calculerSecondesJoursPrecedents(DATE_DEBUT_CONTRAT, maintenant);
+    const gagneTotal = (secondesPasseesTotal * TAUX_SECONDE) + gagneAujourdhui;
+
+    // 1. Affichage du montant principal (strictement discret à la minute)
+    const jourEl = document.getElementById('jour');
+    const moisEl = document.getElementById('mois');
+    const totalEl = document.getElementById('total');
+
+    if (jourEl) jourEl.innerText = gagneAujourdhui.toFixed(4);
+    if (moisEl) moisEl.innerText = gagneMois.toFixed(2);
+    if (totalEl) totalEl.innerText = gagneTotal.toFixed(2);
+
+    // 2. Progression journalière (7h = 420 minutes)
+    const ratioJour = Math.min(1, totalMinutesAujourdhui / MAX_MINUTES_JOUR);
+    const pourcentageJour = Math.min(100, ratioJour * 100);
+    const heuresTravailleesTotal = totalMinutesAujourdhui / 60;
+
+    const progressFill = document.getElementById('progressBarFill');
+    const progressText = document.getElementById('progressionPourcent');
+    const heuresText = document.getElementById('heuresTravaillees');
+
+    if (progressFill) progressFill.style.width = `${pourcentageJour.toFixed(1)}%`;
+    if (progressText) progressText.innerText = `${pourcentageJour.toFixed(1)} %`;
+    if (heuresText) heuresText.innerText = `(${heuresTravailleesTotal.toFixed(1)}h / 7h)`;
+
+    // 3. Décomposition des créneaux (Matin & Après-midi) dans la section Analyse
+    const barMatin = document.getElementById('slotBarMorning');
+    const barApresMidi = document.getElementById('slotBarAfternoon');
+    const txtMatin = document.getElementById('slotMorningText');
+    const txtApresMidi = document.getElementById('slotAfternoonText');
+
+    const minutesMatin = Math.min(240, totalMinutesAujourdhui);
+    const minutesApresMidi = Math.max(0, Math.min(180, totalMinutesAujourdhui - 240));
+
+    if (barMatin) {
+        const pctMatin = Math.min(100, (minutesMatin / 240) * 100);
+        barMatin.style.width = `${pctMatin.toFixed(1)}%`;
+        if (txtMatin) txtMatin.innerText = `${pctMatin.toFixed(1)}% accompli • ${(minutesMatin * TAUX_MINUTE).toFixed(2)} € / 31.56 €`;
+    }
+    if (barApresMidi) {
+        const pctApresMidi = Math.min(100, (minutesApresMidi / 180) * 100);
+        barApresMidi.style.width = `${pctApresMidi.toFixed(1)}%`;
+        if (txtApresMidi) txtApresMidi.innerText = `${pctApresMidi.toFixed(1)}% accompli • ${(minutesApresMidi * TAUX_MINUTE).toFixed(2)} € / 23.67 €`;
+    }
 }
 
 /**
@@ -472,91 +555,44 @@ function mettreAJourGraphiqueCurseur(secondesAujourdhui) {
 
 /**
  * ==========================================================================
- * BOUCLE PRINCIPALE DE RAFRAÎCHISSEMENT TEMPS RÉEL
+ * BOUCLE PRINCIPALE DE RAFRAÎCHISSEMENT TEMPS RÉEL (1 SECONDE)
  * ==========================================================================
  */
 function mettreAJour() {
     const maintenant = new Date();
+    const dateJourChaine = maintenant.toDateString();
 
-    // 1. Détermination de l'état de travail & mise à jour du HUD
+    // 1. Détection du passage à un nouveau jour (minuit)
+    if (dateDernierCalculJour !== null && dateDernierCalculJour !== dateJourChaine) {
+        creditedMinutesAujourdhui = 0;
+        bonusSimuleMinutes = 0;
+    }
+    dateDernierCalculJour = dateJourChaine;
+
+    // 2. Détermination de l'état de travail & mise à jour du Date HUD (seconde par seconde)
     const statusInfo = getWorkStatus(maintenant);
     mettreAJourDateHUD(maintenant, statusInfo);
 
-    // 2. Calculs du temps travaillé aujourd'hui
-    let secondesAujourdhui = getSecondesJournee(maintenant);
-    if (modeDemo) {
-        secondesAujourdhui = Math.max(secondesAujourdhui, 4.5 * 3600);
-    }
-    const gagneAujourdhui = (secondesAujourdhui * TAUX_SECONDE) + bonusSimule;
+    // 3. Calcul des minutes de travail entières réellement complétées aujourd'hui
+    const completedMinutes = getMinutesTravailleesAujourdhui(maintenant);
 
-    // 3. Calculs mensuel et contrat
-    const debutMois = new Date(maintenant.getFullYear(), maintenant.getMonth(), 1, 0, 0, 0);
-    const debutMoisEffectif = debutMois < DATE_DEBUT_CONTRAT ? DATE_DEBUT_CONTRAT : debutMois;
-    const secondesMois = calculerSecondesPeriode(debutMoisEffectif, maintenant);
-    const gagneMois = (secondesMois * TAUX_SECONDE) + bonusSimule;
-
-    const secondesTotal = calculerSecondesPeriode(DATE_DEBUT_CONTRAT, maintenant);
-    const gagneTotal = (secondesTotal * TAUX_SECONDE) + bonusSimule;
-
-    // 4. Progression journalière (7h = 25 200 secondes)
-    const maxSecondesJour = 7 * 3600;
-    const ratioJour = Math.min(1, (secondesAujourdhui / maxSecondesJour));
-    const pourcentageJour = Math.min(100, ratioJour * 100);
-    const heuresTravailleesTotal = Math.min(7, (secondesAujourdhui / 3600));
-
-    const progressFill = document.getElementById('progressBarFill');
-    const progressText = document.getElementById('progressionPourcent');
-    const heuresText = document.getElementById('heuresTravaillees');
-
-    if (progressFill) progressFill.style.width = `${pourcentageJour.toFixed(1)}%`;
-    if (progressText) progressText.innerText = `${pourcentageJour.toFixed(1)} %`;
-    if (heuresText) heuresText.innerText = `(${heuresTravailleesTotal.toFixed(1)}h / 7h)`;
-
-    // 5. Décomposition de la section analyse (Créneau Matin & Après-midi)
-    const creneaux = getSecondesParCreneau(maintenant);
-    const barMatin = document.getElementById('slotBarMorning');
-    const barApresMidi = document.getElementById('slotBarAfternoon');
-    const txtMatin = document.getElementById('slotMorningText');
-    const txtApresMidi = document.getElementById('slotAfternoonText');
-
-    if (barMatin) {
-        const pctMatin = Math.min(100, (creneaux.matin / (4 * 3600)) * 100);
-        barMatin.style.width = `${pctMatin.toFixed(1)}%`;
-        if (txtMatin) txtMatin.innerText = `${pctMatin.toFixed(1)}% accompli • ${(creneaux.matin * TAUX_SECONDE).toFixed(2)} € / 31.56 €`;
-    }
-    if (barApresMidi) {
-        const pctApresMidi = Math.min(100, (creneaux.apresMidi / (3 * 3600)) * 100);
-        barApresMidi.style.width = `${pctApresMidi.toFixed(1)}%`;
-        if (txtApresMidi) txtApresMidi.innerText = `${pctApresMidi.toFixed(1)}% accompli • ${(creneaux.apresMidi * TAUX_SECONDE).toFixed(2)} € / 23.67 €`;
-    }
-
-    // 6. Mise à jour du curseur temporel sur le graphique SVG
-    mettreAJourGraphiqueCurseur(secondesAujourdhui);
-
-    // 7. Affichage des montants
-    const heroCard = document.getElementById('mainHeroCard');
-    const jourEl = document.getElementById('jour');
-    const moisEl = document.getElementById('mois');
-    const totalEl = document.getElementById('total');
-
-    if (jourEl && !heroCard.classList.contains('p5-gain-flash')) {
-        jourEl.innerText = gagneAujourdhui.toFixed(4);
-    }
-    if (moisEl && !heroCard.classList.contains('p5-gain-flash')) {
-        moisEl.innerText = gagneMois.toFixed(2);
-    }
-    if (totalEl && !heroCard.classList.contains('p5-gain-flash')) {
-        totalEl.innerText = gagneTotal.toFixed(2);
-    }
-
-    // 8. Détection du passage de minute pour le déclencheur de gain
-    const minuteActuelle = maintenant.getMinutes();
-    if (dernierMinuteEnregistree !== -1 && minuteActuelle !== dernierMinuteEnregistree) {
-        if (statusInfo.enPoste) {
-            declencherNotificationGain(TAUX_MINUTE, false);
+    // 4. Traitement initial (Boot) vs régime continu
+    if (isInitialBoot) {
+        // Initialisation silencieuse sans animation
+        creditedMinutesAujourdhui = Math.min(MAX_MINUTES_JOUR, completedMinutes);
+        isInitialBoot = false;
+        rafraichirAffichageMontants(maintenant);
+    } else {
+        // Régime continu : détection d'une nouvelle minute complète franchie
+        if (completedMinutes > creditedMinutesAujourdhui) {
+            const diff = completedMinutes - creditedMinutesAujourdhui;
+            crediterMinutes(diff, false);
         }
     }
-    dernierMinuteEnregistree = minuteActuelle;
+
+    // 5. Mise à jour du curseur temporel sur le graphique SVG
+    const secondesAujourdhui = getSecondesJournee(maintenant);
+    mettreAJourGraphiqueCurseur(secondesAujourdhui);
 }
 
 /**
@@ -604,7 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnSimuler) {
         btnSimuler.addEventListener('click', () => {
             jouerSonMenu();
-            declencherNotificationGain(TAUX_MINUTE, true);
+            crediterMinutes(1, true);
         });
     }
 
@@ -618,11 +654,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if (modeDemo) {
                 btnDemo.classList.add('active');
                 demoLabel.innerText = 'ACTIVE // TEMPS RÉEL';
-                declencherNotificationGain(TAUX_MINUTE, true);
+                // Crédite immédiatement 1 minute, puis 1 minute toutes les 5 secondes
+                crediterMinutes(1, true);
+                if (demoInterval) clearInterval(demoInterval);
+                demoInterval = setInterval(() => {
+                    crediterMinutes(1, true);
+                }, 5000);
             } else {
                 btnDemo.classList.remove('active');
                 demoLabel.innerText = 'INACTIVE';
-                bonusSimule = 0;
+                if (demoInterval) {
+                    clearInterval(demoInterval);
+                    demoInterval = null;
+                }
+                bonusSimuleMinutes = 0;
+                rafraichirAffichageMontants(new Date());
             }
             mettreAJour();
         });

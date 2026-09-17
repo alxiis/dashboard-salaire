@@ -778,9 +778,9 @@ body {
     transform: rotate(-0.2deg) translateY(-4px);
 }
 
-/* Flash rouge/jaune énergique lors du gain */
+/* Flash rouge/jaune énergique lors du gain (P5R 450ms) */
 .p5-hero-card.p5-gain-flash {
-    animation: p5HeroFlash 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: p5HeroFlash 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes p5HeroFlash {
@@ -908,6 +908,30 @@ body {
     100% { transform: scale(1) translateY(0); }
 }
 
+/* Micro-rebond JRPG nerveux lors du crédit de minute (P5R 400ms) */
+.p5-main-amount-wrap.minute-tick {
+    animation: p5MinuteTickPop 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes p5MinuteTickPop {
+    0% {
+        transform: scale(1) translateY(0) rotate(0deg);
+        filter: brightness(1);
+    }
+    30% {
+        transform: scale(1.06) translateY(-4px) rotate(-1.5deg);
+        filter: brightness(1.35) drop-shadow(0 0 10px var(--p5-yellow));
+    }
+    65% {
+        transform: scale(1.01) translateY(-1px) rotate(0.4deg);
+        filter: brightness(1.1);
+    }
+    100% {
+        transform: scale(1) translateY(0) rotate(0deg);
+        filter: brightness(1);
+    }
+}
+
 .p5-huge-digits {
     font-size: clamp(3.8rem, 8.5vw, 6.8rem);
     font-weight: 800;
@@ -926,7 +950,7 @@ body {
     text-shadow: 4px 4px 0px #000;
 }
 
-/* Notification de gain jaillissante (+X.XXXX €) */
+/* Notification de gain jaillissante (+0.1315 €) - Pop rapide ~850ms */
 .p5-floating-anchor {
     position: absolute;
     top: -28px;
@@ -948,7 +972,7 @@ body {
     border: 3px solid #000;
     box-shadow: 5px 5px 0px var(--p5-red), 9px 9px 0px #000;
     transform: rotate(-6deg) skewX(-12deg);
-    animation: p5FloatSlash 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: p5FloatSlash 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     white-space: nowrap;
 }
 
@@ -960,22 +984,23 @@ body {
 @keyframes p5FloatSlash {
     0% {
         opacity: 0;
-        transform: scale(0.35) translateY(28px) rotate(-20deg);
+        transform: scale(0.35) translateY(24px) rotate(-16deg);
     }
-    18% {
+    22% {
         opacity: 1;
-        transform: scale(1.15) translateY(-6px) rotate(-6deg);
+        transform: scale(1.12) translateY(-4px) rotate(-5deg);
     }
-    35% {
-        transform: scale(1.0) translateY(-12px) rotate(-4deg);
+    45% {
+        opacity: 1;
+        transform: scale(1.0) translateY(-10px) rotate(-3deg);
     }
     75% {
-        opacity: 1;
-        transform: scale(1.0) translateY(-38px) rotate(-2deg);
+        opacity: 0.95;
+        transform: scale(0.98) translateY(-26px) rotate(-1deg);
     }
     100% {
         opacity: 0;
-        transform: scale(0.85) translateY(-62px) rotate(4deg);
+        transform: scale(0.85) translateY(-48px) rotate(3deg);
     }
 }
 
