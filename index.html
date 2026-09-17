@@ -39,11 +39,11 @@
         <div class="p5-stripe-band"></div>
     </div>
 
-    <!-- Conteneur principal (Largeur 1200px aérée) -->
-    <div class="p5-dashboard-container">
+    <!-- Conteneur d'Application Global Persona 5 Royal -->
+    <div class="p5-app-container">
 
         <!-- ====================================================================
-             1. HEADER ASYMÉTRIQUE & HUD TEMPOREL PERSONA 5 ROYAL (STICKER TOP-LEFT)
+             1. HEADER UNIFIÉ & HUD TEMPOREL PERSONA 5 ROYAL (STICKER TOP-LEFT PERMANENT)
              ==================================================================== -->
         <header class="p5-header" id="sectionHeader">
             <!-- HUD Temporel Collage Persona 5 Royal (Top-Left Sticker Multi-Couches) -->
@@ -79,8 +79,22 @@
                 </div>
             </div>
 
-            <!-- Marque & Statut Général du Système (Côté Droit du Header) -->
+            <!-- Contrôles de Navigation du Header & Statut Général du Système -->
             <div class="p5-header-right-group">
+                <!-- Bouton Retour au Menu Principal (Visible dans les sous-modules) -->
+                <button id="btnBackToMenu" class="p5-btn-back hidden" title="Retourner au Menu Principal (Échap)" aria-label="Retour au Menu Principal" data-back-to-menu>
+                    <span class="back-arrow">◀</span>
+                    <span class="back-text">MENU PRINCIPAL</span>
+                    <span class="back-kbd">ESC</span>
+                </button>
+
+                <!-- Badge HUD mode Hub (Visible sur le Main Menu) -->
+                <div id="hubModeBadge" class="p5-hub-mode-tag">
+                    <span class="tag-radar">◆</span>
+                    <span class="tag-label">HUB // SELECTION MODE</span>
+                </div>
+
+                <!-- Marque & Identité -->
                 <div class="p5-brand-block">
                     <div class="p5-logo-icon">
                         <span class="p5-star">★</span>
@@ -108,8 +122,139 @@
                     </div>
                     <div class="hud-status-caption" id="statutDescription">Compteur actif en direct</div>
                 </div>
+
+                <!-- Bouton Rapide Audio SFX dans le Header -->
+                <button class="p5-btn-audio-header" id="btnHeaderAudio" title="Activer / Désactiver les effets sonores">
+                    <span class="audio-note" id="headerAudioIcon">♪</span>
+                    <span class="audio-state-text" id="headerAudioLabel">SFX</span>
+                </button>
             </div>
         </header>
+
+        <!-- ====================================================================
+             CONTENEUR DES VUES (MAIN MENU | DASHBOARD | CALENDRIER | GTA 6)
+             ==================================================================== -->
+        <div class="p5-views-viewport" id="viewsViewport">
+
+            <!-- ================================================================
+                 VUE 0 // MENU PRINCIPAL JRPG HUB (PAGE D'ACCUEIL PAR DÉFAUT)
+                 ================================================================ -->
+            <section id="viewMainMenu" class="p5-view p5-view-main-menu active" aria-label="Menu Principal Salary Pulse">
+                <div class="p5-main-menu-content">
+                    
+                    <!-- Identité graphique monumentale Persona 5 en double couche -->
+                    <div class="p5-menu-hero-block">
+                        <div class="p5-menu-title-wrap">
+                            <div class="menu-brand-tag">
+                                <span class="star-icon">★</span>
+                                <span class="brand-salary">SALARY</span>
+                                <span class="sub-protocol">PROTOCOL // ROYALE V2.5</span>
+                            </div>
+                            <div class="menu-brand-pulse">
+                                <span class="pulse-text">PULSE</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p5-menu-system-ribbon">
+                            <span class="ribbon-radar">◆</span>
+                            <span class="ribbon-main">SELECT MODULE</span>
+                            <span class="ribbon-detail">// DESTINATION SELECTION INTERFACE</span>
+                        </div>
+                    </div>
+
+                    <!-- Grille asymétrique des 3 modules (Composition JRPG) -->
+                    <div class="p5-menu-grid" role="menubar" aria-label="Sélection des modules">
+
+                        <!-- 1. MODULE PRINCIPAL HERO : DASHBOARD SALARY (DOMINANT) -->
+                        <div class="p5-menu-card card-dashboard-hero is-selected" id="menuOptDashboard" role="menuitem" tabindex="0" data-module="dashboard" aria-label="Ouvrir le module Dashboard Salary">
+                            <div class="card-accent-tape"></div>
+                            <div class="card-number-badge">
+                                <span class="badge-prefix">MOD</span>
+                                <span class="badge-num">01</span>
+                            </div>
+                            <div class="card-content-wrap">
+                                <div class="card-tag-row">
+                                    <span class="card-status-pill"><span class="pulse-dot">●</span> ACTIF EN DIRECT</span>
+                                    <span class="card-rate-pill">7.89 € / HEURE NET</span>
+                                    <span class="card-rate-cadence">+0.1315 € / MIN</span>
+                                </div>
+                                <h2 class="card-title">DASHBOARD SALARY</h2>
+                                <p class="card-desc">
+                                    Moteur temps réel de suivi des rémunérations. Compteur discret snapé à la minute (+0.1315 €), analyse des créneaux (08h30-12h30 &amp; 13h30-16h30), progression 7h et simulateur de gains.
+                                </p>
+                                <div class="card-enter-prompt">
+                                    <span class="prompt-arrow">▶</span>
+                                    <span class="prompt-label">ACCÉDER AU DASHBOARD</span>
+                                    <span class="prompt-key">ENTER</span>
+                                </div>
+                            </div>
+                            <div class="card-slash-decor"></div>
+                        </div>
+
+                        <!-- 2. MODULE SECONDAIRE BISEAUTÉ : CALENDRIER -->
+                        <div class="p5-menu-card card-calendar" id="menuOptCalendar" role="menuitem" tabindex="0" data-module="calendar" aria-label="Ouvrir le module Calendrier">
+                            <div class="card-number-badge">
+                                <span class="badge-prefix">MOD</span>
+                                <span class="badge-num">02</span>
+                            </div>
+                            <div class="card-content-wrap">
+                                <div class="card-tag-row">
+                                    <span class="card-status-pill pill-prep">EN PRÉPARATION</span>
+                                    <span class="card-rate-pill pill-yellow">PLANNING // 35H</span>
+                                </div>
+                                <h2 class="card-title">CALENDRIER</h2>
+                                <p class="card-desc">
+                                    Synchronisation des cycles contractuels, suivi des jours ouvrés, gestion des absences et calcul des échéances de paie mensuelles.
+                                </p>
+                                <div class="card-enter-prompt">
+                                    <span class="prompt-arrow">▶</span>
+                                    <span class="prompt-label">VOIR L'APERÇU DU MODULE</span>
+                                    <span class="prompt-key">ENTER</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. MODULE SECONDAIRE SLASH : GTA 6 COUNTDOWN -->
+                        <div class="p5-menu-card card-gta" id="menuOptGta" role="menuitem" tabindex="0" data-module="gta" aria-label="Ouvrir le module GTA 6 Countdown">
+                            <div class="card-number-badge">
+                                <span class="badge-prefix">MOD</span>
+                                <span class="badge-num">03</span>
+                            </div>
+                            <div class="card-content-wrap">
+                                <div class="card-tag-row">
+                                    <span class="card-status-pill pill-classified">CLASSIFIED</span>
+                                    <span class="card-rate-pill pill-vice">VICE CITY PROTOCOL</span>
+                                </div>
+                                <h2 class="card-title">GTA 6 <span class="title-slash">COUNTDOWN</span></h2>
+                                <p class="card-desc">
+                                    Compte à rebours officiel et tableau de bord prévisionnel pour le lancement le plus attendu de la décennie.
+                                </p>
+                                <div class="card-enter-prompt">
+                                    <span class="prompt-arrow">▶</span>
+                                    <span class="prompt-label">INSPECTER LE MODULE</span>
+                                    <span class="prompt-key">ENTER</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Bandeau d'aide / Contrôles clavier JRPG -->
+                    <div class="p5-menu-hud-footer">
+                        <div class="hud-control-chip"><span class="k-tag">↑ / ↓</span> <span>NAVIGUER</span></div>
+                        <div class="hud-control-chip"><span class="k-tag">ENTER</span> <span>SÉLECTIONNER</span></div>
+                        <div class="hud-control-chip"><span class="k-tag">ESC</span> <span>RETOUR MENU</span></div>
+                        <div class="hud-control-chip"><span class="k-tag">CLIC / TOUCH</span> <span>ACCÈS DIRECT</span></div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ================================================================
+                 VUE 1 // DASHBOARD SALARY PULSE EXISTANT (PRÉSERVÉ À 100%)
+                 ================================================================ -->
+            <section id="viewDashboard" class="p5-view p5-view-dashboard" aria-label="Dashboard Salary Pulse">
+                <div class="p5-dashboard-container">
 
         <!-- ====================================================================
              2. NAVIGATION EN ONGLETS BISEAUTÉS (JRPG TABS)
@@ -484,6 +629,140 @@
             <div class="p5-footer-version">P5R-V2.5-ROYALE</div>
         </footer>
 
+                </div>
+            </section>
+
+            <!-- ================================================================
+                 VUE 2 // CALENDRIER (MODULE PLACEHOLDER)
+                 ================================================================ -->
+            <section id="viewCalendar" class="p5-view p5-placeholder-view" aria-label="Module Calendrier">
+                <div class="p5-placeholder-container">
+                    
+                    <div class="p5-placeholder-banner">
+                        <div class="banner-tag">MODULE 02 // SCHEDULE ARCHITECTURE</div>
+                        <h1 class="placeholder-hero-title">CALENDRIER</h1>
+                        <div class="placeholder-sub-ribbon">GESTION DES CYCLES &amp; HORAIRES CONTRACTUELS</div>
+                    </div>
+
+                    <div class="p5-placeholder-card card-theme-calendar">
+                        <div class="card-hazard-stripe"></div>
+                        
+                        <div class="placeholder-status-badge">
+                            <span class="badge-icon">★</span>
+                            <span>MODULE EN PRÉPARATION // COMING SOON</span>
+                        </div>
+
+                        <p class="placeholder-lead-text">
+                            L'infrastructure de navigation est connectée. Cet espace accueillera le calendrier synchronisé sur vos plages de travail (08h30-12h30 et 13h30-16h30), les décomptes de jours ouvrés, les congés et les cycles de paie.
+                        </p>
+
+                        <div class="placeholder-feature-grid">
+                            <div class="feature-slot">
+                                <span class="slot-idx">01</span>
+                                <span class="slot-title">CYCLES DE PAIE</span>
+                                <span class="slot-desc">Suivi des échéances et des cumuls salariaux mensuels</span>
+                            </div>
+                            <div class="feature-slot">
+                                <span class="slot-idx">02</span>
+                                <span class="slot-title">HORAIRES DU CONTRAT</span>
+                                <span class="slot-desc">Planification des sessions de 7h (08h30-12h30 / 13h30-16h30)</span>
+                            </div>
+                            <div class="feature-slot">
+                                <span class="slot-idx">03</span>
+                                <span class="slot-title">CONGÉS &amp; JOURS FÉRIÉS</span>
+                                <span class="slot-desc">Intégration du calendrier chômé et maintien du taux net</span>
+                            </div>
+                        </div>
+
+                        <div class="placeholder-actions">
+                            <button class="p5-btn-action btn-return-menu" data-back-to-menu>
+                                <span class="btn-icon">◀</span>
+                                <div class="btn-labels">
+                                    <span class="btn-main-text">RETOURNER AU MENU PRINCIPAL</span>
+                                    <span class="btn-sub-text">OU APPUYER SUR LA TOUCHE ÉCHAP [ESC]</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- ================================================================
+                 VUE 3 // GTA 6 COUNTDOWN (MODULE PLACEHOLDER)
+                 ================================================================ -->
+            <section id="viewGtaCountdown" class="p5-view p5-placeholder-view" aria-label="Module GTA 6 Countdown">
+                <div class="p5-placeholder-container">
+                    
+                    <div class="p5-placeholder-banner banner-gta">
+                        <div class="banner-tag">MODULE 03 // VICE CITY PROTOCOL</div>
+                        <h1 class="placeholder-hero-title title-gta">GTA 6 <span class="sub-banner-text">COUNTDOWN</span></h1>
+                        <div class="placeholder-sub-ribbon">PROTOCOLE DE COMPTE À REBOURS OFFICIEL</div>
+                    </div>
+
+                    <div class="p5-placeholder-card card-theme-gta">
+                        <div class="card-hazard-stripe stripe-vice"></div>
+                        
+                        <div class="placeholder-status-badge badge-gta">
+                            <span class="badge-icon">◆</span>
+                            <span>CLASSIFIED DATA // PROTOCOLE EN ATTENTE</span>
+                        </div>
+
+                        <p class="placeholder-lead-text">
+                            Ce module dédié sera activé dès la confirmation des données de lancement officielles par Rockstar Games. Aucune date arbitraire n'est hardcodée pour préserver l'intégrité du système.
+                        </p>
+
+                        <!-- Slots d'attente d'horloge de compte à rebours -->
+                        <div class="gta-countdown-slots">
+                            <div class="countdown-slot-box">
+                                <span class="slot-digit">--</span>
+                                <span class="slot-unit">JOURS</span>
+                            </div>
+                            <span class="countdown-sep">:</span>
+                            <div class="countdown-slot-box">
+                                <span class="slot-digit">--</span>
+                                <span class="slot-unit">HEURES</span>
+                            </div>
+                            <span class="countdown-sep">:</span>
+                            <div class="countdown-slot-box">
+                                <span class="slot-digit">--</span>
+                                <span class="slot-unit">MINUTES</span>
+                            </div>
+                            <span class="countdown-sep">:</span>
+                            <div class="countdown-slot-box">
+                                <span class="slot-digit">--</span>
+                                <span class="slot-unit">SECONDES</span>
+                            </div>
+                        </div>
+
+                        <div class="placeholder-actions">
+                            <button class="p5-btn-action btn-return-menu" data-back-to-menu>
+                                <span class="btn-icon">◀</span>
+                                <div class="btn-labels">
+                                    <span class="btn-main-text">RETOURNER AU MENU PRINCIPAL</span>
+                                    <span class="btn-sub-text">OU APPUYER SUR LA TOUCHE ÉCHAP [ESC]</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Rideau de Transition Graphique JRPG (Wipe Slash P5R ~400ms) -->
+    <div id="p5TransitionWipe" class="p5-transition-wipe" aria-hidden="true">
+        <div class="wipe-band band-black"></div>
+        <div class="wipe-band band-red">
+            <div class="wipe-content">
+                <span class="wipe-star">★</span>
+                <span class="wipe-text" id="wipeText">TAKE YOUR TIME</span>
+                <span class="wipe-sub" id="wipeSub">SYSTEM SHIFTING...</span>
+            </div>
+        </div>
+        <div class="wipe-band band-yellow"></div>
     </div>
 
     <!-- Script principal de calcul & d'animation -->

@@ -265,6 +265,99 @@ function jouerSonMenu() {
 }
 
 /**
+ * Son de survol / déplacement dans les cartes du menu JRPG (Bip aigu ultra-court)
+ */
+function jouerSonSurvol() {
+    if (!audioActif) return;
+    try {
+        initialiserAudioContext();
+        const t = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(850, t);
+        osc.frequency.exponentialRampToValueAtTime(1300, t + 0.035);
+
+        gain.gain.setValueAtTime(0.025, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.04);
+    } catch (e) {
+        // Silencieux
+    }
+}
+
+/**
+ * Son de validation / confirmation JRPG (Double accord ascendant dynamique)
+ */
+function jouerSonConfirmation() {
+    if (!audioActif) return;
+    try {
+        initialiserAudioContext();
+        const t = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(523.25, t); // C5
+        osc1.frequency.setValueAtTime(659.25, t + 0.06); // E5
+        osc1.frequency.setValueAtTime(1046.50, t + 0.12); // C6
+
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(261.63, t); // C4
+        osc2.frequency.setValueAtTime(523.25, t + 0.12); // C5
+
+        gain.gain.setValueAtTime(0.045, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc1.start(t);
+        osc2.start(t);
+        osc1.stop(t + 0.28);
+        osc2.stop(t + 0.28);
+    } catch (e) {
+        // Silencieux
+    }
+}
+
+/**
+ * Son de retour au menu principal (Chime descendant)
+ */
+function jouerSonRetour() {
+    if (!audioActif) return;
+    try {
+        initialiserAudioContext();
+        const t = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(920, t);
+        osc.frequency.exponentialRampToValueAtTime(360, t + 0.12);
+
+        gain.gain.setValueAtTime(0.035, t);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(t);
+        osc.stop(t + 0.14);
+    } catch (e) {
+        // Silencieux
+    }
+}
+
+/**
  * Son de gain financier JRPG (Carillon d'or triomphant)
  */
 function emettreSonGain() {
@@ -597,6 +690,136 @@ function mettreAJour() {
 
 /**
  * ==========================================================================
+ * NAVIGATION MULTI-MODULES & CONTRÔLEUR DE HUB (PERSONA 5 ROYAL)
+ * ==========================================================================
+ */
+let vueCourante = 'viewMainMenu';
+let menuIndexSelectionne = 0;
+let estEnTransition = false;
+
+/**
+ * Synchronise l'état visuel du son entre le header et le panneau dashboard
+ */
+function synchroniserEtatAudio() {
+    const btnAudio = document.getElementById('btnAudioToggle');
+    const audioLabel = document.getElementById('audioLabel');
+    const btnHeaderAudio = document.getElementById('btnHeaderAudio');
+    const headerAudioIcon = document.getElementById('headerAudioIcon');
+    const headerAudioLabel = document.getElementById('headerAudioLabel');
+
+    if (btnAudio && audioLabel) {
+        if (audioActif) {
+            btnAudio.classList.add('active');
+            audioLabel.innerText = 'ACTIVÉ // STÉRÉO';
+        } else {
+            btnAudio.classList.remove('active');
+            audioLabel.innerText = 'DÉSACTIVÉ';
+        }
+    }
+
+    if (btnHeaderAudio && headerAudioIcon && headerAudioLabel) {
+        if (audioActif) {
+            btnHeaderAudio.classList.add('active');
+            headerAudioIcon.innerText = '🔊';
+            headerAudioLabel.innerText = 'SFX ON';
+        } else {
+            btnHeaderAudio.classList.remove('active');
+            headerAudioIcon.innerText = '🔈';
+            headerAudioLabel.innerText = 'SFX OFF';
+        }
+    }
+}
+
+/**
+ * Bascule dynamiquement d'une vue à l'autre avec transition JRPG Wipe Slash (~400ms)
+ */
+function naviguerVers(nomVue) {
+    if (estEnTransition || vueCourante === nomVue) return;
+    const vueCible = document.getElementById(nomVue);
+    if (!vueCible) return;
+
+    estEnTransition = true;
+
+    if (nomVue === 'viewMainMenu') {
+        jouerSonRetour();
+    } else {
+        jouerSonConfirmation();
+    }
+
+    const wipeEl = document.getElementById('p5TransitionWipe');
+    const wipeText = document.getElementById('wipeText');
+    const wipeSub = document.getElementById('wipeSub');
+
+    if (wipeText && wipeSub) {
+        switch (nomVue) {
+            case 'viewDashboard':
+                wipeText.innerText = 'TAKE YOUR TIME';
+                wipeSub.innerText = 'SYSTEM // ACCESSING SALARY ENGINE...';
+                break;
+            case 'viewCalendar':
+                wipeText.innerText = 'LOOK AHEAD';
+                wipeSub.innerText = 'SYSTEM // ACCESSING CALENDAR HUB...';
+                break;
+            case 'viewGtaCountdown':
+                wipeText.innerText = 'VICE CITY 2026';
+                wipeSub.innerText = 'SYSTEM // SYNCING COUNTDOWN PROTOCOL...';
+                break;
+            default:
+                wipeText.innerText = 'SYSTEM HUB';
+                wipeSub.innerText = 'SYSTEM // RETURNING TO MAIN MENU...';
+        }
+    }
+
+    if (wipeEl) wipeEl.classList.add('is-wiping');
+
+    // Basculement effectif du DOM à mi-parcours de l'animation (~200ms)
+    setTimeout(() => {
+        document.querySelectorAll('.p5-view').forEach(v => v.classList.remove('active'));
+        vueCible.classList.add('active');
+        vueCourante = nomVue;
+
+        const btnBack = document.getElementById('btnBackToMenu');
+        const hubBadge = document.getElementById('hubModeBadge');
+
+        if (nomVue === 'viewMainMenu') {
+            if (btnBack) btnBack.classList.add('hidden');
+            if (hubBadge) hubBadge.classList.remove('hidden');
+        } else {
+            if (btnBack) btnBack.classList.remove('hidden');
+            if (hubBadge) hubBadge.classList.add('hidden');
+        }
+
+        window.scrollTo({ top: 0, behavior: 'instant' });
+    }, 200);
+
+    // Déverrouillage et fin du wipe (~420ms)
+    setTimeout(() => {
+        if (wipeEl) wipeEl.classList.remove('is-wiping');
+        estEnTransition = false;
+
+        if (nomVue === 'viewMainMenu') {
+            const cartes = [
+                document.getElementById('menuOptDashboard'),
+                document.getElementById('menuOptCalendar'),
+                document.getElementById('menuOptGta')
+            ].filter(Boolean);
+            const cardActuelle = cartes[menuIndexSelectionne];
+            if (cardActuelle) cardActuelle.focus();
+        }
+    }, 420);
+}
+
+/**
+ * Raccourci de retour au Menu Principal
+ */
+function retournerMenu() {
+    if (vueCourante !== 'viewMainMenu') {
+        naviguerVers('viewMainMenu');
+    }
+}
+
+/**
+ * ==========================================================================
  * INITIALISATION DU SYSTÈME & ÉVÉNEMENTS DU DOM
  * ==========================================================================
  */
@@ -615,11 +838,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, 480);
 
-    // 2. Lancement immédiat de la boucle de suivi
+    // 2. Lancement immédiat de la boucle de suivi temps réel (arrière-plan constant)
     mettreAJour();
     setInterval(mettreAJour, 1000);
 
-    // 3. Navigation par onglets biseautés JRPG
+    // 3. Navigation par onglets biseautés JRPG (Sous-sections du Dashboard)
     const tabButtons = document.querySelectorAll('.p5-tab-btn');
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -674,21 +897,105 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. Bouton Audio SFX
+    // 6. Bouton Audio SFX (Dashboard)
     const btnAudio = document.getElementById('btnAudioToggle');
-    const audioLabel = document.getElementById('audioLabel');
-    if (btnAudio && audioLabel) {
+    if (btnAudio) {
         btnAudio.addEventListener('click', () => {
             audioActif = !audioActif;
             if (audioActif) {
-                btnAudio.classList.add('active');
-                audioLabel.innerText = 'ACTIVÉ // STÉRÉO';
                 initialiserAudioContext();
                 emettreSonGain();
-            } else {
-                btnAudio.classList.remove('active');
-                audioLabel.innerText = 'DÉSACTIVÉ';
             }
+            synchroniserEtatAudio();
         });
     }
+
+    // 7. Bouton Audio SFX (Header Rapide)
+    const btnHeaderAudio = document.getElementById('btnHeaderAudio');
+    if (btnHeaderAudio) {
+        btnHeaderAudio.addEventListener('click', () => {
+            audioActif = !audioActif;
+            if (audioActif) {
+                initialiserAudioContext();
+                emettreSonGain();
+            }
+            synchroniserEtatAudio();
+        });
+    }
+
+    // 8. Contrôleur des cartes du Menu Principal (Hub JRPG)
+    const cartesMenu = [
+        document.getElementById('menuOptDashboard'),
+        document.getElementById('menuOptCalendar'),
+        document.getElementById('menuOptGta')
+    ].filter(Boolean);
+
+    function selectionnerIndexMenu(nouveauIndex, avecSon = false) {
+        if (cartesMenu.length === 0) return;
+        menuIndexSelectionne = (nouveauIndex + cartesMenu.length) % cartesMenu.length;
+        cartesMenu.forEach((carte, idx) => {
+            carte.classList.toggle('is-selected', idx === menuIndexSelectionne);
+        });
+        if (avecSon) {
+            jouerSonSurvol();
+        }
+    }
+
+    // Interactions souris et tactile sur les cartes
+    cartesMenu.forEach((carte, idx) => {
+        carte.addEventListener('mouseenter', () => {
+            if (vueCourante === 'viewMainMenu' && menuIndexSelectionne !== idx) {
+                selectionnerIndexMenu(idx, true);
+            }
+        });
+
+        carte.addEventListener('click', () => {
+            const mod = carte.getAttribute('data-module');
+            const targetView = mod === 'dashboard' ? 'viewDashboard' : (mod === 'calendar' ? 'viewCalendar' : 'viewGtaCountdown');
+            naviguerVers(targetView);
+        });
+    });
+
+    // Boutons de retour au Menu Principal (Header et Placeholders)
+    document.querySelectorAll('[data-back-to-menu]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            retournerMenu();
+        });
+    });
+
+    // Raccourcis clavier globaux JRPG (↑, ↓, Entrée, Échap)
+    window.addEventListener('keydown', (e) => {
+        if (estEnTransition) return;
+
+        // Touche Échap [ESC] : retour immédiat au Hub depuis n'importe quel sous-module
+        if (e.key === 'Escape') {
+            if (vueCourante !== 'viewMainMenu') {
+                e.preventDefault();
+                retournerMenu();
+            }
+            return;
+        }
+
+        // Touches actives uniquement sur le Menu Principal
+        if (vueCourante === 'viewMainMenu') {
+            if (e.key === 'ArrowDown' || e.key === 'KeyS') {
+                e.preventDefault();
+                selectionnerIndexMenu(menuIndexSelectionne + 1, true);
+            } else if (e.key === 'ArrowUp' || e.key === 'KeyW') {
+                e.preventDefault();
+                selectionnerIndexMenu(menuIndexSelectionne - 1, true);
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const carte = cartesMenu[menuIndexSelectionne];
+                if (carte) {
+                    const mod = carte.getAttribute('data-module');
+                    const targetView = mod === 'dashboard' ? 'viewDashboard' : (mod === 'calendar' ? 'viewCalendar' : 'viewGtaCountdown');
+                    naviguerVers(targetView);
+                }
+            }
+        }
+    });
+
+    // Initialisation de l'affichage audio au chargement
+    synchroniserEtatAudio();
 });
