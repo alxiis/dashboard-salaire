@@ -621,8 +621,9 @@ function mettreAJourDateHUD(date, statusInfo) {
         descStatut.innerText = statusInfo.desc;
     }
 
-    // 4. Application de la classe de thème sur le <body>
-    document.body.className = statusInfo.bodyClass;
+    // 4. Application de la classe de thème sur le <body> (en préservant l'état in-main-menu / in-submodule)
+    const modeVueClass = (vueCourante === 'viewMainMenu') ? 'in-main-menu' : 'in-submodule';
+    document.body.className = `${statusInfo.bodyClass} ${modeVueClass}`;
 }
 
 /**
@@ -731,6 +732,57 @@ function synchroniserEtatAudio() {
 }
 
 /**
+ * Récupère la liste ordonnée des 3 commandes du Menu Principal
+ */
+function getCommandElements() {
+    return [
+        document.getElementById('cmdDashboard'),
+        document.getElementById('cmdCalendar'),
+        document.getElementById('cmdGta')
+    ].filter(Boolean);
+}
+
+/**
+ * Repositionne dynamiquement le curseur/pointeur (#p5CommandPointer)
+ */
+function repositionnerPointeur() {
+    const pointer = document.getElementById('p5CommandPointer');
+    const commandItems = getCommandElements();
+    if (!pointer || commandItems.length === 0) return;
+    const activeCmd = commandItems[menuIndexSelectionne];
+    if (!activeCmd) return;
+
+    const topPos = activeCmd.offsetTop + 14;
+    const leftPos = Math.max(-80, activeCmd.offsetLeft - 76);
+    pointer.style.top = `${topPos}px`;
+    pointer.style.left = `${leftPos}px`;
+}
+
+/**
+ * Sélectionne une commande du Main Menu par son index (0: Dashboard, 1: Calendrier, 2: GTA 6)
+ */
+function selectionnerIndexCommande(nouveauIndex, avecSon = false) {
+    const commandItems = getCommandElements();
+    if (commandItems.length === 0) return;
+
+    // Boucle cyclique : 0 -> 1 -> 2 -> 0 ou 0 -> 2 -> 1 -> 0
+    menuIndexSelectionne = (nouveauIndex + commandItems.length) % commandItems.length;
+
+    commandItems.forEach((cmd, idx) => {
+        const isSel = idx === menuIndexSelectionne;
+        cmd.classList.toggle('is-selected', isSel);
+        cmd.classList.toggle('is-dimmed', !isSel);
+        cmd.setAttribute('aria-selected', isSel ? 'true' : 'false');
+    });
+
+    repositionnerPointeur();
+
+    if (avecSon) {
+        jouerSonSurvol();
+    }
+}
+
+/**
  * Bascule dynamiquement d'une vue à l'autre avec transition JRPG Wipe Slash (~400ms)
  */
 function naviguerVers(nomVue) {
@@ -739,6 +791,13 @@ function naviguerVers(nomVue) {
     if (!vueCible) return;
 
     estEnTransition = true;
+
+    // Animation cinématique d'impact 'is-launching' sur la commande si on part du menu
+    const commandItems = getCommandElements();
+    const activeCmd = commandItems[menuIndexSelectionne];
+    if (vueCourante === 'viewMainMenu' && activeCmd) {
+        activeCmd.classList.add('is-launching');
+    }
 
     if (nomVue === 'viewMainMenu') {
         jouerSonRetour();
@@ -770,13 +829,26 @@ function naviguerVers(nomVue) {
         }
     }
 
-    if (wipeEl) wipeEl.classList.add('is-wiping');
+    // Le wipe démarre 120ms après l'impact initial pour un enchaînement cinéma P5R
+    const delaiWipe = (vueCourante === 'viewMainMenu') ? 120 : 0;
+    setTimeout(() => {
+        if (wipeEl) wipeEl.classList.add('is-wiping');
+    }, delaiWipe);
 
-    // Basculement effectif du DOM à mi-parcours de l'animation (~200ms)
+    // Basculement effectif du DOM à mi-parcours de l'animation (~220ms après le départ du wipe)
     setTimeout(() => {
         document.querySelectorAll('.p5-view').forEach(v => v.classList.remove('active'));
         vueCible.classList.add('active');
         vueCourante = nomVue;
+
+        // Mise à jour de la classe de mode sur le body pour le style du header
+        if (nomVue === 'viewMainMenu') {
+            document.body.classList.add('in-main-menu');
+            document.body.classList.remove('in-submodule');
+        } else {
+            document.body.classList.remove('in-main-menu');
+            document.body.classList.add('in-submodule');
+        }
 
         const btnBack = document.getElementById('btnBackToMenu');
         const hubBadge = document.getElementById('hubModeBadge');
@@ -790,23 +862,19 @@ function naviguerVers(nomVue) {
         }
 
         window.scrollTo({ top: 0, behavior: 'instant' });
-    }, 200);
+    }, delaiWipe + 220);
 
-    // Déverrouillage et fin du wipe (~420ms)
+    // Déverrouillage et fin du wipe (~450ms après le départ du wipe)
     setTimeout(() => {
         if (wipeEl) wipeEl.classList.remove('is-wiping');
+        if (activeCmd) activeCmd.classList.remove('is-launching');
         estEnTransition = false;
 
         if (nomVue === 'viewMainMenu') {
-            const cartes = [
-                document.getElementById('menuOptDashboard'),
-                document.getElementById('menuOptCalendar'),
-                document.getElementById('menuOptGta')
-            ].filter(Boolean);
-            const cardActuelle = cartes[menuIndexSelectionne];
-            if (cardActuelle) cardActuelle.focus();
+            selectionnerIndexCommande(menuIndexSelectionne, false);
+            if (activeCmd) activeCmd.focus();
         }
-    }, 420);
+    }, delaiWipe + 450);
 }
 
 /**
@@ -923,47 +991,44 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 8. Contrôleur des cartes du Menu Principal (Hub JRPG)
-    const cartesMenu = [
-        document.getElementById('menuOptDashboard'),
-        document.getElementById('menuOptCalendar'),
-        document.getElementById('menuOptGta')
-    ].filter(Boolean);
+    // 8. Contrôleur du Menu de Commandes Persona 5 Royal
+    const commandItems = getCommandElements();
 
-    function selectionnerIndexMenu(nouveauIndex, avecSon = false) {
-        if (cartesMenu.length === 0) return;
-        menuIndexSelectionne = (nouveauIndex + cartesMenu.length) % cartesMenu.length;
-        cartesMenu.forEach((carte, idx) => {
-            carte.classList.toggle('is-selected', idx === menuIndexSelectionne);
-        });
-        if (avecSon) {
-            jouerSonSurvol();
+    // Initialisation immédiate du mode menu et de la commande sélectionnée
+    document.body.classList.add('in-main-menu');
+    selectionnerIndexCommande(0, false);
+
+    // Repositionnement réactif du pointeur au redimensionnement de l'écran
+    window.addEventListener('resize', () => {
+        if (vueCourante === 'viewMainMenu') {
+            repositionnerPointeur();
         }
-    }
+    });
 
-    // Interactions souris et tactile sur les cartes
-    cartesMenu.forEach((carte, idx) => {
-        carte.addEventListener('mouseenter', () => {
+    // Interactions souris et tactile sur chaque commande
+    commandItems.forEach((cmd, idx) => {
+        cmd.addEventListener('mouseenter', () => {
             if (vueCourante === 'viewMainMenu' && menuIndexSelectionne !== idx) {
-                selectionnerIndexMenu(idx, true);
+                selectionnerIndexCommande(idx, true);
             }
         });
 
-        carte.addEventListener('click', () => {
-            const mod = carte.getAttribute('data-module');
-            const targetView = mod === 'dashboard' ? 'viewDashboard' : (mod === 'calendar' ? 'viewCalendar' : 'viewGtaCountdown');
-            naviguerVers(targetView);
+        cmd.addEventListener('click', () => {
+            if (vueCourante === 'viewMainMenu' && !estEnTransition) {
+                const targetView = cmd.getAttribute('data-target') || 'viewDashboard';
+                naviguerVers(targetView);
+            }
         });
     });
 
-    // Boutons de retour au Menu Principal (Header et Placeholders)
+    // Boutons de retour au Menu Principal (Header et Sous-modules)
     document.querySelectorAll('[data-back-to-menu]').forEach(btn => {
         btn.addEventListener('click', () => {
             retournerMenu();
         });
     });
 
-    // Raccourcis clavier globaux JRPG (↑, ↓, Entrée, Échap)
+    // Raccourcis clavier globaux JRPG (↑, ↓, W, S, Entrée, Espace, Échap)
     window.addEventListener('keydown', (e) => {
         if (estEnTransition) return;
 
@@ -976,20 +1041,19 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Touches actives uniquement sur le Menu Principal
+        // Touches actives sur le Menu Principal
         if (vueCourante === 'viewMainMenu') {
-            if (e.key === 'ArrowDown' || e.key === 'KeyS') {
+            if (e.key === 'ArrowDown' || e.key === 'KeyS' || e.key === 's' || e.key === 'S') {
                 e.preventDefault();
-                selectionnerIndexMenu(menuIndexSelectionne + 1, true);
-            } else if (e.key === 'ArrowUp' || e.key === 'KeyW') {
+                selectionnerIndexCommande(menuIndexSelectionne + 1, true);
+            } else if (e.key === 'ArrowUp' || e.key === 'KeyW' || e.key === 'w' || e.key === 'W') {
                 e.preventDefault();
-                selectionnerIndexMenu(menuIndexSelectionne - 1, true);
+                selectionnerIndexCommande(menuIndexSelectionne - 1, true);
             } else if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                const carte = cartesMenu[menuIndexSelectionne];
-                if (carte) {
-                    const mod = carte.getAttribute('data-module');
-                    const targetView = mod === 'dashboard' ? 'viewDashboard' : (mod === 'calendar' ? 'viewCalendar' : 'viewGtaCountdown');
+                const activeCmd = commandItems[menuIndexSelectionne];
+                if (activeCmd) {
+                    const targetView = activeCmd.getAttribute('data-target') || 'viewDashboard';
                     naviguerVers(targetView);
                 }
             }

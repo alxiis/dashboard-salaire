@@ -1905,483 +1905,566 @@ body {
 }
 
 /* ==========================================================================
-   16. MAIN MENU HUB & MULTI-MODULES EXPERIENCE (PERSONA 5 ROYAL)
+   16. MAIN MENU // FULL-SCREEN JRPG GAME COMMAND SCREEN (PERSONA 5 ROYAL)
    ========================================================================== */
 
-/* Structure du Hub */
-.p5-main-menu-content {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+/* Adaptation de l'en-tête en mode Menu Principal : HUD flottant sans barre rectangulaire */
+body.in-main-menu .p5-header {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    transform: none !important;
+    margin-bottom: 0 !important;
+}
+
+body.in-main-menu .p5-header::before {
+    display: none !important;
+}
+
+body.in-main-menu .p5-brand-block {
+    display: none !important;
+}
+
+body.in-main-menu #btnBackToMenu {
+    display: none !important;
+}
+
+/* Scène Plein Écran du Jeu */
+.p5-game-stage {
+    position: relative;
     width: 100%;
-}
-
-/* Hero Header du Menu Principal */
-.p5-menu-hero-block {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    position: relative;
-    padding: 6px 0;
-}
-
-.p5-menu-title-wrap {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    flex-wrap: wrap;
-}
-
-.menu-brand-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #000;
-    border: 3px solid var(--p5-white);
-    padding: 6px 20px;
-    transform: skewX(-12deg);
-    box-shadow: 6px 6px 0px var(--p5-red), 11px 11px 0px #000;
-}
-
-.menu-brand-tag .star-icon {
-    color: var(--p5-yellow);
-    font-size: 1.8rem;
-    animation: p5StarSpin 2s infinite ease-in-out;
-}
-
-.menu-brand-tag .brand-salary {
-    font-family: var(--font-display);
-    font-size: clamp(2.4rem, 5vw, 3.8rem);
-    letter-spacing: 0.05em;
-    color: var(--p5-white);
-    line-height: 1;
-    text-shadow: 3px 3px 0px var(--p5-red);
-}
-
-.menu-brand-tag .sub-protocol {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    font-weight: 800;
-    color: var(--p5-yellow);
-    letter-spacing: 0.12em;
-    background: #181818;
-    padding: 3px 8px;
-    margin-left: 6px;
-    border: 1px solid #333;
-}
-
-.menu-brand-pulse {
-    background: var(--p5-red);
-    border: 3px solid var(--p5-white);
-    padding: 6px 20px;
-    transform: skewX(-12deg) rotate(-2deg);
-    box-shadow: 5px 5px 0px #000;
-    animation: p5BadgePulse 1.8s infinite ease-in-out;
-}
-
-.menu-brand-pulse .pulse-text {
-    font-family: var(--font-display);
-    font-size: clamp(2.4rem, 5vw, 3.8rem);
-    letter-spacing: 0.06em;
-    color: var(--p5-white);
-    line-height: 1;
-}
-
-/* Ruban Ticker Système Persona 5 */
-.p5-menu-system-ribbon {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: repeating-linear-gradient(
-        -45deg,
-        #111,
-        #111 12px,
-        #050505 12px,
-        #050505 24px
-    );
-    border-left: 6px solid var(--p5-yellow);
-    border-top: 2px solid #282828;
-    border-right: 2px solid #282828;
-    border-bottom: 2px solid var(--p5-red);
-    padding: 8px 18px;
-    box-shadow: 4px 4px 0px #000;
-}
-
-.ribbon-radar {
-    color: var(--p5-red);
-    font-size: 0.9rem;
-    animation: p5RadarPulse 1s infinite alternate;
-}
-
-.ribbon-main {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    letter-spacing: 0.08em;
-    color: var(--p5-yellow);
-}
-
-.ribbon-detail {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--p5-gray);
-    letter-spacing: 0.08em;
-}
-
-/* Grille Asymétrique du Menu JRPG */
-.p5-menu-grid {
-    display: grid;
-    grid-template-columns: 1.38fr 1fr;
-    grid-template-rows: minmax(280px, auto) minmax(280px, auto);
-    gap: 26px;
-    position: relative;
-}
-
-/* Carte de Menu Base */
-.p5-menu-card {
-    background: var(--p5-card-bg);
-    border: 3.5px solid var(--p5-white);
-    box-shadow: 8px 8px 0px #000;
-    padding: 28px 24px 22px;
-    position: relative;
-    cursor: pointer;
-    outline: none;
-    overflow: hidden;
+    min-height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
-                background-color 0.18s ease;
+    overflow: hidden;
+    padding: 10px 0 16px;
 }
 
-.p5-menu-card::before {
-    content: '';
+/* 1. Calques Graphiques d'Arrière-Plan (Halftones, Diagonales, Action Lines) */
+.p5-stage-bg-layers {
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 0 45px 45px 0;
-    border-color: transparent var(--p5-yellow) transparent transparent;
-    z-index: 3;
-    transition: border-color 0.2s ease;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
 }
 
-/* État Sélectionné / Focus / Survol */
-.p5-menu-card:hover,
-.p5-menu-card:focus-visible,
-.p5-menu-card.is-selected {
-    border-color: var(--p5-yellow);
-    background: #141414;
-    transform: translate(-5px, -7px) scale(1.015);
-    box-shadow: 10px 10px 0px var(--p5-red), 18px 18px 0px #000;
-}
-
-.p5-menu-card.is-selected::before {
-    border-color: transparent var(--p5-red) transparent transparent;
-}
-
-/* Carte Dominante (Hero Dashboard) */
-.card-dashboard-hero {
-    grid-column: 1 / 2;
-    grid-row: 1 / 3;
-    transform: rotate(-0.5deg);
-    border-width: 4px;
-    background: linear-gradient(145deg, #161616 0%, #0c0c0c 100%);
-    box-shadow: 10px 10px 0px var(--p5-red), 18px 18px 0px #000;
-}
-
-.card-dashboard-hero:hover,
-.card-dashboard-hero.is-selected {
-    transform: translate(-6px, -8px) rotate(0deg) scale(1.02);
-    box-shadow: 14px 14px 0px var(--p5-yellow), 24px 24px 0px #000;
-    border-color: var(--p5-white);
-}
-
-.card-accent-tape {
+.bg-halftone-circle {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 6px;
+    border-radius: 50%;
+    background-image: radial-gradient(circle, rgba(229, 9, 20, 0.4) 2.2px, transparent 2.2px);
+    background-size: 18px 18px;
+}
+
+.bg-halftone-circle.circle-1 {
+    width: 580px;
+    height: 580px;
+    right: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.35;
+    animation: p5RotateSlow 45s linear infinite;
+}
+
+.bg-halftone-circle.circle-2 {
+    width: 320px;
+    height: 320px;
+    left: 4%;
+    bottom: 8%;
+    opacity: 0.22;
+}
+
+@keyframes p5RotateSlow {
+    from { transform: translateY(-50%) rotate(0deg); }
+    to { transform: translateY(-50%) rotate(360deg); }
+}
+
+.bg-slash-geometry {
+    position: absolute;
+    transform: skewX(-20deg) rotate(-10deg);
+}
+
+.bg-slash-geometry.slash-red {
+    top: -20%;
+    right: 12%;
+    width: 380px;
+    height: 140%;
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.22) 0%, rgba(143, 0, 8, 0.04) 100%);
+    border-left: 4px solid rgba(229, 9, 20, 0.4);
+}
+
+.bg-slash-geometry.slash-dark {
+    bottom: -15%;
+    left: 20%;
+    width: 260px;
+    height: 90%;
+    background: rgba(0, 0, 0, 0.45);
+    border-right: 3px solid rgba(245, 213, 71, 0.25);
+}
+
+.bg-action-burst {
+    position: absolute;
+    right: -10%;
+    top: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(245, 213, 71, 0.08) 0%, transparent 65%);
+}
+
+.bg-caution-diagonal-strip {
+    position: absolute;
+    bottom: 60px;
+    right: -5%;
+    width: 480px;
+    height: 12px;
     background: repeating-linear-gradient(
         -45deg,
         var(--p5-yellow),
-        var(--p5-yellow) 12px,
-        var(--p5-black) 12px,
-        var(--p5-black) 24px
+        var(--p5-yellow) 14px,
+        #000000 14px,
+        #000000 28px
     );
-    z-index: 2;
+    transform: rotate(-12deg);
+    opacity: 0.6;
 }
 
-.card-slash-decor {
+/* 2. Visuel Central Original (Silhouette Manga / Phantom Thief) */
+.p5-menu-figure-stage {
     position: absolute;
-    right: -10%;
-    bottom: -15%;
-    width: 140px;
-    height: 140px;
-    background: radial-gradient(circle, rgba(229, 9, 20, 0.15) 0%, transparent 70%);
+    right: 6%;
+    top: 52%;
+    transform: translateY(-50%);
+    width: 480px;
+    height: 640px;
+    z-index: 1;
     pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
 
-/* Carte Calendrier */
-.card-calendar {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-    transform: rotate(0.8deg);
-    background: linear-gradient(145deg, #131313 0%, #0a0a0a 100%);
+.figure-graphic-wrap {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    filter: drop-shadow(8px 8px 0px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 24px rgba(229, 9, 20, 0.35));
+    animation: p5FigureFloat 4s infinite ease-in-out;
 }
 
-.card-calendar:hover,
-.card-calendar.is-selected {
-    transform: translate(-5px, -7px) rotate(0deg) scale(1.02);
-    box-shadow: 12px 12px 0px #00e5ff, 20px 20px 0px #000;
-    border-color: #00e5ff;
+@keyframes p5FigureFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(0.8deg); }
 }
 
-/* Carte GTA 6 Countdown */
-.card-gta {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    transform: rotate(-0.6deg);
-    background: linear-gradient(145deg, #150d18 0%, #0a050d 100%);
-    border-color: rgba(255, 255, 255, 0.9);
+.p5-character-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    overflow: visible;
 }
 
-.card-gta:hover,
-.card-gta.is-selected {
-    transform: translate(-5px, -7px) rotate(0deg) scale(1.02);
-    box-shadow: 12px 12px 0px #ff2a85, 20px 20px 0px #000;
-    border-color: #ff2a85;
-}
-
-/* Badge Numéro de Module */
-.card-number-badge {
-    position: absolute;
-    top: 16px;
-    right: 18px;
+/* 3. Logo Titre Monumental Flottant */
+.p5-stage-title-block {
+    position: relative;
+    z-index: 4;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    gap: 6px;
+    padding-top: 6px;
+    width: fit-content;
+}
+
+.stage-tag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #000;
+    color: var(--p5-yellow);
+    border: 1.5px solid var(--p5-yellow);
+    box-shadow: 4px 4px 0px var(--p5-red);
+    padding: 4px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    transform: skewX(-12deg);
+    width: fit-content;
+}
+
+.badge-star {
+    color: var(--p5-yellow);
+    font-size: 1rem;
+    animation: p5StarSpin 2s infinite ease-in-out;
+}
+
+.stage-brand-title {
+    position: relative;
+    line-height: 0.85;
+    margin: 4px 0;
+}
+
+.title-layer-back {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 7vw, 5.8rem);
+    letter-spacing: 0.04em;
+    color: #000;
+    -webkit-text-stroke: 4px var(--p5-red);
+    transform: skewX(-14deg);
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.title-layer-front {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 7vw, 5.8rem);
+    letter-spacing: 0.04em;
+    color: var(--p5-white);
+    transform: skewX(-14deg);
+    display: inline-block;
+    z-index: 2;
+    text-shadow: 4px 4px 0px #000;
+}
+
+.stage-sub-ribbon {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #0a0a0a;
+    border-left: 5px solid var(--p5-red);
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    padding: 4px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--p5-offwhite);
+    letter-spacing: 0.08em;
     transform: skewX(-10deg);
 }
 
-.badge-prefix {
-    font-family: var(--font-mono);
-    font-size: 0.68rem;
-    font-weight: 800;
-    color: var(--p5-gray);
-    letter-spacing: 0.12em;
-}
-
-.badge-num {
-    font-family: var(--font-display);
-    font-size: 3rem;
-    line-height: 0.88;
-    color: rgba(255, 255, 255, 0.35);
-    transition: color var(--p5-snap);
-}
-
-.p5-menu-card.is-selected .badge-num {
+.ribbon-dot {
     color: var(--p5-yellow);
-    text-shadow: 2px 2px 0px #000;
+    animation: p5RadarPulse 1s infinite alternate;
 }
 
-/* Enveloppe de Contenu */
-.card-content-wrap {
+/* 4. Menu de Commandes Asymétrique JRPG (Aucune Carte Web) */
+.p5-game-commands {
+    position: relative;
+    z-index: 5;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    position: relative;
-    z-index: 2;
-    height: 100%;
+    gap: 32px;
+    width: fit-content;
+    max-width: 680px;
+    margin: 28px 0 28px 24px;
 }
 
-.card-tag-row {
+/* Pointeur de Sélection Dynamique Flottant */
+.p5-command-pointer {
+    position: absolute;
+    left: -65px;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--p5-yellow);
+    color: #000;
+    border: 2px solid #000;
+    box-shadow: 4px 4px 0px var(--p5-red);
+    padding: 6px 14px;
+    transform: skewX(-14deg) scale(1);
+    z-index: 20;
+    pointer-events: none;
+    transition: top 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                left 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pointer-star {
+    font-size: 1.2rem;
+    color: #000;
+    animation: p5StarSpin 1s infinite linear;
+}
+
+.pointer-slash {
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.pointer-tag {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+    font-weight: 900;
+}
+
+/* Éléments de Commande Individuels */
+.p5-cmd-item {
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.26s ease,
+                opacity 0.26s ease;
+}
+
+.cmd-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.cmd-text-stack {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 12px;
+    line-height: 0.88;
+}
+
+.cmd-text-huge {
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    line-height: 0.9;
+    display: inline-block;
+    transition: color 0.2s ease, text-shadow 0.2s ease, background 0.2s ease;
+}
+
+/* Commande 01 : DASHBOARD SALARY (Position et Couleurs Normales) */
+.cmd-dashboard {
+    transform: rotate(-3.5deg) skewX(-10deg);
+}
+
+.text-dashboard {
+    font-size: clamp(3rem, 6vw, 4.6rem);
+    color: var(--p5-white);
+    -webkit-text-stroke: 3px #000;
+    text-shadow: 4px 4px 0px #000;
+    transform: skewX(-10deg);
+}
+
+.text-salary {
+    font-size: clamp(3.2rem, 6.5vw, 5rem);
+    color: var(--p5-yellow);
+    background: #000;
+    padding: 3px 16px;
+    transform: skewX(-10deg) rotate(-2deg);
+    box-shadow: 6px 6px 0px var(--p5-red), 10px 10px 0px #000;
+    border: 2px solid var(--p5-white);
+}
+
+/* Commande 02 : CALENDRIER (Position et Couleurs Normales) */
+.cmd-calendar {
+    transform: rotate(2deg) skewX(-8deg);
+    margin-left: 36px;
+}
+
+.text-calendar {
+    font-size: clamp(2.8rem, 5.5vw, 4.2rem);
+    color: var(--p5-white);
+    background: #080808;
+    padding: 4px 20px;
+    border: 3px solid var(--p5-white);
+    transform: skewX(-8deg);
+    box-shadow: 6px 6px 0px #00e5ff, 11px 11px 0px #000;
+}
+
+/* Commande 03 : GTA 6 COUNTDOWN (Position et Couleurs Normales) */
+.cmd-gta {
+    transform: rotate(-2.5deg) skewX(-10deg);
+    margin-left: 18px;
+}
+
+.text-gta {
+    font-size: clamp(2.8rem, 5.5vw, 4.2rem);
+    color: #00e5ff;
+    background: #050505;
+    padding: 3px 14px;
+    border: 2px solid #00e5ff;
+    transform: skewX(-10deg);
+    box-shadow: 4px 4px 0px #ff2a85;
+}
+
+.text-countdown {
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    color: var(--p5-white);
+    background: #ff2a85;
+    padding: 3px 16px;
+    transform: skewX(-10deg);
+    box-shadow: 6px 6px 0px #000;
+    border: 2px solid var(--p5-white);
+}
+
+/* Puces d'Information Flottantes sous chaque Commande */
+.cmd-meta-chips {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 2px;
+    margin-top: 2px;
 }
 
-.card-status-pill {
+.cmd-chip {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 800;
-    padding: 3px 8px;
-    background: var(--p5-red);
-    color: #fff;
-    transform: skewX(-10deg);
+    padding: 3px 10px;
+    transform: skewX(-8deg);
     box-shadow: 2px 2px 0px #000;
 }
 
-.pulse-dot {
-    display: inline-block;
-    color: var(--p5-yellow);
-    margin-right: 4px;
-    animation: p5LiveDotPulse 1.2s infinite;
+.chip-status {
+    background: var(--p5-red);
+    color: #fff;
 }
 
-.card-status-pill.pill-prep {
-    background: #242424;
-    color: var(--p5-yellow);
-    border: 1px solid var(--p5-yellow);
-}
-
-.card-status-pill.pill-classified {
-    background: #1b0924;
-    color: #ff2a85;
-    border: 1px solid #ff2a85;
-}
-
-.card-rate-pill {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 3px 8px;
+.chip-rate {
     background: #000;
     color: var(--p5-white);
     border: 1px solid #444;
-    transform: skewX(-10deg);
 }
 
-.card-rate-pill.pill-yellow {
-    border-color: var(--p5-yellow);
-    color: var(--p5-yellow);
-}
-
-.card-rate-pill.pill-vice {
-    border-color: #00e5ff;
-    color: #00e5ff;
-}
-
-.card-rate-cadence {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 3px 8px;
+.chip-cadence {
     background: var(--p5-yellow);
     color: #000;
-    transform: skewX(-10deg);
-    box-shadow: 2px 2px 0px #000;
 }
 
-.card-title {
-    font-family: var(--font-display);
-    letter-spacing: 0.04em;
-    color: var(--p5-white);
-    line-height: 0.95;
-    margin: 4px 0 0;
+.chip-schedule {
+    background: #00e5ff;
+    color: #000;
 }
 
-.card-dashboard-hero .card-title {
-    font-size: clamp(2.4rem, 4.2vw, 3.6rem);
-    text-shadow: 3px 3px 0px var(--p5-red);
-}
-
-.card-calendar .card-title {
-    font-size: 2.2rem;
-    text-shadow: 2px 2px 0px #000;
-}
-
-.card-gta .card-title {
-    font-size: 2.2rem;
-    text-shadow: 2px 2px 0px #ff2a85;
-}
-
-.title-slash {
-    color: #00e5ff;
-}
-
-.card-desc {
-    font-size: 0.92rem;
-    color: var(--p5-offwhite);
-    opacity: 0.85;
-    line-height: 1.48;
-    margin: 4px 0;
-}
-
-/* Call To Action Prompt */
-.card-enter-prompt {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    background: #000;
-    border: 1.5px solid #444;
-    padding: 9px 16px;
-    transform: skewX(-10deg);
-    margin-top: auto;
-    transition: all var(--p5-snap);
-}
-
-.prompt-arrow {
-    color: var(--p5-yellow);
-    font-size: 1.1rem;
-    font-weight: 900;
-    transition: transform var(--p5-snap);
-}
-
-.prompt-label {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    letter-spacing: 0.06em;
-    color: var(--p5-offwhite);
-}
-
-.prompt-key {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 800;
+.chip-prep {
     background: #222;
     color: var(--p5-yellow);
     border: 1px solid var(--p5-yellow);
-    padding: 2px 6px;
-    border-radius: 2px;
-    letter-spacing: 0.05em;
 }
 
-.p5-menu-card.is-selected .card-enter-prompt {
-    background: var(--p5-yellow);
-    border-color: #000;
-    box-shadow: 4px 4px 0px #000;
-}
-
-.p5-menu-card.is-selected .prompt-arrow {
-    color: #000;
-    transform: translateX(4px);
-}
-
-.p5-menu-card.is-selected .prompt-label {
-    color: #000;
-    font-weight: 900;
-}
-
-.p5-menu-card.is-selected .prompt-key {
-    background: #000;
+.chip-vice {
+    background: #ff2a85;
     color: #fff;
-    border-color: #000;
 }
 
-/* Barre HUD d'Aide & Touches du Bas */
-.p5-menu-hud-footer {
+.chip-clock {
+    background: #110916;
+    color: #00e5ff;
+    border: 1px solid #ff2a85;
+}
+
+/* ==========================================================================
+   COMPORTEMENT DE SÉLECTION DU JEU (PRÉCIS & CALIBRÉ)
+   - Option active : scale(1.08 à 1.12), translation dynamique, snap angulaire
+   - Options non actives : léger recul scale(0.96), opacité ~0.82 (parfaitement lisibles)
+   ========================================================================== */
+
+/* Commande Sélectionnée */
+.p5-cmd-item.is-selected {
+    z-index: 15 !important;
+}
+
+.cmd-dashboard.is-selected {
+    transform: translate(-16px, -6px) rotate(-1.5deg) scale(1.10);
+    filter: drop-shadow(8px 8px 0px var(--p5-yellow)) drop-shadow(14px 14px 0px #000);
+}
+
+.cmd-calendar.is-selected {
+    transform: translate(-14px, -5px) rotate(3.2deg) scale(1.10);
+    filter: drop-shadow(8px 8px 0px var(--p5-yellow)) drop-shadow(14px 14px 0px #000);
+}
+
+.cmd-gta.is-selected {
+    transform: translate(-14px, -5px) rotate(-1deg) scale(1.10);
+    filter: drop-shadow(8px 8px 0px #ff2a85) drop-shadow(14px 14px 0px #000);
+}
+
+.p5-cmd-item.is-selected .text-salary {
+    background: var(--p5-yellow);
+    color: #000;
+    box-shadow: 6px 6px 0px var(--p5-red), 12px 12px 0px #000;
+}
+
+.p5-cmd-item.is-selected .text-calendar {
+    background: var(--p5-white);
+    color: #000;
+    border-color: #000;
+    box-shadow: 6px 6px 0px #00e5ff, 12px 12px 0px #000;
+}
+
+.p5-cmd-item.is-selected .text-gta {
+    background: #00e5ff;
+    color: #000;
+    box-shadow: 6px 6px 0px #ff2a85, 12px 12px 0px #000;
+}
+
+/* Commandes Non Sélectionnées (Recul Subtil sans Perte de Lisibilité) */
+.p5-cmd-item.is-dimmed {
+    opacity: 0.82;
+    filter: grayscale(20%);
+}
+
+.cmd-dashboard.is-dimmed {
+    transform: rotate(-3.5deg) skewX(-10deg) scale(0.96);
+}
+
+.cmd-calendar.is-dimmed {
+    transform: rotate(2deg) skewX(-8deg) scale(0.96);
+}
+
+.cmd-gta.is-dimmed {
+    transform: rotate(-2.5deg) skewX(-10deg) scale(0.96);
+}
+
+/* Animation d'Impact au Lancement du Module (Launch Sequence P5R) */
+.p5-cmd-item.is-launching {
+    animation: p5CommandLaunch 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    z-index: 100 !important;
+}
+
+@keyframes p5CommandLaunch {
+    0% {
+        transform: scale(1.10) translate(-14px, -5px);
+        filter: brightness(1.2);
+    }
+    45% {
+        transform: scale(2.2) translate(-32px, -14px);
+        filter: brightness(2.5) contrast(1.6);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(3.6) translate(-70px, -30px);
+        opacity: 0;
+        filter: brightness(3);
+    }
+}
+
+/* 5. Barre HUD d'Aide Manette / Clavier en Bas de l'Écran */
+.p5-stage-hud-help {
+    position: relative;
+    z-index: 4;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
     gap: 14px;
-    background: #0a0a0a;
+    background: #090909;
     border: 2px solid var(--p5-white);
     box-shadow: 4px 4px 0px #000;
-    padding: 12px 18px;
-    margin-top: 6px;
+    padding: 10px 18px;
+    width: fit-content;
+    margin: 8px auto 0;
 }
 
-.hud-control-chip {
+.help-chip {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -2391,259 +2474,15 @@ body {
     color: var(--p5-offwhite);
 }
 
-.k-tag {
+.chip-key {
     background: var(--p5-red);
     color: var(--p5-white);
     font-family: var(--font-mono);
-    font-size: 0.76rem;
+    font-size: 0.74rem;
     font-weight: 800;
     padding: 2px 7px;
     transform: skewX(-10deg);
     box-shadow: 2px 2px 0px #000;
-}
-
-/* ==========================================================================
-   VUES PLACEHOLDERS (CALENDRIER & GTA 6 COUNTDOWN)
-   ========================================================================== */
-.p5-placeholder-view {
-    width: 100%;
-}
-
-.p5-placeholder-container {
-    background: var(--p5-card-bg);
-    border: 3.5px solid var(--p5-white);
-    box-shadow: var(--shadow-p5-combo);
-    padding: 36px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    position: relative;
-    transform: rotate(-0.3deg);
-}
-
-.p5-placeholder-banner {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding-bottom: 12px;
-    border-bottom: 2px dashed #333;
-}
-
-.banner-tag {
-    font-family: var(--font-mono);
-    font-size: 0.82rem;
-    font-weight: 800;
-    color: var(--p5-yellow);
-    letter-spacing: 0.12em;
-}
-
-.placeholder-hero-title {
-    font-family: var(--font-display);
-    font-size: clamp(2.8rem, 5vw, 4.4rem);
-    letter-spacing: 0.04em;
-    color: var(--p5-white);
-    line-height: 0.92;
-    text-shadow: 3px 3px 0px var(--p5-red);
-    margin: 0;
-}
-
-.placeholder-hero-title.title-gta {
-    text-shadow: 3px 3px 0px #ff2a85;
-}
-
-.sub-banner-text {
-    color: #00e5ff;
-}
-
-.placeholder-sub-ribbon {
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--p5-gray);
-    letter-spacing: 0.08em;
-}
-
-.p5-placeholder-card {
-    background: #090909;
-    border: 2.5px solid var(--p5-white);
-    box-shadow: 6px 6px 0px #000;
-    padding: 28px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: relative;
-    overflow: hidden;
-}
-
-.p5-placeholder-card.card-theme-gta {
-    border-color: #ff2a85;
-    box-shadow: 6px 6px 0px #00e5ff, 12px 12px 0px #000;
-}
-
-.card-hazard-stripe {
-    height: 6px;
-    background: repeating-linear-gradient(
-        -45deg,
-        var(--p5-yellow),
-        var(--p5-yellow) 12px,
-        #000 12px,
-        #000 24px
-    );
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-}
-
-.card-hazard-stripe.stripe-vice {
-    background: repeating-linear-gradient(
-        -45deg,
-        #ff2a85,
-        #ff2a85 12px,
-        #00e5ff 12px,
-        #00e5ff 24px
-    );
-}
-
-.placeholder-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #161616;
-    border: 1.5px solid var(--p5-yellow);
-    color: var(--p5-yellow);
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    font-weight: 800;
-    padding: 5px 12px;
-    width: fit-content;
-    transform: skewX(-10deg);
-}
-
-.placeholder-status-badge.badge-gta {
-    border-color: #ff2a85;
-    color: #ff2a85;
-}
-
-.badge-icon {
-    color: var(--p5-yellow);
-}
-
-.badge-gta .badge-icon {
-    color: #ff2a85;
-}
-
-.placeholder-lead-text {
-    font-size: 1.05rem;
-    line-height: 1.55;
-    color: var(--p5-offwhite);
-    max-width: 820px;
-}
-
-/* Grille Fonctionnalités Prévues (Calendrier) */
-.placeholder-feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 16px;
-    margin: 8px 0;
-}
-
-.feature-slot {
-    background: #020202;
-    border: 1.5px solid #2a2a2a;
-    padding: 18px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    transform: skewX(-4deg);
-    transition: all var(--p5-snap);
-}
-
-.feature-slot:hover {
-    border-color: var(--p5-yellow);
-    transform: skewX(-4deg) translateY(-3px);
-    box-shadow: 4px 4px 0px var(--p5-red);
-}
-
-.slot-idx {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    color: var(--p5-red);
-    line-height: 1;
-}
-
-.slot-title {
-    font-family: var(--font-display);
-    font-size: 1.25rem;
-    color: var(--p5-white);
-    letter-spacing: 0.05em;
-}
-
-.slot-desc {
-    font-size: 0.86rem;
-    color: var(--p5-gray);
-    line-height: 1.4;
-}
-
-/* GTA 6 Countdown Slots */
-.gta-countdown-slots {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 24px 16px;
-    background: #050208;
-    border: 2px solid #ff2a85;
-    box-shadow: inset 0 0 20px rgba(255, 42, 133, 0.15), 6px 6px 0px #000;
-    margin: 8px 0;
-}
-
-.countdown-slot-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #0e0514;
-    border: 2px solid #00e5ff;
-    padding: 16px 22px;
-    min-width: 110px;
-    transform: skewX(-8deg);
-    box-shadow: 4px 4px 0px #ff2a85;
-}
-
-.slot-digit {
-    font-family: var(--font-display);
-    font-size: clamp(2.8rem, 5vw, 4.4rem);
-    line-height: 0.9;
-    color: var(--p5-white);
-    text-shadow: 3px 3px 0px #ff2a85;
-}
-
-.slot-unit {
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    color: #00e5ff;
-    margin-top: 4px;
-}
-
-.countdown-sep {
-    font-family: var(--font-display);
-    font-size: 2.8rem;
-    color: #ff2a85;
-    font-weight: 900;
-}
-
-.placeholder-actions {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.btn-return-menu {
-    min-width: 320px;
 }
 
 /* ==========================================================================
@@ -2758,36 +2597,33 @@ body {
     .p5-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 20px;
+        gap: 16px;
     }
     .p5-header-right-group {
         width: 100%;
         justify-content: space-between;
     }
-    .p5-menu-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
+    .p5-menu-figure-stage {
+        width: 360px;
+        height: 500px;
+        opacity: 0.35;
+        right: -20px;
+        z-index: 1;
     }
-    .card-dashboard-hero {
-        grid-column: 1 / 2;
-        grid-row: 1 / 2;
-    }
-    .card-calendar {
-        grid-column: 1 / 2;
-        grid-row: 2 / 3;
-    }
-    .card-gta {
-        grid-column: 1 / 2;
-        grid-row: 3 / 4;
-    }
-    .card-quick-stats {
-        grid-template-columns: 1fr 1fr 1fr;
+    .p5-game-commands {
+        max-width: 100%;
+        margin-left: 12px;
+        gap: 26px;
     }
 }
 
 @media (max-width: 650px) {
     body {
-        padding: 14px 8px 40px;
+        padding: 12px 6px 36px;
+    }
+    .p5-game-stage {
+        padding: 4px 0 10px;
+        min-height: auto;
     }
     .p5-date-hud-sticker {
         transform: none;
@@ -2808,7 +2644,7 @@ body {
     .p5-header-right-group {
         flex-direction: column;
         align-items: flex-start;
-        gap: 14px;
+        gap: 12px;
     }
     .p5-btn-back {
         width: 100%;
@@ -2833,30 +2669,43 @@ body {
     .p5-btn-action, .p5-btn-toggle {
         width: 100%;
     }
-    .p5-menu-hero-block {
-        gap: 6px;
+    .p5-menu-figure-stage {
+        width: 240px;
+        height: 340px;
+        opacity: 0.20;
+        right: -40px;
+        top: 40%;
     }
-    .card-quick-stats {
-        grid-template-columns: 1fr;
+    .p5-game-commands {
+        gap: 22px;
+        margin-left: 0;
+        width: 100%;
+    }
+    .cmd-dashboard, .cmd-calendar, .cmd-gta {
+        margin-left: 0 !important;
+    }
+    .p5-command-pointer {
+        display: none; /* Remplacé par l'effet de bordure/fond sur mobile pour éviter tout débordement */
+    }
+    .p5-stage-hud-help {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 8px;
+    }
+    .btn-return-menu {
+        width: 100%;
+        min-width: unset;
     }
     .gta-countdown-slots {
         gap: 10px;
     }
     .countdown-slot-box {
-        min-width: 85px;
-        padding: 12px 14px;
+        min-width: 80px;
+        padding: 10px 12px;
     }
     .countdown-sep {
         display: none;
-    }
-    .p5-menu-hud-controls {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-    .btn-return-menu {
-        width: 100%;
-        min-width: unset;
     }
 }
 

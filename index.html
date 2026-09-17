@@ -137,114 +137,161 @@
         <div class="p5-views-viewport" id="viewsViewport">
 
             <!-- ================================================================
-                 VUE 0 // MENU PRINCIPAL JRPG HUB (PAGE D'ACCUEIL PAR DÉFAUT)
+                 VUE 0 // MENU PRINCIPAL JRPG HUB (PLEIN ÉCRAN COMMAND SCREEN)
                  ================================================================ -->
-            <section id="viewMainMenu" class="p5-view p5-view-main-menu active" aria-label="Menu Principal Salary Pulse">
-                <div class="p5-main-menu-content">
+            <section id="viewMainMenu" class="p5-view p5-view-main-menu active" aria-label="Menu Principal de Commandes Persona 5 Royal">
+                <div class="p5-game-stage" id="p5GameStage">
                     
-                    <!-- Identité graphique monumentale Persona 5 en double couche -->
-                    <div class="p5-menu-hero-block">
-                        <div class="p5-menu-title-wrap">
-                            <div class="menu-brand-tag">
-                                <span class="star-icon">★</span>
-                                <span class="brand-salary">SALARY</span>
-                                <span class="sub-protocol">PROTOCOL // ROYALE V2.5</span>
-                            </div>
-                            <div class="menu-brand-pulse">
-                                <span class="pulse-text">PULSE</span>
-                            </div>
+                    <!-- 1. Calques de Fond Graphiques JRPG (Halftones, Slashes, Action Lines) -->
+                    <div class="p5-stage-bg-layers" aria-hidden="true">
+                        <div class="bg-halftone-circle circle-1"></div>
+                        <div class="bg-halftone-circle circle-2"></div>
+                        <div class="bg-slash-geometry slash-red"></div>
+                        <div class="bg-slash-geometry slash-dark"></div>
+                        <div class="bg-action-burst"></div>
+                        <div class="bg-caution-diagonal-strip"></div>
+                    </div>
+
+                    <!-- 2. Visuel Central Original (Silhouette Manga / Phantom Thief Stylisée) -->
+                    <!-- ARCHITECTURE OUVERTE : Vous pouvez remplacer le SVG interne par une balise <img src="..." class="p5-character-img"> -->
+                    <div class="p5-menu-figure-stage" id="p5MenuFigureStage" aria-hidden="true">
+                        <div class="figure-shadow-layer"></div>
+                        <div class="figure-graphic-wrap">
+                            <!-- Composition Vectorielle Haute Définition Originale -->
+                            <svg class="p5-character-svg" viewBox="0 0 500 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                    <linearGradient id="p5CoatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#141414" />
+                                        <stop offset="60%" stop-color="#050505" />
+                                        <stop offset="100%" stop-color="#E50914" />
+                                    </linearGradient>
+                                    <linearGradient id="p5RedFlare" x1="0%" y1="100%" x2="100%" y2="0%">
+                                        <stop offset="0%" stop-color="#990000" />
+                                        <stop offset="50%" stop-color="#E50914" />
+                                        <stop offset="100%" stop-color="#F5D547" />
+                                    </linearGradient>
+                                    <pattern id="coatDots" width="12" height="12" patternUnits="userSpaceOnUse">
+                                        <circle cx="2" cy="2" r="1.5" fill="rgba(229,9,20,0.3)" />
+                                    </pattern>
+                                </defs>
+                                
+                                <!-- Halo & Étoile d'Arrière-Plan -->
+                                <polygon points="250,60 280,180 400,180 305,250 340,370 250,295 160,370 195,250 100,180 220,180" fill="rgba(229,9,20,0.22)" transform="scale(1.2) translate(-40, 40)" />
+                                <circle cx="270" cy="280" r="190" fill="url(#coatDots)" />
+
+                                <!-- Manteau Long Volant (Pans arrière rouge vif découpés) -->
+                                <path d="M120 420 L40 680 L180 620 L160 480 Z" fill="url(#p5RedFlare)" stroke="#000" stroke-width="4" />
+                                <path d="M360 440 L480 670 L340 590 L320 460 Z" fill="url(#p5RedFlare)" stroke="#000" stroke-width="4" />
+
+                                <!-- Silhouette Corps Principal (Trenchcoat Noir Élégant) -->
+                                <path d="M220 180 L290 185 L350 310 L390 530 L320 690 L240 690 L180 540 L160 310 Z" fill="url(#p5CoatGrad)" stroke="#FFFFFF" stroke-width="3" />
+                                
+                                <!-- Revers & Col Haut Stylisé -->
+                                <path d="M190 195 L250 290 L200 380 L160 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
+                                <path d="M310 195 L250 290 L300 380 L340 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
+                                <polygon points="250,210 262,280 250,330 238,280" fill="#E50914" stroke="#FFF" stroke-width="2" />
+                                <polygon points="250,195 268,225 250,240 232,225" fill="#FFFFFF" stroke="#000" stroke-width="2" />
+
+                                <!-- Tête, Masque Angulaire & Regard Flamboyant -->
+                                <path d="M210 145 L250 85 L290 145 L270 195 L230 195 Z" fill="#050505" stroke="#FFF" stroke-width="3" />
+                                <!-- Mèches de Cheveux Manga Asymétriques -->
+                                <path d="M190 130 L160 170 L210 160 L180 200 L230 180 L250 70 L285 100 L320 130 L290 165 L330 185 L280 185" fill="#000000" stroke="#E50914" stroke-width="3" />
+                                <!-- Masque Voleur Fantôme Blanc et Or -->
+                                <path d="M215 135 Q250 160 285 135 Q270 175 250 180 Q230 175 215 135 Z" fill="#FFFFFF" stroke="#000" stroke-width="3" />
+                                <!-- Yeux / Regard Vif Doré Phosphorescent -->
+                                <polygon points="228,146 242,152 232,156" fill="#F5D547" />
+                                <polygon points="272,146 258,152 268,156" fill="#F5D547" />
+
+                                <!-- Gants Blancs & Dynamique des Bras -->
+                                <path d="M150 280 L90 410 L130 430 L180 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
+                                <path d="M350 280 L410 400 L370 425 L320 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
+                                <!-- Gant Gauche Poing Serré ou Étoile Tenue -->
+                                <ellipse cx="85" cy="425" rx="20" ry="16" fill="#FFF" stroke="#000" stroke-width="3" transform="rotate(-15 85 425)" />
+                                <!-- Étoile Jaune Flottante dans la Main -->
+                                <polygon points="85,385 92,405 112,405 96,418 102,438 85,425 68,438 74,418 58,405 78,405" fill="#F5D547" stroke="#000" stroke-width="2" />
+                            </svg>
                         </div>
+                    </div>
+
+                    <!-- 3. Logo Flottant Monumental Intégré dans la Scène -->
+                    <div class="p5-stage-title-block">
+                        <div class="stage-tag-badge">
+                            <span class="badge-star">★</span>
+                            <span class="badge-code">TAKE YOUR HEART // ROYALE V2.5</span>
+                        </div>
+                        <div class="stage-brand-title">
+                            <span class="title-layer-back">SALARY PULSE</span>
+                            <span class="title-layer-front">SALARY PULSE</span>
+                        </div>
+                        <div class="stage-sub-ribbon">
+                            <span class="ribbon-dot">◆</span>
+                            <span class="ribbon-text">COMMAND INTERFACE // CHOOSE YOUR TARGET</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Menu de Commandes Asymétrique JRPG (Aucune Carte Web) -->
+                    <nav class="p5-game-commands" id="p5GameCommands" role="menu" aria-label="Commandes du jeu">
                         
-                        <div class="p5-menu-system-ribbon">
-                            <span class="ribbon-radar">◆</span>
-                            <span class="ribbon-main">SELECT MODULE</span>
-                            <span class="ribbon-detail">// DESTINATION SELECTION INTERFACE</span>
-                        </div>
-                    </div>
-
-                    <!-- Grille asymétrique des 3 modules (Composition JRPG) -->
-                    <div class="p5-menu-grid" role="menubar" aria-label="Sélection des modules">
-
-                        <!-- 1. MODULE PRINCIPAL HERO : DASHBOARD SALARY (DOMINANT) -->
-                        <div class="p5-menu-card card-dashboard-hero is-selected" id="menuOptDashboard" role="menuitem" tabindex="0" data-module="dashboard" aria-label="Ouvrir le module Dashboard Salary">
-                            <div class="card-accent-tape"></div>
-                            <div class="card-number-badge">
-                                <span class="badge-prefix">MOD</span>
-                                <span class="badge-num">01</span>
-                            </div>
-                            <div class="card-content-wrap">
-                                <div class="card-tag-row">
-                                    <span class="card-status-pill"><span class="pulse-dot">●</span> ACTIF EN DIRECT</span>
-                                    <span class="card-rate-pill">7.89 € / HEURE NET</span>
-                                    <span class="card-rate-cadence">+0.1315 € / MIN</span>
-                                </div>
-                                <h2 class="card-title">DASHBOARD SALARY</h2>
-                                <p class="card-desc">
-                                    Moteur temps réel de suivi des rémunérations. Compteur discret snapé à la minute (+0.1315 €), analyse des créneaux (08h30-12h30 &amp; 13h30-16h30), progression 7h et simulateur de gains.
-                                </p>
-                                <div class="card-enter-prompt">
-                                    <span class="prompt-arrow">▶</span>
-                                    <span class="prompt-label">ACCÉDER AU DASHBOARD</span>
-                                    <span class="prompt-key">ENTER</span>
-                                </div>
-                            </div>
-                            <div class="card-slash-decor"></div>
+                        <!-- Pointeur Graphique Flottant Dynamique -->
+                        <div class="p5-command-pointer" id="p5CommandPointer" aria-hidden="true">
+                            <span class="pointer-star">★</span>
+                            <span class="pointer-slash">▶</span>
+                            <span class="pointer-tag">SELECT</span>
                         </div>
 
-                        <!-- 2. MODULE SECONDAIRE BISEAUTÉ : CALENDRIER -->
-                        <div class="p5-menu-card card-calendar" id="menuOptCalendar" role="menuitem" tabindex="0" data-module="calendar" aria-label="Ouvrir le module Calendrier">
-                            <div class="card-number-badge">
-                                <span class="badge-prefix">MOD</span>
-                                <span class="badge-num">02</span>
-                            </div>
-                            <div class="card-content-wrap">
-                                <div class="card-tag-row">
-                                    <span class="card-status-pill pill-prep">EN PRÉPARATION</span>
-                                    <span class="card-rate-pill pill-yellow">PLANNING // 35H</span>
+                        <!-- Commande 0 : DASHBOARD SALARY (Option dominante) -->
+                        <div class="p5-cmd-item cmd-dashboard is-selected" id="cmdDashboard" role="menuitem" tabindex="0" data-index="0" data-target="viewDashboard">
+                            <div class="cmd-inner">
+                                <div class="cmd-accent-bracket"></div>
+                                <div class="cmd-text-stack">
+                                    <span class="cmd-text-huge text-dashboard">DASHBOARD</span>
+                                    <span class="cmd-text-huge text-salary">SALARY</span>
                                 </div>
-                                <h2 class="card-title">CALENDRIER</h2>
-                                <p class="card-desc">
-                                    Synchronisation des cycles contractuels, suivi des jours ouvrés, gestion des absences et calcul des échéances de paie mensuelles.
-                                </p>
-                                <div class="card-enter-prompt">
-                                    <span class="prompt-arrow">▶</span>
-                                    <span class="prompt-label">VOIR L'APERÇU DU MODULE</span>
-                                    <span class="prompt-key">ENTER</span>
+                                <div class="cmd-meta-chips">
+                                    <span class="cmd-chip chip-status"><span class="pulse-dot">●</span> EN DIRECT</span>
+                                    <span class="cmd-chip chip-rate">7.89 € / H</span>
+                                    <span class="cmd-chip chip-cadence">+0.1315 € / MIN</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 3. MODULE SECONDAIRE SLASH : GTA 6 COUNTDOWN -->
-                        <div class="p5-menu-card card-gta" id="menuOptGta" role="menuitem" tabindex="0" data-module="gta" aria-label="Ouvrir le module GTA 6 Countdown">
-                            <div class="card-number-badge">
-                                <span class="badge-prefix">MOD</span>
-                                <span class="badge-num">03</span>
-                            </div>
-                            <div class="card-content-wrap">
-                                <div class="card-tag-row">
-                                    <span class="card-status-pill pill-classified">CLASSIFIED</span>
-                                    <span class="card-rate-pill pill-vice">VICE CITY PROTOCOL</span>
+                        <!-- Commande 1 : CALENDRIER -->
+                        <div class="p5-cmd-item cmd-calendar" id="cmdCalendar" role="menuitem" tabindex="0" data-index="1" data-target="viewCalendar">
+                            <div class="cmd-inner">
+                                <div class="cmd-accent-bracket"></div>
+                                <div class="cmd-text-stack">
+                                    <span class="cmd-text-huge text-calendar">CALENDRIER</span>
                                 </div>
-                                <h2 class="card-title">GTA 6 <span class="title-slash">COUNTDOWN</span></h2>
-                                <p class="card-desc">
-                                    Compte à rebours officiel et tableau de bord prévisionnel pour le lancement le plus attendu de la décennie.
-                                </p>
-                                <div class="card-enter-prompt">
-                                    <span class="prompt-arrow">▶</span>
-                                    <span class="prompt-label">INSPECTER LE MODULE</span>
-                                    <span class="prompt-key">ENTER</span>
+                                <div class="cmd-meta-chips">
+                                    <span class="cmd-chip chip-schedule">PLANNING // 35H</span>
+                                    <span class="cmd-chip chip-prep">EN PRÉPARATION</span>
                                 </div>
                             </div>
                         </div>
 
-                    </div>
+                        <!-- Commande 2 : GTA 6 COUNTDOWN -->
+                        <div class="p5-cmd-item cmd-gta" id="cmdGta" role="menuitem" tabindex="0" data-index="2" data-target="viewGtaCountdown">
+                            <div class="cmd-inner">
+                                <div class="cmd-accent-bracket"></div>
+                                <div class="cmd-text-stack">
+                                    <span class="cmd-text-huge text-gta">GTA 6</span>
+                                    <span class="cmd-text-huge text-countdown">COUNTDOWN</span>
+                                </div>
+                                <div class="cmd-meta-chips">
+                                    <span class="cmd-chip chip-vice">VICE CITY 2026</span>
+                                    <span class="cmd-chip chip-clock">--:--:--:--</span>
+                                </div>
+                            </div>
+                        </div>
 
-                    <!-- Bandeau d'aide / Contrôles clavier JRPG -->
-                    <div class="p5-menu-hud-footer">
-                        <div class="hud-control-chip"><span class="k-tag">↑ / ↓</span> <span>NAVIGUER</span></div>
-                        <div class="hud-control-chip"><span class="k-tag">ENTER</span> <span>SÉLECTIONNER</span></div>
-                        <div class="hud-control-chip"><span class="k-tag">ESC</span> <span>RETOUR MENU</span></div>
-                        <div class="hud-control-chip"><span class="k-tag">CLIC / TOUCH</span> <span>ACCÈS DIRECT</span></div>
+                    </nav>
+
+                    <!-- 5. Barre HUD d'Aide Manette / Clavier en Bas de l'Écran -->
+                    <div class="p5-stage-hud-help">
+                        <div class="help-chip"><span class="chip-key">↑ / ↓</span> <span>NAVIGUER</span></div>
+                        <div class="help-chip"><span class="chip-key">ENTER</span> <span>SÉLECTIONNER</span></div>
+                        <div class="help-chip"><span class="chip-key">ESC</span> <span>RETOUR HUB</span></div>
+                        <div class="help-chip chip-mouse"><span class="chip-key">SURVOL / CLIC</span> <span>ACCÈS SOURIS</span></div>
                     </div>
 
                 </div>
