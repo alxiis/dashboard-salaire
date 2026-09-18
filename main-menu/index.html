@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Pulse // Main Menu Hub — Persona 5 Royal</title>
+    
+    <!-- Polices Typographiques Officielles JRPG Persona 5 Royal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,800&family=Bebas+Neue&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Feuilles de Styles : Partagée + Menu Principal -->
+    <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="in-main-menu">
+
+    <!-- Écran de Démarrage Éclair (Sequence Boot ~450ms) -->
+    <div id="p5BootScreen" class="p5-boot-screen">
+        <div class="boot-content">
+            <div class="boot-logo">
+                <span class="boot-star">★</span>
+                <span class="boot-title">SALARY PULSE</span>
+            </div>
+            <div class="boot-progress-line">
+                <div class="boot-progress-bar"></div>
+            </div>
+            <div class="boot-status" id="bootStatusText">INITIALIZING // P5R ENGINE</div>
+        </div>
+        <div class="boot-scanlines"></div>
+    </div>
+
+    <!-- Calques Graphiques d'Arrière-Plan Universels -->
+    <div class="p5-bg-overlay" aria-hidden="true">
+        <div class="p5-stripe-band"></div>
+        <div class="p5-halftone"></div>
+        <div class="p5-action-slash slash-1"></div>
+        <div class="p5-action-slash slash-2"></div>
+    </div>
+
+    <!-- Conteneur Global de l'Application -->
+    <div class="p5-app-container">
+
+        <!-- ====================================================================
+             1. HEADER & HUD TEMPOREL STICKER (HAUT GAUCHE)
+             ==================================================================== -->
+        <header class="p5-header">
+            
+            <!-- STICKER DATE HUD COLLAGE JRPG (COIN SUPÉRIEUR GAUCHE) -->
+            <div class="p5-date-hud-sticker" id="p5DateSticker">
+                
+                <!-- Calque 1 : Cartouche Numérique Découpé (Jour & Mois) -->
+                <div class="hud-sticker-daybox">
+                    <span class="sticker-pin">★</span>
+                    <div class="sticker-num-row">
+                        <span class="sticker-big-day" id="hudDayVal">16</span>
+                        <div class="sticker-month-col">
+                            <span class="sticker-month-tag" id="hudMonthNum">09</span>
+                            <div class="sticker-month-name" id="hudMonthName">SEPTEMBER</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calque 2 & 3 : Bandeau du jour de la semaine & Statut contextuel -->
+                <div class="hud-sticker-slash-group">
+                    <div class="sticker-weekday-banner" id="hudWeekdayBanner">
+                        <span class="weekday-text" id="hudWeekdayText">WEDNESDAY</span>
+                    </div>
+
+                    <!-- Calque 3 : Étiquette contextuelle d'état (AFTER WORK, WORKING, LUNCH BREAK, OFF DUTY) -->
+                    <div class="sticker-context-pill context-afterwork" id="hudContextPill">
+                        <span class="context-dot">◆</span>
+                        <span class="context-text" id="hudContextText">AFTER WORK</span>
+                    </div>
+
+                    <!-- Calque 4 : Horloge temps réel & Année -->
+                    <div class="sticker-time-tag">
+                        <span class="time-clock-icon">◷</span>
+                        <span class="time-clock-val" id="hudLiveClock">16:32:00</span>
+                        <span class="time-year-val" id="hudYearVal">2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contrôles du Header Droit -->
+            <div class="p5-header-right-group">
+                <!-- Badge HUD mode Hub -->
+                <div id="hubModeBadge" class="p5-hub-mode-tag">
+                    <span class="tag-radar">◆</span>
+                    <span class="tag-label">HUB // SELECTION MODE</span>
+                </div>
+
+                <!-- Badge de Statut Complémentaire -->
+                <div class="hud-status-wrapper">
+                    <div id="statutBadge" class="p5-status-badge status-working">
+                        <span class="p5-status-radar">◆</span>
+                        <div class="p5-status-text-block">
+                            <span class="status-prefix">STATUS //</span>
+                            <span id="statutTexte" class="status-main">WORKING</span>
+                        </div>
+                    </div>
+                    <div class="hud-status-caption" id="statutDescription">Compteur actif en direct</div>
+                </div>
+
+                <!-- Bouton Rapide Audio SFX -->
+                <button class="p5-btn-audio-header" id="btnHeaderAudio" title="Activer / Désactiver les effets sonores">
+                    <span class="audio-note" id="headerAudioIcon">♪</span>
+                    <span class="audio-state-text" id="headerAudioLabel">SFX</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ====================================================================
+             2. SCÈNE PLEIN ÉCRAN DU COMMAND MENU (PERSONA 5 ROYAL)
+             ==================================================================== -->
+        <main class="p5-game-stage" id="p5GameStage">
+            
+            <!-- 1. Calques de Fond Graphiques JRPG (Halftones, Slashes, Action Lines) -->
+            <div class="p5-stage-bg-layers" aria-hidden="true">
+                <div class="bg-halftone-circle circle-1"></div>
+                <div class="bg-halftone-circle circle-2"></div>
+                <div class="bg-slash-geometry slash-red"></div>
+                <div class="bg-slash-geometry slash-dark"></div>
+                <div class="bg-action-burst"></div>
+                <div class="bg-caution-diagonal-strip"></div>
+            </div>
+
+            <!-- 2. Visuel Central Original (Silhouette Manga / Phantom Thief Stylisée) -->
+            <div class="p5-menu-figure-stage" id="p5MenuFigureStage" aria-hidden="true">
+                <div class="figure-shadow-layer"></div>
+                <div class="figure-graphic-wrap">
+                    <svg class="p5-character-svg" viewBox="0 0 500 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="p5CoatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#141414" />
+                                <stop offset="60%" stop-color="#050505" />
+                                <stop offset="100%" stop-color="#E50914" />
+                            </linearGradient>
+                            <linearGradient id="p5RedFlare" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#990000" />
+                                <stop offset="50%" stop-color="#E50914" />
+                                <stop offset="100%" stop-color="#F5D547" />
+                            </linearGradient>
+                            <pattern id="coatDots" width="12" height="12" patternUnits="userSpaceOnUse">
+                                <circle cx="2" cy="2" r="1.5" fill="rgba(229,9,20,0.3)" />
+                            </pattern>
+                        </defs>
+                        
+                        <!-- Halo & Étoile d'Arrière-Plan -->
+                        <polygon points="250,60 280,180 400,180 305,250 340,370 250,295 160,370 195,250 100,180 220,180" fill="rgba(229,9,20,0.22)" transform="scale(1.2) translate(-40, 40)" />
+                        <circle cx="270" cy="280" r="190" fill="url(#coatDots)" />
+
+                        <!-- Manteau Long Volant (Pans arrière rouge vif découpés) -->
+                        <path d="M120 420 L40 680 L180 620 L160 480 Z" fill="url(#p5RedFlare)" stroke="#000" stroke-width="4" />
+                        <path d="M360 440 L480 670 L340 590 L320 460 Z" fill="url(#p5RedFlare)" stroke="#000" stroke-width="4" />
+
+                        <!-- Silhouette Corps Principal (Trenchcoat Noir Élégant) -->
+                        <path d="M220 180 L290 185 L350 310 L390 530 L320 690 L240 690 L180 540 L160 310 Z" fill="url(#p5CoatGrad)" stroke="#FFFFFF" stroke-width="3" />
+                        
+                        <!-- Revers & Col Haut Stylisé -->
+                        <path d="M190 195 L250 290 L200 380 L160 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
+                        <path d="M310 195 L250 290 L300 380 L340 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
+                        <polygon points="250,210 262,280 250,330 238,280" fill="#E50914" stroke="#FFF" stroke-width="2" />
+                        <polygon points="250,195 268,225 250,240 232,225" fill="#FFFFFF" stroke="#000" stroke-width="2" />
+
+                        <!-- Tête, Masque Angulaire & Regard Flamboyant -->
+                        <path d="M210 145 L250 85 L290 145 L270 195 L230 195 Z" fill="#050505" stroke="#FFF" stroke-width="3" />
+                        <path d="M190 130 L160 170 L210 160 L180 200 L230 180 L250 70 L285 100 L320 130 L290 165 L330 185 L280 185" fill="#000000" stroke="#E50914" stroke-width="3" />
+                        <path d="M215 135 Q250 160 285 135 Q270 175 250 180 Q230 175 215 135 Z" fill="#FFFFFF" stroke="#000" stroke-width="3" />
+                        <polygon points="228,146 242,152 232,156" fill="#F5D547" />
+                        <polygon points="272,146 258,152 268,156" fill="#F5D547" />
+
+                        <!-- Gants Blancs & Étoile Tenue -->
+                        <path d="M150 280 L90 410 L130 430 L180 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
+                        <path d="M350 280 L410 400 L370 425 L320 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
+                        <ellipse cx="85" cy="425" rx="20" ry="16" fill="#FFF" stroke="#000" stroke-width="3" transform="rotate(-15 85 425)" />
+                        <polygon points="85,385 92,405 112,405 96,418 102,438 85,425 68,438 74,418 58,405 78,405" fill="#F5D547" stroke="#000" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 3. Logo Flottant Monumental Intégré dans la Scène -->
+            <div class="p5-stage-title-block">
+                <div class="stage-tag-badge">
+                    <span class="badge-star">★</span>
+                    <span class="badge-code">TAKE YOUR HEART // ROYALE V2.5</span>
+                </div>
+                <div class="stage-brand-title">
+                    <span class="title-layer-back">SALARY PULSE</span>
+                    <span class="title-layer-front">SALARY PULSE</span>
+                </div>
+                <div class="stage-sub-ribbon">
+                    <span class="ribbon-dot">◆</span>
+                    <span class="ribbon-text">COMMAND INTERFACE // CHOOSE YOUR TARGET</span>
+                </div>
+            </div>
+
+            <!-- 4. Menu de Commandes Asymétrique JRPG -->
+            <nav class="p5-game-commands" id="p5GameCommands" role="menu" aria-label="Commandes du jeu">
+                
+                <!-- Pointeur Graphique Flottant Dynamique -->
+                <div class="p5-command-pointer" id="p5CommandPointer" aria-hidden="true">
+                    <span class="pointer-star">★</span>
+                    <span class="pointer-slash">▶</span>
+                    <span class="pointer-tag">SELECT</span>
+                </div>
+
+                <!-- Commande 0 : DASHBOARD SALARY -->
+                <div class="p5-cmd-item cmd-dashboard is-selected" id="cmdDashboard" role="menuitem" tabindex="0" data-index="0" data-target="../dashboard-salary/">
+                    <div class="cmd-inner">
+                        <div class="cmd-text-stack">
+                            <span class="cmd-text-huge text-dashboard">DASHBOARD</span>
+                            <span class="cmd-text-huge text-salary">SALARY</span>
+                        </div>
+                        <div class="cmd-meta-chips">
+                            <span class="cmd-chip chip-status"><span class="pulse-dot">●</span> EN DIRECT</span>
+                            <span class="cmd-chip chip-rate">7.89 € / H</span>
+                            <span class="cmd-chip chip-cadence">+0.1315 € / MIN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commande 1 : CALENDRIER -->
+                <div class="p5-cmd-item cmd-calendar" id="cmdCalendar" role="menuitem" tabindex="0" data-index="1" data-target="../calendar/">
+                    <div class="cmd-inner">
+                        <div class="cmd-text-stack">
+                            <span class="cmd-text-huge text-calendar">CALENDRIER</span>
+                        </div>
+                        <div class="cmd-meta-chips">
+                            <span class="cmd-chip chip-schedule">PLANNING // 35H</span>
+                            <span class="cmd-chip chip-prep">EN PRÉPARATION</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Commande 2 : GTA 6 COUNTDOWN -->
+                <div class="p5-cmd-item cmd-gta" id="cmdGta" role="menuitem" tabindex="0" data-index="2" data-target="../gta-countdown/">
+                    <div class="cmd-inner">
+                        <div class="cmd-text-stack">
+                            <span class="cmd-text-huge text-gta">GTA 6</span>
+                            <span class="cmd-text-huge text-countdown">COUNTDOWN</span>
+                        </div>
+                        <div class="cmd-meta-chips">
+                            <span class="cmd-chip chip-vice">VICE CITY 2026</span>
+                            <span class="cmd-chip chip-clock">--:--:--:--</span>
+                        </div>
+                    </div>
+                </div>
+
+            </nav>
+
+            <!-- 5. Barre HUD d'Aide Manette / Clavier en Bas de l'Écran -->
+            <div class="p5-stage-hud-help">
+                <div class="help-chip"><span class="chip-key">↑ / ↓</span> <span>NAVIGUER</span></div>
+                <div class="help-chip"><span class="chip-key">ENTER</span> <span>SÉLECTIONNER</span></div>
+                <div class="help-chip chip-mouse"><span class="chip-key">SURVOL / CLIC</span> <span>ACCÈS SOURIS</span></div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Rideau de Transition Graphique JRPG (Wipe Slash P5R ~400ms) -->
+    <div id="p5TransitionWipe" class="p5-transition-wipe" aria-hidden="true">
+        <div class="wipe-band band-black"></div>
+        <div class="wipe-band band-red">
+            <div class="wipe-content">
+                <span class="wipe-star">★</span>
+                <span class="wipe-text" id="wipeText">TAKE YOUR TIME</span>
+                <span class="wipe-sub" id="wipeSub">SYSTEM SHIFTING...</span>
+            </div>
+        </div>
+        <div class="wipe-band band-yellow"></div>
+    </div>
+
+    <!-- Scripts : Moteur Partagé + Contrôleur Menu -->
+    <script src="../shared/shared.js" defer></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
+

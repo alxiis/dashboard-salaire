@@ -1,0 +1,976 @@
+/* ==========================================================================
+   SALARY PULSE // SHARED STYLESHEET (PERSONA 5 ROYAL JRPG × FINTECH)
+   Ressources universelles partagées entre tous les modules du système
+   ========================================================================== */
+
+/* ==========================================================================
+   1. VARIABLES & CHARTE CHROMATIQUE GLOBALE
+   ========================================================================== */
+:root {
+    --p5-black: #050505;
+    --p5-dark: #0f0f0f;
+    --p5-card-bg: #141414;
+    --p5-card-hover: #1c1c1c;
+    --p5-white: #F5F5F0;
+    --p5-offwhite: #DCDCD7;
+    --p5-red: #E50914;
+    --p5-red-dark: #8F0008;
+    --p5-red-glow: rgba(229, 9, 20, 0.45);
+    --p5-yellow: #F5D547;
+    --p5-yellow-dark: #D4B022;
+    --p5-gray: #777777;
+    --p5-dark-gray: #242424;
+
+    /* Typographies P5R */
+    --font-display: 'Bebas Neue', 'Impact', sans-serif;
+    --font-body: 'Barlow Semi Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Ombres dures Comic Book (Hard Drop Shadows) */
+    --shadow-red: 5px 5px 0px var(--p5-red);
+    --shadow-black: 6px 6px 0px #000000;
+    --shadow-p5-combo: 6px 6px 0px var(--p5-red), 12px 12px 0px #000000;
+    --shadow-yellow: 5px 5px 0px var(--p5-yellow);
+
+    /* Transitions nerveuses */
+    --p5-snap: 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    --p5-cut: 0.12s ease-out;
+}
+
+/* ==========================================================================
+   2. RESET & BASE
+   ========================================================================== */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--p5-black);
+    color: var(--p5-white);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    padding: 24px 20px 60px;
+    display: flex;
+    justify-content: center;
+}
+
+/* ==========================================================================
+   3. ÉCRAN DE BOOT ÉCLAIR (INITIALIZING SEQUENCE - 450MS)
+   ========================================================================== */
+.p5-boot-screen {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s;
+}
+
+.p5-boot-screen.boot-done {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.boot-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    z-index: 2;
+    transform: rotate(-2deg);
+}
+
+.boot-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.boot-star {
+    font-size: 2.4rem;
+    color: var(--p5-yellow);
+    animation: p5StarSpin 1.2s infinite ease-in-out;
+}
+
+@keyframes p5StarSpin {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.25) rotate(180deg); }
+    100% { transform: scale(1) rotate(360deg); }
+}
+
+.boot-title {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    letter-spacing: 0.08em;
+    color: var(--p5-white);
+    text-shadow: 4px 4px 0px var(--p5-red);
+}
+
+.boot-progress-line {
+    width: 260px;
+    height: 6px;
+    background: #222;
+    border: 1px solid var(--p5-white);
+    overflow: hidden;
+}
+
+.boot-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: var(--p5-red);
+    animation: p5BootBar 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes p5BootBar {
+    0% { width: 0%; }
+    50% { width: 65%; }
+    100% { width: 100%; }
+}
+
+.boot-status {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--p5-yellow);
+    letter-spacing: 0.1em;
+}
+
+.boot-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0),
+        rgba(255,255,255,0) 50%,
+        rgba(0, 0, 0, 0.4) 50%,
+        rgba(0, 0, 0, 0.4)
+    );
+    background-size: 100% 4px;
+    opacity: 0.6;
+}
+
+/* ==========================================================================
+   4. ARRIÈRE-PLAN DYNAMIQUE : HALFTONE, SLASHES & STRIPES
+   ========================================================================== */
+.p5-bg-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.p5-halftone {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(229, 9, 20, 0.14) 1.8px, transparent 1.8px);
+    background-size: 22px 22px;
+    opacity: 0.85;
+}
+
+.p5-action-slash {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.22) 0%, rgba(143, 0, 8, 0.05) 100%);
+    transform: rotate(-14deg) skewX(-15deg);
+    pointer-events: none;
+}
+
+.p5-action-slash.slash-1 {
+    top: -15%;
+    right: -10%;
+    width: 65vw;
+    height: 125vh;
+    border-left: 4px solid rgba(229, 9, 20, 0.45);
+}
+
+.p5-action-slash.slash-2 {
+    bottom: -20%;
+    left: -15%;
+    width: 55vw;
+    height: 85vh;
+    border-right: 3px solid rgba(245, 213, 71, 0.28);
+}
+
+.p5-stripe-band {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 7px;
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--p5-yellow),
+        var(--p5-yellow) 14px,
+        var(--p5-black) 14px,
+        var(--p5-black) 28px
+    );
+    z-index: 100;
+}
+
+/* ==========================================================================
+   5. CONTENEUR GLOBAL D'APPLICATION
+   ========================================================================== */
+.p5-app-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 1260px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    animation: p5IntroPop 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes p5IntroPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.97) translateY(24px) rotate(-0.5deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0) rotate(0deg);
+    }
+}
+
+/* ==========================================================================
+   6. HEADER & HUD TEMPOREL STICKER (HAUT GAUCHE)
+   ========================================================================== */
+.p5-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 18px 24px;
+    background: var(--p5-dark);
+    border: 3px solid var(--p5-white);
+    box-shadow: var(--shadow-red);
+    position: relative;
+    transform: rotate(-0.6deg);
+}
+
+.p5-header::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 18px;
+    height: 18px;
+    background: var(--p5-yellow);
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.p5-brand-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.p5-logo-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--p5-red);
+    color: var(--p5-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    border: 3px solid var(--p5-white);
+    transform: rotate(-6deg);
+    box-shadow: 4px 4px 0px #000;
+}
+
+.p5-star {
+    transform: translateY(-1px);
+    display: inline-block;
+    color: var(--p5-yellow);
+}
+
+.p5-brand-title {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    line-height: 0.92;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.p5-brand-title .title-main {
+    color: var(--p5-white);
+    text-shadow: 3px 3px 0px var(--p5-red);
+}
+
+.p5-brand-title .title-sub {
+    color: var(--p5-yellow);
+    background: #000;
+    padding: 2px 8px;
+    transform: skewX(-10deg);
+}
+
+.p5-tag-ribbon {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.p5-pill-black {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    background: #000;
+    color: var(--p5-white);
+    padding: 3px 8px;
+    border: 1px solid var(--p5-gray);
+    transform: skewX(-10deg);
+}
+
+.p5-pill-red {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    background: var(--p5-red);
+    color: var(--p5-white);
+    padding: 3px 8px;
+    transform: skewX(-10deg);
+}
+
+.p5-header-right-group {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+}
+
+/* Bouton Retour au Menu Principal (Header) */
+.p5-btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #000;
+    color: var(--p5-white);
+    border: 2px solid var(--p5-yellow);
+    box-shadow: 4px 4px 0px var(--p5-red);
+    padding: 7px 14px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    letter-spacing: 0.06em;
+    transform: skewX(-10deg);
+    text-decoration: none;
+    transition: all var(--p5-snap);
+}
+
+.p5-btn-back:hover {
+    background: var(--p5-red);
+    color: var(--p5-white);
+    border-color: var(--p5-white);
+    transform: skewX(-10deg) translateY(-2px);
+    box-shadow: 6px 6px 0px #000;
+}
+
+.p5-btn-back:active {
+    transform: skewX(-10deg) translateY(2px);
+    box-shadow: 2px 2px 0px #000;
+}
+
+.p5-btn-back.hidden {
+    display: none !important;
+}
+
+.p5-btn-back .back-arrow {
+    color: var(--p5-yellow);
+    font-size: 1rem;
+    transition: transform var(--p5-snap);
+}
+
+.p5-btn-back:hover .back-arrow {
+    transform: translateX(-3px);
+    color: #fff;
+}
+
+.p5-btn-back .back-kbd {
+    background: #222;
+    color: var(--p5-yellow);
+    border: 1px solid var(--p5-yellow);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 1px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+}
+
+/* Badge HUD mode Hub (Header) */
+.p5-hub-mode-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #000;
+    color: var(--p5-yellow);
+    border: 1.5px solid var(--p5-yellow);
+    padding: 6px 12px;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    letter-spacing: 0.08em;
+    transform: skewX(-8deg);
+    box-shadow: 3px 3px 0px #222;
+}
+
+.p5-hub-mode-tag.hidden {
+    display: none !important;
+}
+
+.p5-hub-mode-tag .tag-radar {
+    color: var(--p5-red);
+    font-size: 0.85rem;
+    animation: p5RadarPulse 1s infinite alternate;
+}
+
+@keyframes p5RadarPulse {
+    0% { opacity: 0.3; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Bouton d'accès rapide Audio (Header) */
+.p5-btn-audio-header {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #0a0a0a;
+    color: var(--p5-offwhite);
+    border: 1.5px solid var(--p5-gray);
+    padding: 6px 12px;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 700;
+    cursor: pointer;
+    transform: skewX(-8deg);
+    transition: all var(--p5-snap);
+}
+
+.p5-btn-audio-header:hover {
+    background: #1a1a1a;
+    color: var(--p5-white);
+    border-color: var(--p5-white);
+    transform: skewX(-8deg) translateY(-2px);
+    box-shadow: 3px 3px 0px var(--p5-red);
+}
+
+.p5-btn-audio-header.active {
+    background: var(--p5-red);
+    color: #fff;
+    border-color: var(--p5-yellow);
+    box-shadow: 3px 3px 0px var(--p5-yellow);
+}
+
+/* Badge de Statut de Travail (Header) */
+.hud-status-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+}
+
+.p5-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    background: #000;
+    border: 2px solid var(--p5-gray);
+    box-shadow: 3px 3px 0px #000;
+    transform: skewX(-8deg);
+    transition: all var(--p5-snap);
+}
+
+.p5-status-radar {
+    font-size: 0.8rem;
+    animation: p5RadarPulse 1s infinite alternate;
+}
+
+.p5-status-text-block {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-prefix {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--p5-gray);
+    font-weight: 700;
+}
+
+.status-main {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: 0.06em;
+    font-weight: 800;
+}
+
+.hud-status-caption {
+    font-size: 0.74rem;
+    color: var(--p5-gray);
+    font-family: var(--font-mono);
+}
+
+.p5-status-badge.status-working {
+    border-color: var(--p5-red);
+    color: #fff;
+    box-shadow: 3px 3px 0px var(--p5-red);
+}
+.p5-status-badge.status-working .p5-status-radar { color: var(--p5-yellow); }
+.p5-status-badge.status-working .status-main { color: var(--p5-white); }
+
+.p5-status-badge.status-break {
+    border-color: var(--p5-yellow);
+    color: var(--p5-yellow);
+}
+.p5-status-badge.status-break .p5-status-radar { color: var(--p5-red); }
+
+.p5-status-badge.status-complete {
+    border-color: var(--p5-white);
+    color: var(--p5-yellow);
+}
+.p5-status-badge.status-complete .p5-status-radar { color: var(--p5-yellow); }
+
+.p5-status-badge.status-offduty {
+    border-color: #444;
+    color: #888;
+}
+.p5-status-badge.status-offduty .p5-status-radar { color: #555; }
+
+/* ==========================================================================
+   7. STICKER COLLAGE HUD TEMPOREL (MULTI-COUCHE TOP-LEFT)
+   ========================================================================== */
+.p5-date-hud-sticker {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+    z-index: 10;
+    transform: translateY(-4px) translateX(-4px);
+    filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.7));
+}
+
+.hud-sticker-daybox {
+    background: #F5F5F0;
+    color: #050505;
+    border: 3.5px solid #000000;
+    padding: 6px 14px 8px;
+    box-shadow: 6px 6px 0px var(--p5-red), 11px 11px 0px #000000;
+    transform: rotate(-3.5deg);
+    position: relative;
+    z-index: 2;
+    transition: transform var(--p5-snap);
+    animation: p5StickerDayDrop 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hud-sticker-daybox:hover {
+    transform: rotate(-1deg) scale(1.03);
+}
+
+@keyframes p5StickerDayDrop {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px) rotate(-10deg) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) rotate(-3.5deg) scale(1);
+    }
+}
+
+.sticker-pin {
+    position: absolute;
+    top: -9px;
+    left: -9px;
+    width: 20px;
+    height: 20px;
+    background: var(--p5-yellow);
+    color: #000000;
+    font-size: 0.8rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #000000;
+    box-shadow: 2px 2px 0px #000000;
+    transform: rotate(15deg);
+    z-index: 5;
+}
+
+.sticker-num-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.sticker-big-day {
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 5vw, 4.4rem);
+    line-height: 0.82;
+    letter-spacing: -0.03em;
+    color: #000000;
+    font-variant-numeric: tabular-nums;
+}
+
+.sticker-month-tag {
+    background: #000000;
+    color: var(--p5-yellow);
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 2px 6px;
+    border: 1.5px solid var(--p5-red);
+    transform: rotate(6deg) translateY(-2px);
+    box-shadow: 2px 2px 0px var(--p5-red);
+}
+
+.sticker-month-name {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+    color: var(--p5-red-dark);
+    margin-top: 3px;
+    line-height: 1;
+}
+
+.hud-sticker-slash-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: -14px;
+    margin-top: 4px;
+    z-index: 3;
+    gap: 5px;
+}
+
+.sticker-weekday-banner {
+    background: var(--p5-red);
+    color: var(--p5-white);
+    border: 2.5px solid #000000;
+    box-shadow: 4px 4px 0px #000000;
+    padding: 4px 16px 4px 14px;
+    transform: skewX(-14deg) rotate(2deg);
+    animation: p5StickerSlashIn 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.08s both;
+    transition: transform var(--p5-snap);
+}
+
+.sticker-weekday-banner:hover {
+    transform: skewX(-14deg) rotate(0deg) translate(2px, -2px);
+}
+
+@keyframes p5StickerSlashIn {
+    0% {
+        opacity: 0;
+        transform: translateX(-30px) skewX(-20deg) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) skewX(-14deg) rotate(2deg) scale(1);
+    }
+}
+
+.weekday-text {
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    letter-spacing: 0.08em;
+    line-height: 1;
+    text-shadow: 2px 2px 0px #000000;
+    display: inline-block;
+    transform: skewX(14deg);
+}
+
+.sticker-context-pill {
+    padding: 4px 12px;
+    transform: skewX(-12deg) rotate(-1deg);
+    border: 2px solid #000000;
+    box-shadow: 3px 3px 0px #000000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    animation: p5StickerPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+    transition: all var(--p5-snap);
+}
+
+@keyframes p5StickerPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.6) skewX(-12deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) skewX(-12deg) rotate(-1deg);
+    }
+}
+
+.sticker-context-pill .context-dot {
+    font-size: 0.85rem;
+}
+
+.sticker-context-pill.context-afterwork {
+    background: #000000;
+    color: var(--p5-yellow);
+    border-color: var(--p5-yellow);
+    box-shadow: 3px 3px 0px var(--p5-red);
+}
+.sticker-context-pill.context-afterwork .context-dot {
+    color: var(--p5-yellow);
+}
+
+.sticker-context-pill.context-working {
+    background: var(--p5-red);
+    color: var(--p5-white);
+    border-color: var(--p5-white);
+    animation: p5StickerWorkingPulse 2s infinite ease-in-out;
+}
+.sticker-context-pill.context-working .context-dot {
+    color: var(--p5-yellow);
+}
+@keyframes p5StickerWorkingPulse {
+    0%, 100% { box-shadow: 3px 3px 0px #000; }
+    50% { box-shadow: 0 0 12px var(--p5-red-glow), 4px 4px 0px #000; }
+}
+
+.sticker-context-pill.context-break {
+    background: var(--p5-yellow);
+    color: #000000;
+    border-color: #000000;
+}
+.sticker-context-pill.context-break .context-dot {
+    color: var(--p5-red);
+}
+
+.sticker-context-pill.context-offduty {
+    background: #242424;
+    color: #b0b0b0;
+    border-color: #555555;
+}
+.sticker-context-pill.context-offduty .context-dot {
+    color: #777777;
+}
+
+.sticker-time-tag {
+    background: #000000;
+    color: var(--p5-white);
+    border: 1px solid var(--p5-gray);
+    padding: 3px 10px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    transform: skewX(-10deg);
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 3px 3px 0px #000000;
+    animation: p5StickerPop 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;
+}
+
+.time-clock-icon {
+    color: var(--p5-yellow);
+}
+
+.time-clock-val {
+    color: var(--p5-yellow);
+    letter-spacing: 0.05em;
+}
+
+.time-year-val {
+    color: var(--p5-gray);
+    font-size: 0.72rem;
+    border-left: 1px solid #333;
+    padding-left: 6px;
+}
+
+/* ==========================================================================
+   8. RIDEAU DE TRANSITION GRAPHIQUE JRPG (WIPE SLASH P5R)
+   ========================================================================== */
+.p5-transition-wipe {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+.p5-transition-wipe.is-wiping {
+    visibility: visible;
+    pointer-events: all;
+}
+
+.wipe-band {
+    width: 150vw;
+    position: absolute;
+    left: -25vw;
+    transform: skewX(-22deg) translateX(120%);
+}
+
+.wipe-band.band-black {
+    top: 0;
+    height: 100vh;
+    background: #000000;
+    z-index: 1;
+}
+
+.wipe-band.band-red {
+    top: 0;
+    height: 100vh;
+    background: var(--p5-red);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wipe-band.band-yellow {
+    top: 0;
+    height: 100vh;
+    background: var(--p5-yellow);
+    z-index: 3;
+    opacity: 0.35;
+}
+
+.p5-transition-wipe.is-wiping .band-black {
+    animation: p5WipeSlash 0.44s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.p5-transition-wipe.is-wiping .band-red {
+    animation: p5WipeSlash 0.44s cubic-bezier(0.77, 0, 0.175, 1) 0.04s forwards;
+}
+
+.p5-transition-wipe.is-wiping .band-yellow {
+    animation: p5WipeSlash 0.44s cubic-bezier(0.77, 0, 0.175, 1) 0.08s forwards;
+}
+
+.wipe-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transform: skewX(22deg) rotate(-2deg);
+}
+
+.wipe-star {
+    font-size: 3rem;
+    color: var(--p5-yellow);
+    animation: p5StarSpin 0.8s infinite linear;
+}
+
+.wipe-text {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    letter-spacing: 0.06em;
+    color: var(--p5-white);
+    text-shadow: 5px 5px 0px #000;
+}
+
+.wipe-sub {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--p5-yellow);
+    letter-spacing: 0.16em;
+}
+
+@keyframes p5WipeSlash {
+    0% {
+        transform: skewX(-22deg) translateX(120%);
+    }
+    45%, 55% {
+        transform: skewX(-22deg) translateX(0%);
+    }
+    100% {
+        transform: skewX(-22deg) translateX(-120%);
+    }
+}
+
+/* ==========================================================================
+   9. RESPONSIVE COMMUN & ACCESSIBILITÉ
+   ========================================================================== */
+@media (max-width: 950px) {
+    .p5-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    .p5-header-right-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 650px) {
+    body {
+        padding: 12px 6px 36px;
+    }
+    .p5-date-hud-sticker {
+        transform: none;
+        width: 100%;
+    }
+    .hud-sticker-daybox {
+        padding: 4px 10px 6px;
+    }
+    .sticker-big-day {
+        font-size: 2.8rem;
+    }
+    .sticker-weekday-banner {
+        padding: 3px 12px;
+    }
+    .weekday-text {
+        font-size: 1.2rem;
+    }
+    .p5-header-right-group {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .p5-btn-back {
+        width: 100%;
+        justify-content: center;
+    }
+    .p5-hub-mode-tag {
+        width: 100%;
+        justify-content: center;
+    }
+    .hud-status-wrapper {
+        align-items: flex-start;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .p5-boot-screen {
+        display: none !important;
+    }
+    .p5-transition-wipe {
+        display: none !important;
+    }
+}
+

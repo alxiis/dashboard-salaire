@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Pulse // GTA 6 Countdown — Persona 5 Royal</title>
+    
+    <!-- Polices Typographiques Officielles JRPG Persona 5 Royal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,800&family=Bebas+Neue&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Feuille de Styles Partagée -->
+    <link rel="stylesheet" href="../shared/shared.css">
+    
+    <style>
+        .p5-placeholder-container {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            width: 100%;
+        }
+
+        .p5-placeholder-banner.banner-gta {
+            background: #000;
+            border-left: 8px solid #ff2a85;
+            border-top: 2px solid #00e5ff;
+            border-bottom: 2px solid #00e5ff;
+            padding: 24px 28px;
+            transform: skewX(-10deg);
+            box-shadow: 6px 6px 0px #000;
+        }
+
+        .banner-tag {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: #ff2a85;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+        }
+
+        .placeholder-hero-title.title-gta {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 7vw, 5.2rem);
+            color: #00e5ff;
+            line-height: 0.9;
+            margin: 6px 0;
+            text-shadow: 4px 4px 0px #ff2a85;
+        }
+
+        .title-gta .sub-banner-text {
+            color: var(--p5-white);
+            text-shadow: 4px 4px 0px #000;
+        }
+
+        .placeholder-sub-ribbon {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--p5-yellow);
+            letter-spacing: 0.1em;
+        }
+
+        .p5-placeholder-card.card-theme-gta {
+            background: var(--p5-card-bg);
+            border: 3.5px solid var(--p5-white);
+            box-shadow: 6px 6px 0px #ff2a85, 12px 12px 0px #000;
+            padding: 32px 28px;
+            position: relative;
+            transform: rotate(-0.3deg);
+        }
+
+        .card-hazard-stripe.stripe-vice {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: repeating-linear-gradient(
+                -45deg,
+                #ff2a85,
+                #ff2a85 10px,
+                #00e5ff 10px,
+                #00e5ff 20px
+            );
+        }
+
+        .placeholder-status-badge.badge-gta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #000;
+            color: #ff2a85;
+            border: 2px solid #ff2a85;
+            padding: 6px 16px;
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            letter-spacing: 0.06em;
+            transform: skewX(-10deg);
+            margin-bottom: 20px;
+        }
+
+        .placeholder-lead-text {
+            font-size: 1.1rem;
+            line-height: 1.5;
+            color: var(--p5-offwhite);
+            margin-bottom: 24px;
+            max-width: 820px;
+        }
+
+        .gta-countdown-slots {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .countdown-slot-box {
+            background: #08030b;
+            border: 2px solid #ff2a85;
+            box-shadow: 4px 4px 0px #00e5ff;
+            padding: 16px 22px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 110px;
+            transform: skewX(-8deg);
+        }
+
+        .slot-digit {
+            font-family: var(--font-mono);
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            color: #00e5ff;
+            line-height: 1;
+        }
+
+        .slot-unit {
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            color: var(--p5-yellow);
+            font-weight: 800;
+            margin-top: 6px;
+            letter-spacing: 0.1em;
+        }
+
+        .countdown-sep {
+            font-family: var(--font-display);
+            font-size: 2.8rem;
+            color: #ff2a85;
+            user-select: none;
+        }
+
+        .btn-return-menu {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--p5-yellow);
+            color: #000;
+            border: 3px solid #000;
+            box-shadow: 6px 6px 0px var(--p5-red), 10px 10px 0px #000;
+            padding: 14px 28px;
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transform: skewX(-12deg);
+            text-decoration: none;
+            transition: all var(--p5-snap);
+        }
+
+        .btn-return-menu:hover {
+            background: var(--p5-white);
+            transform: skewX(-12deg) translateY(-2px);
+            box-shadow: 8px 8px 0px var(--p5-red), 14px 14px 0px #000;
+        }
+    </style>
+</head>
+<body class="in-submodule">
+
+    <!-- Calques Graphiques d'Arrière-Plan Universels -->
+    <div class="p5-bg-overlay" aria-hidden="true">
+        <div class="p5-stripe-band"></div>
+        <div class="p5-halftone"></div>
+        <div class="p5-action-slash slash-1"></div>
+        <div class="p5-action-slash slash-2"></div>
+    </div>
+
+    <!-- Conteneur Global de l'Application -->
+    <div class="p5-app-container">
+
+        <!-- HEADER & HUD TEMPOREL STICKER -->
+        <header class="p5-header">
+            
+            <!-- STICKER DATE HUD COLLAGE JRPG -->
+            <div class="p5-date-hud-sticker" id="p5DateSticker">
+                <div class="hud-sticker-daybox">
+                    <span class="sticker-pin">★</span>
+                    <div class="sticker-num-row">
+                        <span class="sticker-big-day" id="hudDayVal">16</span>
+                        <div class="sticker-month-col">
+                            <span class="sticker-month-tag" id="hudMonthNum">09</span>
+                            <div class="sticker-month-name" id="hudMonthName">SEPTEMBER</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hud-sticker-slash-group">
+                    <div class="sticker-weekday-banner" id="hudWeekdayBanner">
+                        <span class="weekday-text" id="hudWeekdayText">WEDNESDAY</span>
+                    </div>
+
+                    <div class="sticker-context-pill context-afterwork" id="hudContextPill">
+                        <span class="context-dot">◆</span>
+                        <span class="context-text" id="hudContextText">AFTER WORK</span>
+                    </div>
+
+                    <div class="sticker-time-tag">
+                        <span class="time-clock-icon">◷</span>
+                        <span class="time-clock-val" id="hudLiveClock">16:32:00</span>
+                        <span class="time-year-val" id="hudYearVal">2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contrôles du Header Droit -->
+            <div class="p5-header-right-group">
+                <a href="../main-menu/" id="btnBackToMenu" class="p5-btn-back" title="Retourner au Menu Principal (Échap)">
+                    <span class="back-arrow">◀</span>
+                    <span class="back-text">MENU PRINCIPAL</span>
+                    <span class="back-kbd">ESC</span>
+                </a>
+
+                <div class="p5-brand-block">
+                    <div class="p5-logo-icon">
+                        <span class="p5-star">★</span>
+                    </div>
+                    <div class="p5-brand-text">
+                        <div class="p5-brand-title">
+                            <span class="title-main">SALARY</span>
+                            <span class="title-sub">PULSE</span>
+                        </div>
+                        <div class="p5-tag-ribbon">
+                            <span class="p5-pill-black">SYSTEM // V2.5</span>
+                            <span class="p5-pill-red">P5R ROYALE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hud-status-wrapper">
+                    <div id="statutBadge" class="p5-status-badge status-working">
+                        <span class="p5-status-radar">◆</span>
+                        <div class="p5-status-text-block">
+                            <span class="status-prefix">STATUS //</span>
+                            <span id="statutTexte" class="status-main">WORKING</span>
+                        </div>
+                    </div>
+                    <div class="hud-status-caption" id="statutDescription">Compteur actif en direct</div>
+                </div>
+
+                <button class="p5-btn-audio-header" id="btnHeaderAudio" title="Activer / Désactiver les effets sonores">
+                    <span class="audio-note" id="headerAudioIcon">♪</span>
+                    <span class="audio-state-text" id="headerAudioLabel">SFX</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENU DU COMPTE À REBOURS GTA 6 -->
+        <main class="p5-placeholder-container">
+            
+            <div class="p5-placeholder-banner banner-gta">
+                <div class="banner-tag">MODULE 03 // VICE CITY PROTOCOL</div>
+                <h1 class="placeholder-hero-title title-gta">GTA 6 <span class="sub-banner-text">COUNTDOWN</span></h1>
+                <div class="placeholder-sub-ribbon">PROTOCOLE DE COMPTE À REBOURS OFFICIEL</div>
+            </div>
+
+            <div class="p5-placeholder-card card-theme-gta">
+                <div class="card-hazard-stripe stripe-vice"></div>
+                
+                <div class="placeholder-status-badge badge-gta">
+                    <span class="badge-icon">◆</span>
+                    <span>CLASSIFIED DATA // PROTOCOLE EN ATTENTE</span>
+                </div>
+
+                <p class="placeholder-lead-text">
+                    Ce module dédié sera activé dès la confirmation des données de lancement officielles par Rockstar Games. Aucune date arbitraire n'est hardcodée pour préserver l'intégrité du système.
+                </p>
+
+                <!-- Slots d'attente d'horloge de compte à rebours -->
+                <div class="gta-countdown-slots">
+                    <div class="countdown-slot-box">
+                        <span class="slot-digit">--</span>
+                        <span class="slot-unit">JOURS</span>
+                    </div>
+                    <span class="countdown-sep">:</span>
+                    <div class="countdown-slot-box">
+                        <span class="slot-digit">--</span>
+                        <span class="slot-unit">HEURES</span>
+                    </div>
+                    <span class="countdown-sep">:</span>
+                    <div class="countdown-slot-box">
+                        <span class="slot-digit">--</span>
+                        <span class="slot-unit">MINUTES</span>
+                    </div>
+                    <span class="countdown-sep">:</span>
+                    <div class="countdown-slot-box">
+                        <span class="slot-digit">--</span>
+                        <span class="slot-unit">SECONDES</span>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="../main-menu/" class="btn-return-menu" id="btnReturnMenu">
+                        <span>◀</span>
+                        <span>RETOURNER AU MENU PRINCIPAL [ESC]</span>
+                    </a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Rideau de Transition Graphique JRPG (Wipe Slash P5R) -->
+    <div id="p5TransitionWipe" class="p5-transition-wipe" aria-hidden="true">
+        <div class="wipe-band band-black"></div>
+        <div class="wipe-band band-red">
+            <div class="wipe-content">
+                <span class="wipe-star">★</span>
+                <span class="wipe-text" id="wipeText">SYSTEM HUB</span>
+                <span class="wipe-sub" id="wipeSub">RETURNING TO MAIN MENU...</span>
+            </div>
+        </div>
+        <div class="wipe-band band-yellow"></div>
+    </div>
+
+    <script src="../shared/shared.js" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            function retournerMenu(e) {
+                if (e) e.preventDefault();
+                declencherWipe('../main-menu/', 'return', 'SYSTEM HUB', 'RETURNING TO MAIN MENU...');
+            }
+
+            const btnBack = document.getElementById('btnBackToMenu');
+            const btnReturn = document.getElementById('btnReturnMenu');
+            if (btnBack) btnBack.addEventListener('click', retournerMenu);
+            if (btnReturn) btnReturn.addEventListener('click', retournerMenu);
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    retournerMenu(e);
+                }
+            });
+
+            function tickHUD() {
+                const maintenant = new Date();
+                const etat = chargerEtatPartage();
+                const statusInfo = getWorkStatus(maintenant, etat.creditedMinutes, etat.bonusSimuleMinutes, etat.modeDemo);
+                mettreAJourDateHUD(maintenant, statusInfo);
+            }
+            tickHUD();
+            setInterval(tickHUD, 1000);
+        });
+    </script>
+</body>
+</html>
+

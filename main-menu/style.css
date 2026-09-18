@@ -1,0 +1,627 @@
+/* ==========================================================================
+   MAIN MENU // FULL-SCREEN JRPG COMMAND SCREEN (PERSONA 5 ROYAL)
+   Direction artistique : Scène de jeu vidéo, silhouette manga, commandes asymétriques
+   ========================================================================== */
+
+/* 1. Header Transparent en Mode Menu Principal */
+.p5-header {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    transform: none !important;
+    margin-bottom: 0 !important;
+}
+
+.p5-header::before {
+    display: none !important;
+}
+
+.p5-header .p5-brand-block {
+    display: none !important;
+}
+
+.p5-header #btnBackToMenu {
+    display: none !important;
+}
+
+/* 2. Scène Plein Écran du Jeu */
+.p5-game-stage {
+    position: relative;
+    width: 100%;
+    min-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 10px 0 16px;
+}
+
+/* Calques Graphiques d'Arrière-Plan (Halftones, Diagonales, Action Lines) */
+.p5-stage-bg-layers {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.bg-halftone-circle {
+    position: absolute;
+    border-radius: 50%;
+    background-image: radial-gradient(circle, rgba(229, 9, 20, 0.4) 2.2px, transparent 2.2px);
+    background-size: 18px 18px;
+}
+
+.bg-halftone-circle.circle-1 {
+    width: 580px;
+    height: 580px;
+    right: 6%;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.35;
+    animation: p5RotateSlow 45s linear infinite;
+}
+
+.bg-halftone-circle.circle-2 {
+    width: 320px;
+    height: 320px;
+    left: 4%;
+    bottom: 8%;
+    opacity: 0.22;
+}
+
+@keyframes p5RotateSlow {
+    from { transform: translateY(-50%) rotate(0deg); }
+    to { transform: translateY(-50%) rotate(360deg); }
+}
+
+.bg-slash-geometry {
+    position: absolute;
+    transform: skewX(-20deg) rotate(-10deg);
+}
+
+.bg-slash-geometry.slash-red {
+    top: -20%;
+    right: 12%;
+    width: 380px;
+    height: 140%;
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.22) 0%, rgba(143, 0, 8, 0.04) 100%);
+    border-left: 4px solid rgba(229, 9, 20, 0.4);
+}
+
+.bg-slash-geometry.slash-dark {
+    bottom: -15%;
+    left: 20%;
+    width: 260px;
+    height: 90%;
+    background: rgba(0, 0, 0, 0.45);
+    border-right: 3px solid rgba(245, 213, 71, 0.25);
+}
+
+.bg-action-burst {
+    position: absolute;
+    right: -10%;
+    top: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(245, 213, 71, 0.08) 0%, transparent 65%);
+}
+
+.bg-caution-diagonal-strip {
+    position: absolute;
+    bottom: 60px;
+    right: -5%;
+    width: 480px;
+    height: 12px;
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--p5-yellow),
+        var(--p5-yellow) 14px,
+        #000000 14px,
+        #000000 28px
+    );
+    transform: rotate(-12deg);
+    opacity: 0.6;
+}
+
+/* 3. Visuel Central Original (Silhouette Voleur Fantôme Manga) */
+.p5-menu-figure-stage {
+    position: absolute;
+    right: 6%;
+    top: 52%;
+    transform: translateY(-50%);
+    width: 480px;
+    height: 640px;
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.figure-graphic-wrap {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    filter: drop-shadow(8px 8px 0px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 24px rgba(229, 9, 20, 0.35));
+    animation: p5FigureFloat 4s infinite ease-in-out;
+}
+
+@keyframes p5FigureFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(0.8deg); }
+}
+
+.p5-character-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    overflow: visible;
+}
+
+/* 4. Logo Titre Monumental Flottant */
+.p5-stage-title-block {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 6px;
+    width: fit-content;
+}
+
+.stage-tag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #000;
+    color: var(--p5-yellow);
+    border: 1.5px solid var(--p5-yellow);
+    box-shadow: 4px 4px 0px var(--p5-red);
+    padding: 4px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    transform: skewX(-12deg);
+    width: fit-content;
+}
+
+.badge-star {
+    color: var(--p5-yellow);
+    font-size: 1rem;
+    animation: p5StarSpin 2s infinite ease-in-out;
+}
+
+.stage-brand-title {
+    position: relative;
+    line-height: 0.85;
+    margin: 4px 0;
+}
+
+.title-layer-back {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 7vw, 5.8rem);
+    letter-spacing: 0.04em;
+    color: #000;
+    -webkit-text-stroke: 4px var(--p5-red);
+    transform: skewX(-14deg);
+    user-select: none;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.title-layer-front {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: clamp(3.2rem, 7vw, 5.8rem);
+    letter-spacing: 0.04em;
+    color: var(--p5-white);
+    transform: skewX(-14deg);
+    display: inline-block;
+    z-index: 2;
+    text-shadow: 4px 4px 0px #000;
+}
+
+.stage-sub-ribbon {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #0a0a0a;
+    border-left: 5px solid var(--p5-red);
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    padding: 4px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--p5-offwhite);
+    letter-spacing: 0.08em;
+    transform: skewX(-10deg);
+}
+
+.ribbon-dot {
+    color: var(--p5-yellow);
+    animation: p5RadarPulse 1s infinite alternate;
+}
+
+/* 5. Menu de Commandes Asymétrique JRPG (Monumental Typography) */
+.p5-game-commands {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    width: fit-content;
+    max-width: 680px;
+    margin: 28px 0 28px 24px;
+}
+
+/* Pointeur de Sélection Dynamique Flottant */
+.p5-command-pointer {
+    position: absolute;
+    left: -65px;
+    top: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--p5-yellow);
+    color: #000;
+    border: 2px solid #000;
+    box-shadow: 4px 4px 0px var(--p5-red);
+    padding: 6px 14px;
+    transform: skewX(-14deg) scale(1);
+    z-index: 20;
+    pointer-events: none;
+    transition: top 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                left 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pointer-star {
+    font-size: 1.2rem;
+    color: #000;
+    animation: p5StarSpin 1s infinite linear;
+}
+
+.pointer-slash {
+    font-size: 1.1rem;
+    font-weight: 900;
+}
+
+.pointer-tag {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    letter-spacing: 0.08em;
+    font-weight: 900;
+}
+
+/* Éléments de Commande Individuels */
+.p5-cmd-item {
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.26s ease,
+                opacity 0.26s ease;
+}
+
+.cmd-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.cmd-text-stack {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 12px;
+    line-height: 0.88;
+}
+
+.cmd-text-huge {
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+    line-height: 0.9;
+    display: inline-block;
+    transition: color 0.2s ease, text-shadow 0.2s ease, background 0.2s ease;
+}
+
+/* Commande 01 : DASHBOARD SALARY */
+.cmd-dashboard {
+    transform: rotate(-3.5deg) skewX(-10deg);
+}
+
+.text-dashboard {
+    font-size: clamp(3rem, 6vw, 4.6rem);
+    color: var(--p5-white);
+    -webkit-text-stroke: 3px #000;
+    text-shadow: 4px 4px 0px #000;
+    transform: skewX(-10deg);
+}
+
+.text-salary {
+    font-size: clamp(3.2rem, 6.5vw, 5rem);
+    color: var(--p5-yellow);
+    background: #000;
+    padding: 3px 16px;
+    border: 3px solid var(--p5-white);
+    transform: skewX(-10deg);
+    box-shadow: 6px 6px 0px var(--p5-red);
+}
+
+/* Commande 02 : CALENDRIER */
+.cmd-calendar {
+    transform: rotate(2deg) skewX(-8deg);
+    margin-left: 36px;
+}
+
+.text-calendar {
+    font-size: clamp(2.8rem, 5.5vw, 4.2rem);
+    color: #000;
+    background: var(--p5-white);
+    padding: 3px 18px;
+    border: 3px solid #000;
+    transform: skewX(-8deg);
+    box-shadow: 6px 6px 0px #00e5ff;
+}
+
+/* Commande 03 : GTA 6 COUNTDOWN */
+.cmd-gta {
+    transform: rotate(-2.5deg) skewX(-10deg);
+    margin-left: 18px;
+}
+
+.text-gta {
+    font-size: clamp(2.8rem, 5.5vw, 4.2rem);
+    color: #00e5ff;
+    background: #050505;
+    padding: 3px 14px;
+    border: 2px solid #00e5ff;
+    transform: skewX(-10deg);
+    box-shadow: 4px 4px 0px #ff2a85;
+}
+
+.text-countdown {
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    color: var(--p5-white);
+    background: #ff2a85;
+    padding: 3px 16px;
+    transform: skewX(-10deg);
+    box-shadow: 6px 6px 0px #000;
+    border: 2px solid var(--p5-white);
+}
+
+/* Puces d'Information Flottantes */
+.cmd-meta-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 2px;
+}
+
+.cmd-chip {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 3px 10px;
+    transform: skewX(-8deg);
+    box-shadow: 2px 2px 0px #000;
+}
+
+.chip-status {
+    background: var(--p5-red);
+    color: #fff;
+}
+
+.chip-rate {
+    background: #000;
+    color: var(--p5-white);
+    border: 1px solid #444;
+}
+
+.chip-cadence {
+    background: var(--p5-yellow);
+    color: #000;
+}
+
+.chip-schedule {
+    background: #00e5ff;
+    color: #000;
+}
+
+.chip-prep {
+    background: #222;
+    color: var(--p5-yellow);
+    border: 1px solid var(--p5-yellow);
+}
+
+.chip-vice {
+    background: #ff2a85;
+    color: #fff;
+}
+
+.chip-clock {
+    background: #110916;
+    color: #00e5ff;
+    border: 1px solid #ff2a85;
+}
+
+/* ==========================================================================
+   6. COMPORTEMENT DE SÉLECTION DU JEU (CALIBRATION PRÉCISE)
+   ========================================================================== */
+
+/* Commande Sélectionnée */
+.p5-cmd-item.is-selected {
+    z-index: 15 !important;
+}
+
+.cmd-dashboard.is-selected {
+    transform: translate(-16px, -6px) rotate(-1.5deg) scale(1.10);
+    filter: drop-shadow(8px 8px 0px var(--p5-yellow)) drop-shadow(14px 14px 0px #000);
+}
+
+.cmd-calendar.is-selected {
+    transform: translate(-14px, -5px) rotate(3.2deg) scale(1.10);
+    filter: drop-shadow(8px 8px 0px var(--p5-yellow)) drop-shadow(14px 14px 0px #000);
+}
+
+.cmd-gta.is-selected {
+    transform: translate(-14px, -5px) rotate(-1deg) scale(1.10);
+    filter: drop-shadow(8px 8px 0px #ff2a85) drop-shadow(14px 14px 0px #000);
+}
+
+.p5-cmd-item.is-selected .text-salary {
+    background: var(--p5-yellow);
+    color: #000;
+    box-shadow: 6px 6px 0px var(--p5-red), 12px 12px 0px #000;
+}
+
+.p5-cmd-item.is-selected .text-calendar {
+    background: var(--p5-white);
+    color: #000;
+    border-color: #000;
+    box-shadow: 6px 6px 0px #00e5ff, 12px 12px 0px #000;
+}
+
+.p5-cmd-item.is-selected .text-gta {
+    background: #00e5ff;
+    color: #000;
+    box-shadow: 6px 6px 0px #ff2a85, 12px 12px 0px #000;
+}
+
+/* Commandes Non Sélectionnées (Recul Subtil sans Perte de Lisibilité) */
+.p5-cmd-item.is-dimmed {
+    opacity: 0.82;
+    filter: grayscale(20%);
+}
+
+.cmd-dashboard.is-dimmed {
+    transform: rotate(-3.5deg) skewX(-10deg) scale(0.96);
+}
+
+.cmd-calendar.is-dimmed {
+    transform: rotate(2deg) skewX(-8deg) scale(0.96);
+}
+
+.cmd-gta.is-dimmed {
+    transform: rotate(-2.5deg) skewX(-10deg) scale(0.96);
+}
+
+/* Animation d'Impact au Lancement du Module (Launch Sequence P5R) */
+.p5-cmd-item.is-launching {
+    animation: p5CommandLaunch 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    z-index: 100 !important;
+}
+
+@keyframes p5CommandLaunch {
+    0% {
+        transform: scale(1.10) translate(-14px, -5px);
+        filter: brightness(1.2);
+    }
+    45% {
+        transform: scale(2.2) translate(-32px, -14px);
+        filter: brightness(2.5) contrast(1.6);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(3.6) translate(-70px, -30px);
+        opacity: 0;
+        filter: brightness(3);
+    }
+}
+
+/* 7. Barre HUD d'Aide en Bas de l'Écran */
+.p5-stage-hud-help {
+    position: relative;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    background: #090909;
+    border: 2px solid var(--p5-white);
+    box-shadow: 4px 4px 0px #000;
+    padding: 10px 18px;
+    width: fit-content;
+    margin: 8px auto 0;
+}
+
+.help-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    letter-spacing: 0.06em;
+    color: var(--p5-offwhite);
+}
+
+.chip-key {
+    background: var(--p5-red);
+    color: var(--p5-white);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 2px 7px;
+    transform: skewX(-10deg);
+    box-shadow: 2px 2px 0px #000;
+}
+
+/* 8. Responsive Spécifique au Main Menu */
+@media (max-width: 950px) {
+    .p5-menu-figure-stage {
+        width: 360px;
+        height: 500px;
+        opacity: 0.35;
+        right: -20px;
+        z-index: 1;
+    }
+    .p5-game-commands {
+        max-width: 100%;
+        margin-left: 12px;
+        gap: 26px;
+    }
+}
+
+@media (max-width: 650px) {
+    .p5-game-stage {
+        padding: 4px 0 10px;
+        min-height: auto;
+    }
+    .p5-menu-figure-stage {
+        width: 240px;
+        height: 340px;
+        opacity: 0.20;
+        right: -40px;
+        top: 40%;
+    }
+    .p5-game-commands {
+        gap: 22px;
+        margin-left: 0;
+        width: 100%;
+    }
+    .cmd-dashboard, .cmd-calendar, .cmd-gta {
+        margin-left: 0 !important;
+    }
+    .p5-command-pointer {
+        display: none;
+    }
+    .p5-stage-hud-help {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        gap: 8px;
+    }
+}
+
