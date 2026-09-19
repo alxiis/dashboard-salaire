@@ -25,6 +25,12 @@ Chaque page module déclare `<body data-sp-page="…">` et un `<header data-sp-h
 (fond, header, HUD date, transition, touche ESC) est monté par `shared.js`. Les pages chargent
 `scheduleConfig.js` puis `schedule-engine.js` avant `shared.js`.
 
+## Déploiement (GitHub Pages)
+
+Pages sert les fichiers avec `Cache-Control: max-age=600`. Tous les scripts et feuilles de style portent donc un `?v=VERSION`
+(dans chaque `index.html`) : **changer cette version à chaque mise en ligne** pour qu'aucun navigateur ne mélange d'anciens et de nouveaux fichiers.
+En cas d'affichage incomplet (« -- », « undefined »), recharger avec Ctrl+F5.
+
 ## Lancer
 
 ```bash

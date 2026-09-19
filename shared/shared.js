@@ -23,6 +23,17 @@
        --------------------------------------------------------------------- */
     // Données issues de shared/scheduleConfig.js + schedule-engine.js (à charger avant ce fichier)
     const Schedule = window.Schedule;
+    if (!Schedule) {
+        // Fichiers partiellement en cache : on l'explique au lieu d'échouer en silence
+        document.addEventListener('DOMContentLoaded', () => {
+            const n = document.createElement('p');
+            n.setAttribute('role', 'alert');
+            n.style.cssText = 'position:fixed;inset:auto 0 0 0;z-index:99999;margin:0;padding:12px 16px;background:#e50914;color:#fff;font:800 16px system-ui,sans-serif;text-align:center';
+            n.textContent = 'Fichiers du site en cache obsolètes : rechargez la page avec Ctrl+F5 (ou Cmd+Maj+R).';
+            document.body.appendChild(n);
+        });
+        throw new Error('window.Schedule est absent : scheduleConfig.js / schedule-engine.js non chargés.');
+    }
     const CONFIG = Object.freeze({
         MONTHLY_NET: Schedule.CONFIG.MONTHLY_NET,
         MAX_MINUTES_JOUR: Schedule.MINUTES_PAR_JOUR, // minutes de bureau par jour d'entreprise
