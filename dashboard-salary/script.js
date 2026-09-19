@@ -1,388 +1,315 @@
 /**
- * ==========================================================================
- * DASHBOARD SALARY // ENGINE CONTROLLER (PERSONA 5 ROYAL JRPG × FINTECH)
- * Moteur de calcul discret à la minute (+0.1315 €), graphiques SVG et tabs
- * ==========================================================================
+ * DASHBOARD SALARY // moteur salarial à la minute
+ *
+ * Règles (inchangées) :
+ *   - 7,89 €/h ≈ 0,1315 €/min ; le compteur ne bouge qu'à la minute entière travaillée
+ *   - plages 08h30–12h30 et 13h30–16h30, lundi–vendredi, plafond 420 min/jour
+ *   - les minutes « simulées » (bouton +1 min, démo) s'ajoutent au réel dans la limite du plafond
  */
+(function () {
+    'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
+    const { CONFIG, store, audio, work, hud, nav, onTick } = window.SP;
+    const { TAUX_HORAIRE_NET, TAUX_MINUTE, TAUX_SECONDE, MAX_MINUTES_JOUR, GAIN_JOUR_MAX, PLAGES } = CONFIG;
 
-    // 1. ÉTAT DU MOTEUR SALARIAL DISCRET
-    let creditedMinutesAujourdhui = 0;
-    let bonusSimuleMinutes = 0;
-    let dateDernierCalculJour = null;
-    let isInitialBoot = true;
-    let modeDemo = false;
-    let demoInterval = null;
+    const DEMO_INTERVAL_MS = 5000;
+    const [MATIN, APRES_MIDI] = PLAGES;
+    const DUREE_MATIN = MATIN.fin - MATIN.debut; // 240
+    const DUREE_APRES_MIDI = APRES_MIDI.fin - APRES_MIDI.debut; // 180
 
-    // Récupération de l'état persistant
-    const maintenant = new Date();
-    const dateJourChaine = maintenant.toDateString();
-    const etatSauvegarde = chargerEtatPartage();
+    const $ = (id) => document.getElementById(id);
+    const setText = hud.setText;
+    const euros = (minutes) => (minutes * TAUX_MINUTE).toFixed(2);
 
-    if (etatSauvegarde.dateJour === dateJourChaine) {
-        creditedMinutesAujourdhui = etatSauvegarde.creditedMinutes || 0;
-        bonusSimuleMinutes = etatSauvegarde.bonusSimuleMinutes || 0;
-        modeDemo = etatSauvegarde.modeDemo || false;
-    } else {
-        creditedMinutesAujourdhui = 0;
-        bonusSimuleMinutes = 0;
-        modeDemo = false;
-    }
-    dateDernierCalculJour = dateJourChaine;
+    /* ---------- état ---------- */
+    const sauvegarde = store.charger(); // déjà remis à zéro si la date a changé
+    let creditedMinutes = sauvegarde.creditedMinutes;
+    let bonusSimuleMinutes = sauvegarde.bonusSimuleMinutes;
+    let modeDemo = sauvegarde.modeDemo;
+    let jourCourant = store.jourCle();
+    let premierPassage = true;
+    let demoTimer = null;
 
-    function synchroniserPersistance() {
-        sauvegarderEtatPartage({
-            creditedMinutes: creditedMinutesAujourdhui,
-            bonusSimuleMinutes: bonusSimuleMinutes,
-            dateJour: dateDernierCalculJour,
-            audioActif: audioActif,
-            modeDemo: modeDemo
+    // Cumul des jours strictement passés : ne change qu'une fois par jour
+    let cachePasse = { jour: null, mois: 0, total: 0 };
+
+    const totalMinutes = () => Math.min(MAX_MINUTES_JOUR, creditedMinutes + bonusSimuleMinutes);
+
+    function persister() {
+        store.sauvegarder({
+            creditedMinutes,
+            bonusSimuleMinutes,
+            dateJour: jourCourant,
+            audioActif: audio.isOn(),
+            modeDemo
         });
     }
 
-    /**
-     * Calcule le nombre de secondes travaillées aujourd'hui (plafonnées à 25 200 s = 7h)
-     */
-    function getSecondesJournee(dateCible) {
-        if (!estJourOuvre(dateCible)) return 0;
-
-        const minutesActuelles = dateCible.getHours() * 60 + dateCible.getMinutes() + dateCible.getSeconds() / 60;
-        let totalSecondes = 0;
-
-        for (const plage of PLAGES) {
-            if (minutesActuelles > plage.debut) {
-                const finEffective = Math.min(minutesActuelles, plage.fin);
-                totalSecondes += (finEffective - plage.debut) * 60;
-            }
-        }
-        return Math.min(MAX_MINUTES_JOUR * 60, totalSecondes);
-    }
-
-    /**
-     * Calcule le nombre de minutes entières de travail complétées aujourd'hui
-     */
-    function getMinutesTravailleesAujourdhui(dateCible) {
-        return Math.floor(getSecondesJournee(dateCible) / 60);
-    }
-
-    /**
-     * Calcule le cumul de secondes pour les jours passés (strictement avant aujourd'hui)
-     */
-    function calculerSecondesJoursPrecedents(debut, dateCourante) {
-        if (dateCourante < debut) return 0;
-
-        let cumulSecondes = 0;
-        const curseur = new Date(debut.getFullYear(), debut.getMonth(), debut.getDate(), 0, 0, 0);
-        const limiteJour = new Date(dateCourante.getFullYear(), dateCourante.getMonth(), dateCourante.getDate(), 0, 0, 0);
-
-        while (curseur < limiteJour) {
-            if (estJourOuvre(curseur)) {
-                cumulSecondes += MAX_MINUTES_JOUR * 60;
-            }
+    /* ---------- calculs ---------- */
+    function secondesJoursPrecedents(debut, fin) {
+        if (fin <= debut) return 0;
+        let cumul = 0;
+        const curseur = new Date(debut.getFullYear(), debut.getMonth(), debut.getDate());
+        const limite = new Date(fin.getFullYear(), fin.getMonth(), fin.getDate());
+        while (curseur < limite) {
+            if (work.estJourOuvre(curseur)) cumul += MAX_MINUTES_JOUR * 60;
             curseur.setDate(curseur.getDate() + 1);
         }
-        return cumulSecondes;
+        return cumul;
     }
 
-    /**
-     * Déclenche l'animation visuelle et sonore du gain de minute
-     */
-    function declencherAnimationGain(montant = TAUX_MINUTE, estSimulation = false) {
-        const anchor = document.getElementById('floatingGainAnchor');
-        const heroCard = document.getElementById('mainHeroCard');
-        const amountWrap = document.getElementById('mainAmountWrap');
-        const btnSimuler = document.getElementById('btnSimulerGain');
+    function actualiserCachePasse(date) {
+        const jour = store.jourCle(date);
+        if (cachePasse.jour === jour) return;
+        const debutMois = new Date(date.getFullYear(), date.getMonth(), 1);
+        const debutMoisEffectif = debutMois < CONFIG.DATE_DEBUT_CONTRAT ? CONFIG.DATE_DEBUT_CONTRAT : debutMois;
+        cachePasse = {
+            jour,
+            mois: secondesJoursPrecedents(debutMoisEffectif, date) * TAUX_SECONDE,
+            total: secondesJoursPrecedents(CONFIG.DATE_DEBUT_CONTRAT, date) * TAUX_SECONDE
+        };
+    }
 
-        if (estSimulation && btnSimuler) {
-            btnSimuler.classList.remove('btn-vibrating');
-            void btnSimuler.offsetWidth;
-            btnSimuler.classList.add('btn-vibrating');
-            setTimeout(() => {
-                if (btnSimuler) btnSimuler.classList.remove('btn-vibrating');
-            }, 400);
-        }
+    /* ---------- affichage ---------- */
+    function rafraichirMontants(date) {
+        actualiserCachePasse(date);
+        const minutes = totalMinutes();
+        const gagneAujourdhui = minutes * TAUX_MINUTE;
+        const pct = Math.min(100, (minutes / MAX_MINUTES_JOUR) * 100);
 
-        if (anchor) {
+        setText('jour', gagneAujourdhui.toFixed(4));
+        setText('mois', (cachePasse.mois + gagneAujourdhui).toFixed(2));
+        setText('total', (cachePasse.total + gagneAujourdhui).toFixed(2));
+
+        $('progressBarFill').style.width = `${pct.toFixed(1)}%`;
+        setText('progressionPourcent', `${pct.toFixed(1)} %`);
+        setText('heuresTravaillees', `(${(minutes / 60).toFixed(1)}h / 7h)`);
+
+        const minMatin = Math.min(DUREE_MATIN, minutes);
+        const minApresMidi = Math.max(0, Math.min(DUREE_APRES_MIDI, minutes - DUREE_MATIN));
+        [
+            ['slotBarMorning', 'slotMorningText', minMatin, DUREE_MATIN],
+            ['slotBarAfternoon', 'slotAfternoonText', minApresMidi, DUREE_APRES_MIDI]
+        ].forEach(([barId, textId, fait, duree]) => {
+            const p = (fait / duree) * 100;
+            $(barId).style.width = `${p.toFixed(1)}%`;
+            setText(textId, `${p.toFixed(1)}% accompli • ${euros(fait)} € / ${euros(duree)} €`);
+        });
+    }
+
+    /* ---------- courbe SVG : coordonnées dérivées du contrat ---------- */
+    const CHART = { x0: 60, x1: 760, yBase: 185, yMax: 35 };
+    const minuteX = (m) => CHART.x0 + ((m - MATIN.debut) / (APRES_MIDI.fin - MATIN.debut)) * (CHART.x1 - CHART.x0);
+    const euroY = (e) => CHART.yBase - (e / GAIN_JOUR_MAX) * (CHART.yBase - CHART.yMax);
+    /** minutes travaillées à l'heure `m` (minutes depuis minuit) */
+    const travailleA = (m) =>
+        Math.max(0, Math.min(m, MATIN.fin) - MATIN.debut) + Math.max(0, Math.min(m, APRES_MIDI.fin) - APRES_MIDI.debut);
+    const pointA = (m) => [minuteX(m), euroY(travailleA(m) * TAUX_MINUTE)];
+    const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+
+    function construireCourbe() {
+        const sommets = [MATIN.debut, MATIN.fin, APRES_MIDI.debut, APRES_MIDI.fin].map(pointA);
+        const ligne = sommets.map((p) => p.map((v) => v.toFixed(1)).join(',')).join(' ');
+        const aire = `${CHART.x0},${CHART.yBase} ${ligne} ${CHART.x1},${CHART.yBase}`;
+        $('chartLine').setAttribute('points', ligne);
+        $('chartFill').setAttribute('points', aire);
+        $('chartFillDots').setAttribute('points', aire);
+
+        const [xPauseDebut] = pointA(MATIN.fin);
+        const [xPauseFin] = pointA(APRES_MIDI.debut);
+        const pause = $('chartLunch');
+        pause.setAttribute('x', xPauseDebut.toFixed(1));
+        pause.setAttribute('width', (xPauseFin - xPauseDebut).toFixed(1));
+        $('chartLunchLabel').setAttribute('transform', `rotate(-90 ${(xPauseDebut + 14).toFixed(1)} 115)`);
+        $('chartLunchLabel').setAttribute('x', (xPauseDebut + 14).toFixed(1));
+
+        // jalons horaires : [minute, afficher le montant, couleur]
+        const jalons = [[MATIN.debut, true], [630, true], [MATIN.fin, true], [APRES_MIDI.debut, false], [900, true], [APRES_MIDI.fin, true]];
+        const NS = 'http://www.w3.org/2000/svg';
+        const marks = $('chartMarks');
+        marks.textContent = '';
+        jalons.forEach(([m, avecMontant], i) => {
+            const [x, y] = pointA(m);
+            const cercle = document.createElementNS(NS, 'circle');
+            cercle.setAttribute('cx', x.toFixed(1));
+            cercle.setAttribute('cy', y.toFixed(1));
+            cercle.setAttribute('r', i === 0 || i === jalons.length - 1 ? 7 : 5);
+            cercle.setAttribute('class', i === 2 || i === jalons.length - 1 ? 'mark mark-key' : 'mark');
+            const texte = document.createElementNS(NS, 'text');
+            texte.setAttribute('x', x.toFixed(1));
+            texte.setAttribute('y', 214);
+            texte.setAttribute('text-anchor', 'middle');
+            texte.setAttribute('class', i === jalons.length - 1 ? 'axis-label axis-end' : 'axis-label');
+            texte.textContent = avecMontant ? `${hhmm(m)} (${euros(travailleA(m))}€)` : hhmm(m);
+            marks.append(cercle, texte);
+        });
+    }
+
+    function deplacerCurseur(date) {
+        const minuteJour = work.estJourOuvre(date)
+            ? Math.min(APRES_MIDI.fin, Math.max(MATIN.debut, date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60))
+            : MATIN.debut;
+        const x = minuteX(minuteJour);
+        const y = euroY((work.secondesTravaillees(date) / 60) * TAUX_MINUTE);
+        const curseur = $('svgLiveCursor');
+        const point = $('svgLiveDot');
+        curseur.setAttribute('x1', x.toFixed(1));
+        curseur.setAttribute('x2', x.toFixed(1));
+        point.setAttribute('cx', x.toFixed(1));
+        point.setAttribute('cy', y.toFixed(1));
+    }
+
+    /* ---------- animation de gain ---------- */
+    function rejouer(el, classe, duree) {
+        if (!el) return;
+        el.classList.remove(classe);
+        void el.offsetWidth; // relance l'animation CSS
+        el.classList.add(classe);
+        setTimeout(() => el.classList.remove(classe), duree);
+    }
+
+    function animerGain(montant, estSimulation) {
+        if (estSimulation) rejouer($('btnSimulerGain'), 'btn-vibrating', 400);
+
+        const ancre = $('floatingGainAnchor');
+        if (ancre) {
             const badge = document.createElement('div');
-            badge.className = 'p5-floating-badge';
-            const montantFormatte = montant.toFixed(4);
-            badge.innerHTML = `
-                <span class="p5-badge-slash-icon">★</span>
-                <span>+${montantFormatte} €</span>
-            `;
-            anchor.appendChild(badge);
-
-            setTimeout(() => {
-                if (badge.parentNode) {
-                    badge.parentNode.removeChild(badge);
-                }
-            }, 850);
+            badge.className = 'sp-floating-badge';
+            badge.innerHTML = `<span class="sp-badge-slash-icon" aria-hidden="true">★</span><span>+${montant.toFixed(4)} €</span>`;
+            ancre.appendChild(badge);
+            setTimeout(() => badge.remove(), 850);
         }
-
-        if (amountWrap) {
-            amountWrap.classList.remove('minute-tick');
-            void amountWrap.offsetWidth;
-            amountWrap.classList.add('minute-tick');
-            setTimeout(() => {
-                if (amountWrap) amountWrap.classList.remove('minute-tick');
-            }, 450);
-        }
-
-        if (heroCard) {
-            heroCard.classList.remove('p5-gain-flash');
-            void heroCard.offsetWidth;
-            heroCard.classList.add('p5-gain-flash');
-            setTimeout(() => {
-                if (heroCard) heroCard.classList.remove('p5-gain-flash');
-            }, 450);
-        }
-
-        emettreSonGain();
+        rejouer($('mainAmountWrap'), 'minute-tick', 450);
+        rejouer($('mainHeroCard'), 'sp-gain-flash', 450);
+        audio.play('gain');
     }
 
-    /**
-     * Crédite un nombre donné de minutes complètes de salaire
-     */
-    function crediterMinutes(nbMinutes = 1, estSimulation = false) {
-        const totalActuel = creditedMinutesAujourdhui + bonusSimuleMinutes;
-        if (totalActuel >= MAX_MINUTES_JOUR) return;
-
-        const minutesRestantes = MAX_MINUTES_JOUR - totalActuel;
-        const minutesACrediter = Math.min(nbMinutes, minutesRestantes);
-        if (minutesACrediter <= 0) return;
-
-        if (estSimulation) {
-            bonusSimuleMinutes += minutesACrediter;
-        } else {
-            creditedMinutesAujourdhui += minutesACrediter;
-        }
-
-        synchroniserPersistance();
-        const gain = minutesACrediter * TAUX_MINUTE;
-        declencherAnimationGain(gain, estSimulation);
-        rafraichirAffichageMontants(new Date());
+    /* ---------- crédit de minutes ---------- */
+    function crediterReel(nbMinutes) {
+        const avant = creditedMinutes;
+        creditedMinutes = Math.min(MAX_MINUTES_JOUR, creditedMinutes + nbMinutes);
+        if (creditedMinutes === avant) return;
+        persister();
+        animerGain((creditedMinutes - avant) * TAUX_MINUTE, false);
+        rafraichirMontants(new Date());
     }
 
-    /**
-     * Met à jour l'affichage de tous les montants et indicateurs
-     */
-    function rafraichirAffichageMontants(dateCible) {
-        const totalMinutesAujourdhui = Math.min(MAX_MINUTES_JOUR, creditedMinutesAujourdhui + bonusSimuleMinutes);
-        const gagneAujourdhui = totalMinutesAujourdhui * TAUX_MINUTE;
-
-        const debutMois = new Date(dateCible.getFullYear(), dateCible.getMonth(), 1, 0, 0, 0);
-        const debutMoisEffectif = debutMois < DATE_DEBUT_CONTRAT ? DATE_DEBUT_CONTRAT : debutMois;
-        const secondesPasseesMois = calculerSecondesJoursPrecedents(debutMoisEffectif, dateCible);
-        const gagneMois = (secondesPasseesMois * TAUX_SECONDE) + gagneAujourdhui;
-
-        const secondesPasseesTotal = calculerSecondesJoursPrecedents(DATE_DEBUT_CONTRAT, dateCible);
-        const gagneTotal = (secondesPasseesTotal * TAUX_SECONDE) + gagneAujourdhui;
-
-        const jourEl = document.getElementById('jour');
-        const moisEl = document.getElementById('mois');
-        const totalEl = document.getElementById('total');
-
-        if (jourEl) jourEl.innerText = gagneAujourdhui.toFixed(4);
-        if (moisEl) moisEl.innerText = gagneMois.toFixed(2);
-        if (totalEl) totalEl.innerText = gagneTotal.toFixed(2);
-
-        const ratioJour = Math.min(1, totalMinutesAujourdhui / MAX_MINUTES_JOUR);
-        const pourcentageJour = Math.min(100, ratioJour * 100);
-        const heuresTravailleesTotal = totalMinutesAujourdhui / 60;
-
-        const progressFill = document.getElementById('progressBarFill');
-        const progressText = document.getElementById('progressionPourcent');
-        const heuresText = document.getElementById('heuresTravaillees');
-
-        if (progressFill) progressFill.style.width = `${pourcentageJour.toFixed(1)}%`;
-        if (progressText) progressText.innerText = `${pourcentageJour.toFixed(1)} %`;
-        if (heuresText) heuresText.innerText = `(${heuresTravailleesTotal.toFixed(1)}h / 7h)`;
-
-        const barMatin = document.getElementById('slotBarMorning');
-        const barApresMidi = document.getElementById('slotBarAfternoon');
-        const txtMatin = document.getElementById('slotMorningText');
-        const txtApresMidi = document.getElementById('slotAfternoonText');
-
-        const minutesMatin = Math.min(240, totalMinutesAujourdhui);
-        const minutesApresMidi = Math.max(0, Math.min(180, totalMinutesAujourdhui - 240));
-
-        if (barMatin) {
-            const pctMatin = Math.min(100, (minutesMatin / 240) * 100);
-            barMatin.style.width = `${pctMatin.toFixed(1)}%`;
-            if (txtMatin) txtMatin.innerText = `${pctMatin.toFixed(1)}% accompli • ${(minutesMatin * TAUX_MINUTE).toFixed(2)} € / 31.56 €`;
-        }
-        if (barApresMidi) {
-            const pctApresMidi = Math.min(100, (minutesApresMidi / 180) * 100);
-            barApresMidi.style.width = `${pctApresMidi.toFixed(1)}%`;
-            if (txtApresMidi) txtApresMidi.innerText = `${pctApresMidi.toFixed(1)}% accompli • ${(minutesApresMidi * TAUX_MINUTE).toFixed(2)} € / 23.67 €`;
-        }
+    function crediterSimule(nbMinutes) {
+        const ajout = Math.min(nbMinutes, MAX_MINUTES_JOUR - totalMinutes());
+        if (ajout <= 0) return;
+        bonusSimuleMinutes += ajout;
+        persister();
+        animerGain(ajout * TAUX_MINUTE, true);
+        rafraichirMontants(new Date());
     }
 
-    /**
-     * Met à jour le curseur dynamique sur le graphique SVG
-     */
-    function mettreAJourGraphiqueCurseur(secondesAujourdhui) {
-        const cursor = document.getElementById('svgLiveCursor');
-        const dot = document.getElementById('svgLiveDot');
-        if (!cursor || !dot) return;
-
-        const ratio = Math.min(1, Math.max(0, secondesAujourdhui / 25200));
-        const targetX = 60 + ratio * 700;
-
-        cursor.setAttribute('x1', targetX);
-        cursor.setAttribute('x2', targetX);
-        dot.setAttribute('cx', targetX);
-
-        const targetY = 185 - ratio * 185;
-        dot.setAttribute('cy', Math.max(10, targetY));
-    }
-
-    /**
-     * Boucle principale de rafraîchissement temps réel (1 seconde)
-     */
-    function mettreAJour() {
-        const dateNow = new Date();
-        const jourChaine = dateNow.toDateString();
-
-        if (dateDernierCalculJour !== null && dateDernierCalculJour !== jourChaine) {
-            creditedMinutesAujourdhui = 0;
+    /* ---------- boucle temps réel ---------- */
+    function tick(now) {
+        const jour = store.jourCle(now);
+        if (jour !== jourCourant) { // passage à minuit
+            jourCourant = jour;
+            creditedMinutes = 0;
             bonusSimuleMinutes = 0;
-            dateDernierCalculJour = jourChaine;
-            synchroniserPersistance();
+            arreterDemo();
+            persister();
+            rafraichirMontants(now);
         }
 
-        const statusInfo = getWorkStatus(dateNow, creditedMinutesAujourdhui, bonusSimuleMinutes, modeDemo);
-        mettreAJourDateHUD(dateNow, statusInfo);
+        hud.update(now, work.getWorkStatus(now, creditedMinutes, bonusSimuleMinutes, modeDemo));
 
-        const completedMinutes = getMinutesTravailleesAujourdhui(dateNow);
-
-        if (isInitialBoot) {
-            creditedMinutesAujourdhui = Math.min(MAX_MINUTES_JOUR, completedMinutes);
-            isInitialBoot = false;
-            synchroniserPersistance();
-            rafraichirAffichageMontants(dateNow);
-        } else {
-            if (completedMinutes > creditedMinutesAujourdhui) {
-                const diff = completedMinutes - creditedMinutesAujourdhui;
-                crediterMinutes(diff, false);
-            }
+        const termine = Math.min(MAX_MINUTES_JOUR, Math.floor(work.secondesTravaillees(now) / 60));
+        if (premierPassage) {
+            creditedMinutes = termine;
+            premierPassage = false;
+            persister();
+            rafraichirMontants(now);
+        } else if (termine > creditedMinutes) {
+            crediterReel(termine - creditedMinutes);
         }
-
-        const secondesAujourdhui = getSecondesJournee(dateNow);
-        mettreAJourGraphiqueCurseur(secondesAujourdhui);
+        deplacerCurseur(now);
     }
 
-    // 2. CONTRÔLES INTERACTIFS DU DASHBOARD
+    /* ---------- démo continue ---------- */
+    const btnDemo = $('btnDemoToggle');
 
-    // Onglets JRPG
-    const tabButtons = document.querySelectorAll('.p5-tab-btn');
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            jouerSonMenu();
-            tabButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const targetId = btn.getAttribute('data-target');
-            const targetSection = document.getElementById(targetId);
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    });
-
-    // Bouton Simuler Gain (+1 min)
-    const btnSimuler = document.getElementById('btnSimulerGain');
-    if (btnSimuler) {
-        btnSimuler.addEventListener('click', () => {
-            jouerSonMenu();
-            crediterMinutes(1, true);
-        });
+    function afficherDemo() {
+        btnDemo.classList.toggle('active', modeDemo);
+        btnDemo.setAttribute('aria-pressed', String(modeDemo));
+        setText('demoLabel', modeDemo ? 'ACTIVE // TEMPS RÉEL' : 'INACTIVE');
     }
 
-    // Bouton Démo Live
-    const btnDemo = document.getElementById('btnDemoToggle');
-    const demoLabel = document.getElementById('demoLabel');
-    if (btnDemo && demoLabel) {
+    function demarrerDemo() {
+        clearInterval(demoTimer);
+        demoTimer = setInterval(() => crediterSimule(1), DEMO_INTERVAL_MS);
+    }
+
+    function arreterDemo() {
+        clearInterval(demoTimer);
+        demoTimer = null;
+        modeDemo = false;
+        afficherDemo();
+    }
+
+    btnDemo.addEventListener('click', () => {
+        audio.play('menu');
         if (modeDemo) {
-            btnDemo.classList.add('active');
-            demoLabel.innerText = 'ACTIVE // TEMPS RÉEL';
-            demoInterval = setInterval(() => {
-                crediterMinutes(1, true);
-            }, 5000);
+            arreterDemo();
+            bonusSimuleMinutes = 0;
+        } else {
+            modeDemo = true;
+            afficherDemo();
+            demarrerDemo();
+            crediterSimule(1);
         }
-
-        btnDemo.addEventListener('click', () => {
-            jouerSonMenu();
-            modeDemo = !modeDemo;
-            if (modeDemo) {
-                btnDemo.classList.add('active');
-                demoLabel.innerText = 'ACTIVE // TEMPS RÉEL';
-                crediterMinutes(1, true);
-                if (demoInterval) clearInterval(demoInterval);
-                demoInterval = setInterval(() => {
-                    crediterMinutes(1, true);
-                }, 5000);
-            } else {
-                btnDemo.classList.remove('active');
-                demoLabel.innerText = 'INACTIVE';
-                if (demoInterval) {
-                    clearInterval(demoInterval);
-                    demoInterval = null;
-                }
-                bonusSimuleMinutes = 0;
-                rafraichirAffichageMontants(new Date());
-            }
-            synchroniserPersistance();
-            mettreAJour();
-        });
-    }
-
-    // Bouton Audio SFX (Dashboard)
-    const btnAudio = document.getElementById('btnAudioToggle');
-    const audioLabel = document.getElementById('audioLabel');
-    function rafraichirAudioLabel() {
-        if (btnAudio && audioLabel) {
-            if (audioActif) {
-                btnAudio.classList.add('active');
-                audioLabel.innerText = 'ACTIVÉ // STÉRÉO';
-            } else {
-                btnAudio.classList.remove('active');
-                audioLabel.innerText = 'DÉSACTIVÉ';
-            }
-        }
-    }
-    rafraichirAudioLabel();
-
-    if (btnAudio) {
-        btnAudio.addEventListener('click', () => {
-            basculerAudioGlobale();
-            rafraichirAudioLabel();
-        });
-    }
-
-    // 3. NAVIGATION DE RETOUR AU MENU PRINCIPAL
-    function retournerAuMenu() {
-        declencherWipe('../main-menu/', 'return', 'SYSTEM HUB', 'RETURNING TO MAIN MENU...');
-    }
-
-    const btnBack = document.getElementById('btnBackToMenu');
-    if (btnBack) {
-        btnBack.addEventListener('click', (e) => {
-            e.preventDefault();
-            retournerAuMenu();
-        });
-    }
-
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            retournerAuMenu();
-        }
+        persister();
+        rafraichirMontants(new Date());
+        tick(new Date());
     });
 
-    // Lancement de la boucle temps réel
-    mettreAJour();
-    setInterval(mettreAJour, 1000);
-});
+    /* ---------- autres contrôles ---------- */
+    $('btnSimulerGain').addEventListener('click', () => {
+        audio.play('menu');
+        crediterSimule(1);
+    });
 
+    const btnAudio = $('btnAudioToggle');
+    btnAudio.addEventListener('click', () => audio.toggle());
+    audio.subscribe((on) => {
+        btnAudio.classList.toggle('active', on);
+        btnAudio.setAttribute('aria-pressed', String(on));
+        persister();
+    });
+
+    // Onglets : défilement + onglet actif synchronisé avec la section visible
+    const onglets = Array.from(document.querySelectorAll('.sp-tab-btn'));
+    const activerOnglet = (cible) => onglets.forEach((b) => {
+        const actif = b.dataset.target === cible;
+        b.classList.toggle('active', actif);
+        if (actif) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+    onglets.forEach((btn) => btn.addEventListener('click', () => {
+        audio.play('menu');
+        activerOnglet(btn.dataset.target);
+        $(btn.dataset.target).scrollIntoView({ behavior: window.SP.prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    }));
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entrees) => {
+            const visible = entrees.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+            if (visible) activerOnglet(visible.target.id);
+        }, { rootMargin: '-25% 0px -55% 0px' });
+        onglets.forEach((b) => observer.observe($(b.dataset.target)));
+    }
+
+    /* ---------- init ---------- */
+    setText('gainMinute', `+${TAUX_MINUTE.toFixed(4)} € / min`);
+    setText('tauxHoraire', `${TAUX_HORAIRE_NET.toFixed(2)} € / heure`);
+    setText('objectifJour', `${GAIN_JOUR_MAX.toFixed(2)} € net`);
+    setText('gainSeconde', `≈ ${TAUX_SECONDE.toFixed(5)}`);
+    setText('svgTargetLabel', `OBJECTIF ${GAIN_JOUR_MAX.toFixed(2)}€`);
+
+    construireCourbe();
+    afficherDemo();
+    if (modeDemo) demarrerDemo();
+    window.addEventListener('pagehide', () => clearInterval(demoTimer));
+    onTick(tick);
+})();

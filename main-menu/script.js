@@ -1,136 +1,125 @@
 /**
- * ==========================================================================
- * MAIN MENU // GAME CONTROLLER (PERSONA 5 ROYAL COMMAND SCREEN)
- * Contrôleur de commandes asymétriques, pointeur dynamique et navigation clavier
- * ==========================================================================
+ * MAIN MENU // sélection des modules
+ * Source de vérité unique : selectedModuleIndex (0 Dashboard · 1 Calendrier · 2 GTA 6).
+ * Clavier, souris, tactile et focus passent tous par select() → render().
  */
+(function () {
+    'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
-    let menuIndexSelectionne = 0;
-    let estEnTransition = false;
+    const { CONFIG, audio, nav, hud, work, onTick } = window.SP;
 
-    const commandItems = [
-        document.getElementById('cmdDashboard'),
-        document.getElementById('cmdCalendar'),
-        document.getElementById('cmdGta')
-    ].filter(Boolean);
+    const commandes = Array.from(document.querySelectorAll('.mm-cmd'));
+    const pointeur = document.getElementById('mmPointer');
+    const LAUNCH_IMPACT_MS = 150;
 
-    const pointer = document.getElementById('p5CommandPointer');
+    // Composition « plein écran asymétrique » ou empilée (mobile / portrait)
+    const compositionLarge = window.matchMedia('(min-width: 820px) and (min-aspect-ratio: 5/4)');
 
-    /**
-     * Repositionne le pointeur flottant JRPG (#p5CommandPointer)
-     */
-    function repositionnerPointeur() {
-        if (!pointer || commandItems.length === 0) return;
-        const activeCmd = commandItems[menuIndexSelectionne];
-        if (!activeCmd) return;
+    let selectedModuleIndex = 0;
+    let lancement = false;
 
-        const topPos = activeCmd.offsetTop + 14;
-        const leftPos = Math.max(-80, activeCmd.offsetLeft - 76);
-        pointer.style.top = `${topPos}px`;
-        pointer.style.left = `${leftPos}px`;
+    /* ---------- rendu dérivé de l'état ---------- */
+    function placerPointeur() {
+        const cmd = commandes[selectedModuleIndex];
+        if (!cmd || !pointeur) return;
+        const w = pointeur.offsetWidth;
+        const h = pointeur.offsetHeight;
+        // offsetLeft/Top ignorent les transforms : position stable pendant l'animation
+        const large = compositionLarge.matches;
+        // large : à gauche, centré · empilé : accroché au coin bas-gauche (le n° occupe le haut)
+        const x = large ? cmd.offsetLeft - w * 0.7 : Math.max(0, cmd.offsetLeft - w * 0.4);
+        const y = large ? cmd.offsetTop + cmd.offsetHeight / 2 - h / 2 : cmd.offsetTop + cmd.offsetHeight - h * 0.75;
+        pointeur.style.setProperty('--px', `${Math.round(x)}px`);
+        pointeur.style.setProperty('--py', `${Math.round(y)}px`);
     }
 
-    /**
-     * Sélectionne une commande par son index (0: Dashboard, 1: Calendrier, 2: GTA 6)
-     */
-    function selectionnerIndexCommande(nouveauIndex, avecSon = false) {
-        if (commandItems.length === 0) return;
-
-        // Boucle cyclique : 0 -> 1 -> 2 -> 0 ou 0 -> 2 -> 1 -> 0
-        menuIndexSelectionne = (nouveauIndex + commandItems.length) % commandItems.length;
-
-        commandItems.forEach((cmd, idx) => {
-            const isSel = idx === menuIndexSelectionne;
-            cmd.classList.toggle('is-selected', isSel);
-            cmd.classList.toggle('is-dimmed', !isSel);
-            cmd.setAttribute('aria-selected', isSel ? 'true' : 'false');
+    function render() {
+        document.body.style.setProperty('--sel', selectedModuleIndex);
+        commandes.forEach((cmd, i) => {
+            const actif = i === selectedModuleIndex;
+            cmd.style.setProperty('--rel', i - selectedModuleIndex);
+            cmd.classList.toggle('is-selected', actif);
+            if (actif) cmd.setAttribute('aria-current', 'true');
+            else cmd.removeAttribute('aria-current');
         });
-
-        repositionnerPointeur();
-
-        if (avecSon) {
-            jouerSonSurvol();
-        }
+        placerPointeur();
     }
 
-    /**
-     * Séquence cinématographique de lancement du module sélectionné
-     */
-    function lancerCommande(index) {
-        if (estEnTransition || commandItems.length === 0) return;
-        estEnTransition = true;
-
-        const activeCmd = commandItems[index];
-        if (activeCmd) {
-            activeCmd.classList.add('is-launching');
-        }
-
-        let targetUrl = '../dashboard-salary/';
-        let wipeText = 'TAKE YOUR TIME';
-        let wipeSub = 'SYSTEM // ACCESSING SALARY ENGINE...';
-
-        if (index === 1) {
-            targetUrl = '../calendar/';
-            wipeText = 'LOOK AHEAD';
-            wipeSub = 'SYSTEM // ACCESSING CALENDAR HUB...';
-        } else if (index === 2) {
-            targetUrl = '../gta-countdown/';
-            wipeText = 'VICE CITY 2026';
-            wipeSub = 'SYSTEM // SYNCING COUNTDOWN PROTOCOL...';
-        }
-
-        // Déclenchement du Wipe Slash cinématique
-        setTimeout(() => {
-            declencherWipe(targetUrl, 'confirm', wipeText, wipeSub);
-        }, 120);
+    function select(index, { son = true, focus = false } = {}) {
+        const suivant = (index + commandes.length) % commandes.length;
+        if (suivant === selectedModuleIndex) return;
+        selectedModuleIndex = suivant;
+        render();
+        if (son) audio.play('hover');
+        if (focus) commandes[suivant].focus({ preventScroll: true });
     }
 
-    // Événements Souris & Tactile sur chaque commande
-    commandItems.forEach((cmd, idx) => {
-        cmd.addEventListener('mouseenter', () => {
-            if (menuIndexSelectionne !== idx) {
-                selectionnerIndexCommande(idx, true);
-            }
-        });
+    /* ---------- lancement : sélection → impact → expansion → wipe → module ---------- */
+    function ouvrir(index) {
+        if (lancement) return;
+        lancement = true;
+        select(index, { son: false });
+        document.body.classList.add('is-launching');
+        commandes[selectedModuleIndex].classList.add('is-launching');
+        setTimeout(() => nav.goModule(selectedModuleIndex), window.SP.prefersReducedMotion() ? 0 : LAUNCH_IMPACT_MS);
+    }
 
-        cmd.addEventListener('click', () => {
-            lancerCommande(idx);
-        });
+    /* ---------- entrées ---------- */
+    commandes.forEach((cmd, i) => {
+        cmd.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !lancement) select(i); });
+        cmd.addEventListener('focus', () => { if (!lancement) select(i); });
+        cmd.addEventListener('click', (e) => { e.preventDefault(); ouvrir(i); });
     });
 
-    // Raccourcis Clavier JRPG Globaux (↑, ↓, W, S, Entrée, Espace)
     window.addEventListener('keydown', (e) => {
-        if (estEnTransition) return;
-
-        if (e.key === 'ArrowDown' || e.key === 'KeyS' || e.key === 's' || e.key === 'S') {
-            e.preventDefault();
-            selectionnerIndexCommande(menuIndexSelectionne + 1, true);
-        } else if (e.key === 'ArrowUp' || e.key === 'KeyW' || e.key === 'w' || e.key === 'W') {
-            e.preventDefault();
-            selectionnerIndexCommande(menuIndexSelectionne - 1, true);
-        } else if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            lancerCommande(menuIndexSelectionne);
+        if (lancement || e.ctrlKey || e.metaKey || e.altKey) return;
+        // e.key : indépendant de la disposition (AZERTY : Z/S, QWERTY : W/S)
+        switch (e.key.length === 1 ? e.key.toLowerCase() : e.key) {
+            case 'ArrowDown': case 's':
+                e.preventDefault(); select(selectedModuleIndex + 1, { focus: true }); break;
+            case 'ArrowUp': case 'w': case 'z':
+                e.preventDefault(); select(selectedModuleIndex - 1, { focus: true }); break;
+            case 'Enter': case ' ':
+                // Un vrai <button> focalisé (ex. SFX) garde son comportement natif
+                if (e.target instanceof HTMLElement && e.target.closest('button')) return;
+                e.preventDefault(); if (!e.repeat) ouvrir(selectedModuleIndex); break;
+            default:
         }
     });
 
-    // Repositionnement réactif sur resize
-    window.addEventListener('resize', repositionnerPointeur);
+    // Retour depuis le cache navigateur : on repart d'un état propre
+    window.addEventListener('pageshow', (e) => {
+        if (!e.persisted) return;
+        lancement = false;
+        document.body.classList.remove('is-launching');
+        commandes.forEach((c) => c.classList.remove('is-launching'));
+        placerPointeur();
+    });
 
-    // Initialisation immédiate de la sélection et du pointeur
-    selectionnerIndexCommande(0, false);
-    setTimeout(repositionnerPointeur, 100);
+    let resizeRaf = 0;
+    window.addEventListener('resize', () => {
+        cancelAnimationFrame(resizeRaf);
+        resizeRaf = requestAnimationFrame(placerPointeur);
+    });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(placerPointeur);
 
-    // Boucle de rafraîchissement temps réel de l'horloge Date HUD (1 seconde)
-    function rafraichirHUD() {
-        const maintenant = new Date();
-        const etat = chargerEtatPartage();
-        const statusInfo = getWorkStatus(maintenant, etat.creditedMinutes, etat.bonusSimuleMinutes, etat.modeDemo);
-        mettreAJourDateHUD(maintenant, statusInfo);
-    }
+    /* ---------- données vivantes (taux issus du moteur, jamais hardcodés) ---------- */
+    document.getElementById('mmRate').textContent = CONFIG.TAUX_HORAIRE_NET.toFixed(2);
+    document.getElementById('mmMinute').textContent = `+${CONFIG.TAUX_MINUTE.toFixed(4)} € / MIN`;
 
-    rafraichirHUD();
-    setInterval(rafraichirHUD, 1000);
-});
+    const live = document.getElementById('mmLive');
+    onTick((now) => {
+        const statut = work.statutCourant(now);
+        hud.update(now, statut);
+        hud.setText('mmLiveText', statut.enPoste ? 'EN DIRECT' : statut.label);
+        live.classList.toggle('is-live', statut.enPoste);
+    });
 
+    /* ---------- init ---------- */
+    render();
+    // 1er placement sans transition, puis activation du déplacement animé
+    requestAnimationFrame(() => {
+        placerPointeur();
+        requestAnimationFrame(() => pointeur.classList.add('is-ready'));
+    });
+})();

@@ -1,10 +1,10 @@
 /* ==========================================================================
-   DASHBOARD SALARY // STYLESHEET (PERSONA 5 ROYAL JRPG × FINTECH)
+   DASHBOARD SALARY // STYLESHEET (SALARY PULSE DESIGN SYSTEM)
    Styles du tableau de bord de suivi salarial, onglets, cartes, jauges et graphique
    ========================================================================== */
 
 /* Conteneur Principal du Dashboard */
-.p5-dashboard-container {
+.sp-dashboard-container {
     position: relative;
     width: 100%;
     display: flex;
@@ -15,18 +15,18 @@
 /* ==========================================================================
    8. NAVIGATION EN ONGLETS BISEAUTÉS (JRPG TABS)
    ========================================================================== */
-.p5-nav-tabs {
+.sp-nav-tabs {
     display: flex;
     gap: 12px;
     overflow-x: auto;
     padding-bottom: 4px;
     scrollbar-width: none;
 }
-.p5-nav-tabs::-webkit-scrollbar { display: none; }
+.sp-nav-tabs::-webkit-scrollbar { display: none; }
 
-.p5-tab-btn {
+.sp-tab-btn {
     background: #111111;
-    color: var(--p5-white);
+    color: var(--sp-white);
     border: 2px solid #333333;
     padding: 10px 18px;
     font-family: var(--font-display);
@@ -37,31 +37,31 @@
     align-items: center;
     gap: 10px;
     transform: skewX(-12deg);
-    transition: var(--p5-snap);
+    transition: var(--sp-snap);
     white-space: nowrap;
 }
 
-.p5-tab-btn .tab-index {
-    color: var(--p5-yellow);
+.sp-tab-btn .tab-index {
+    color: var(--sp-yellow);
     font-size: 0.95rem;
 }
 
-.p5-tab-btn:hover {
-    background: var(--p5-dark-gray);
-    border-color: var(--p5-red);
+.sp-tab-btn:hover {
+    background: var(--sp-dark-gray);
+    border-color: var(--sp-red);
     transform: skewX(-12deg) translateY(-3px);
 }
 
-.p5-tab-btn.active {
-    background: var(--p5-red);
-    color: var(--p5-white);
-    border-color: var(--p5-white);
+.sp-tab-btn.active {
+    background: var(--sp-red);
+    color: var(--sp-white);
+    border-color: var(--sp-white);
     box-shadow: 5px 5px 0px #000;
 }
 
-.p5-tab-btn.active .tab-index {
-    color: var(--p5-black);
-    background: var(--p5-yellow);
+.sp-tab-btn.active .tab-index {
+    color: var(--sp-black);
+    background: var(--sp-yellow);
     padding: 1px 6px;
     font-weight: 900;
 }
@@ -69,40 +69,40 @@
 /* ==========================================================================
    9. HERO CARD : SOLDE GÉANT & COMPTEUR TEMPS RÉEL (MONUMENTAL)
    ========================================================================== */
-.p5-hero-card {
-    background: var(--p5-card-bg);
-    border: 4px solid var(--p5-white);
-    box-shadow: var(--shadow-p5-combo);
+.sp-hero-card {
+    background: var(--sp-card-bg);
+    border: 4px solid var(--sp-white);
+    box-shadow: var(--sp-shadow-combo);
     padding: 36px 36px 32px;
     position: relative;
     transform: rotate(-0.5deg);
-    transition: transform var(--p5-snap), border-color var(--p5-snap), box-shadow var(--p5-snap);
+    transition: transform var(--sp-snap), border-color var(--sp-snap), box-shadow var(--sp-snap);
     overflow: hidden;
 }
 
-.p5-hero-card:hover {
+.sp-hero-card:hover {
     transform: rotate(-0.2deg) translateY(-4px);
 }
 
-/* Flash rouge/jaune énergique lors du gain (P5R 450ms) */
-.p5-hero-card.p5-gain-flash {
-    animation: p5HeroFlash 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+/* Flash rouge/jaune énergique lors du gain (450ms) */
+.sp-hero-card.sp-gain-flash {
+    animation: spHeroFlash 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes p5HeroFlash {
+@keyframes spHeroFlash {
     0% {
-        border-color: var(--p5-yellow);
-        box-shadow: 0 0 45px var(--p5-red), 10px 10px 0px var(--p5-yellow);
+        border-color: var(--sp-yellow);
+        box-shadow: 0 0 45px var(--sp-red), 10px 10px 0px var(--sp-yellow);
         background: #250305;
     }
     100% {
-        border-color: var(--p5-white);
-        box-shadow: var(--shadow-p5-combo);
-        background: var(--p5-card-bg);
+        border-color: var(--sp-white);
+        box-shadow: var(--sp-shadow-combo);
+        background: var(--sp-card-bg);
     }
 }
 
-.p5-hero-banner {
+.sp-hero-banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -111,9 +111,9 @@
     margin-bottom: 24px;
 }
 
-.p5-cut-ribbon {
-    background: var(--p5-red);
-    color: var(--p5-white);
+.sp-cut-ribbon {
+    background: var(--sp-red);
+    color: var(--sp-white);
     padding: 6px 18px;
     font-weight: 900;
     font-size: 0.95rem;
@@ -125,20 +125,20 @@
     gap: 8px;
 }
 
-.p5-cut-ribbon .ribbon-icon {
-    color: var(--p5-yellow);
+.sp-cut-ribbon .ribbon-icon {
+    color: var(--sp-yellow);
     font-size: 0.85rem;
 }
 
-.p5-cut-ribbon .ribbon-text {
+.sp-cut-ribbon .ribbon-text {
     transform: skewX(14deg);
     display: inline-block;
 }
 
-.p5-card-code {
+.sp-card-code {
     font-family: var(--font-mono);
     font-size: 0.78rem;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
     letter-spacing: 0.1em;
     font-weight: 700;
     background: #000;
@@ -147,7 +147,7 @@
 }
 
 /* Viewport du montant principal */
-.p5-hero-viewport {
+.sp-hero-viewport {
     position: relative;
     display: flex;
     align-items: center;
@@ -157,46 +157,46 @@
     padding: 10px 0;
 }
 
-.p5-currency-badge {
+.sp-currency-badge {
     position: absolute;
     left: 20px;
     top: 50%;
     transform: translateY(-50%) skewX(-12deg) rotate(-4deg);
     background: #000000;
-    border: 3px solid var(--p5-white);
+    border: 3px solid var(--sp-white);
     padding: 4px 12px;
     text-align: center;
-    box-shadow: 4px 4px 0px var(--p5-red);
+    box-shadow: 4px 4px 0px var(--sp-red);
 }
 
-.p5-currency-badge .badge-sub {
+.sp-currency-badge .badge-sub {
     display: block;
     font-size: 0.65rem;
     font-weight: 900;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
     letter-spacing: 0.08em;
 }
 
-.p5-currency-badge .badge-curr {
+.sp-currency-badge .badge-curr {
     display: block;
     font-family: var(--font-display);
     font-size: 1.6rem;
-    color: var(--p5-white);
+    color: var(--sp-white);
     line-height: 0.9;
 }
 
 @media (max-width: 768px) {
-    .p5-currency-badge {
+    .sp-currency-badge {
         position: static;
         transform: skewX(-12deg);
         margin-bottom: 12px;
     }
-    .p5-hero-viewport {
+    .sp-hero-viewport {
         flex-direction: column;
     }
 }
 
-.p5-main-amount-wrap {
+.sp-main-amount-wrap {
     display: inline-flex;
     align-items: baseline;
     font-family: var(--font-mono);
@@ -204,18 +204,18 @@
     transition: transform 0.15s ease-out;
 }
 
-.p5-main-amount-wrap.minute-tick {
-    animation: p5MinuteTickPop 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.sp-main-amount-wrap.minute-tick {
+    animation: spMinuteTickPop 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes p5MinuteTickPop {
+@keyframes spMinuteTickPop {
     0% {
         transform: scale(1) translateY(0) rotate(0deg);
         filter: brightness(1);
     }
     30% {
         transform: scale(1.06) translateY(-4px) rotate(-1.5deg);
-        filter: brightness(1.35) drop-shadow(0 0 10px var(--p5-yellow));
+        filter: brightness(1.35) drop-shadow(0 0 10px var(--sp-yellow));
     }
     65% {
         transform: scale(1.01) translateY(-1px) rotate(0.4deg);
@@ -227,26 +227,26 @@
     }
 }
 
-.p5-huge-digits {
+.sp-huge-digits {
     font-size: clamp(3.8rem, 8.5vw, 6.8rem);
     font-weight: 800;
     letter-spacing: -0.04em;
     line-height: 0.88;
     font-variant-numeric: tabular-nums;
-    color: var(--p5-white);
-    text-shadow: 5px 5px 0px var(--p5-red), 10px 10px 0px #000;
+    color: var(--sp-white);
+    text-shadow: 5px 5px 0px var(--sp-red), 10px 10px 0px #000;
 }
 
-.p5-euro-sym {
+.sp-euro-sym {
     font-family: var(--font-display);
     font-size: clamp(2.8rem, 6vw, 4.6rem);
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
     margin-left: 10px;
     text-shadow: 4px 4px 0px #000;
 }
 
 /* Notification de gain jaillissante (+0.1315 €) - Pop rapide ~850ms */
-.p5-floating-anchor {
+.sp-floating-anchor {
     position: absolute;
     top: -28px;
     right: 4%;
@@ -254,29 +254,29 @@
     z-index: 20;
 }
 
-.p5-floating-badge {
+.sp-floating-badge {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--p5-yellow);
-    color: var(--p5-black);
+    background: var(--sp-yellow);
+    color: var(--sp-black);
     font-family: var(--font-display);
     font-size: 1.45rem;
     letter-spacing: 0.05em;
     padding: 7px 18px;
     border: 3px solid #000;
-    box-shadow: 5px 5px 0px var(--p5-red), 9px 9px 0px #000;
+    box-shadow: 5px 5px 0px var(--sp-red), 9px 9px 0px #000;
     transform: rotate(-6deg) skewX(-12deg);
-    animation: p5FloatSlash 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: spFloatSlash 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     white-space: nowrap;
 }
 
-.p5-badge-slash-icon {
-    color: var(--p5-red);
+.sp-badge-slash-icon {
+    color: var(--sp-red);
     font-size: 1.5rem;
 }
 
-@keyframes p5FloatSlash {
+@keyframes spFloatSlash {
     0% {
         opacity: 0;
         transform: scale(0.35) translateY(24px) rotate(-16deg);
@@ -299,14 +299,14 @@
     }
 }
 
-/* Barre de progression Persona 5 */
-.p5-progress-block {
+/* Barre de progression Salary Pulse */
+.sp-progress-block {
     margin-top: 10px;
     padding-top: 22px;
     border-top: 2px dashed rgba(255, 255, 255, 0.2);
 }
 
-.p5-progress-meta {
+.sp-progress-meta {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -315,73 +315,73 @@
     margin-bottom: 12px;
 }
 
-.p5-progress-title {
+.sp-progress-title {
     font-size: 0.88rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    color: var(--p5-offwhite);
+    color: var(--sp-offwhite);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.p5-yellow-star {
-    color: var(--p5-yellow);
+.sp-yellow-star {
+    color: var(--sp-yellow);
     font-size: 1.1rem;
 }
 
-.p5-progress-badge {
+.sp-progress-badge {
     background: #000;
-    border: 2px solid var(--p5-yellow);
+    border: 2px solid var(--sp-yellow);
     padding: 4px 12px;
     transform: skewX(-10deg);
     font-family: var(--font-mono);
     font-weight: 800;
     font-size: 0.95rem;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
 }
 
-.p5-progress-badge .sub-hours {
-    color: var(--p5-white);
+.sp-progress-badge .sub-hours {
+    color: var(--sp-white);
     font-size: 0.82rem;
     margin-left: 8px;
 }
 
-.p5-gauge-track {
+.sp-gauge-track {
     width: 100%;
     height: 22px;
     background: #000;
-    border: 3px solid var(--p5-white);
+    border: 3px solid var(--sp-white);
     position: relative;
     overflow: hidden;
     transform: skewX(-12deg);
     box-shadow: 4px 4px 0px #000;
 }
 
-.p5-gauge-fill {
+.sp-gauge-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--p5-red-dark) 0%, var(--p5-red) 70%, var(--p5-yellow) 100%);
+    background: linear-gradient(90deg, var(--sp-red-dark) 0%, var(--sp-red) 70%, var(--sp-yellow) 100%);
     transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     overflow: hidden;
 }
 
-.p5-gauge-sweep-light {
+.sp-gauge-sweep-light {
     position: absolute;
     top: 0;
     bottom: 0;
     width: 60px;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
-    animation: p5LightSweep 3.5s infinite ease-in-out;
+    animation: spLightSweep 3.5s infinite ease-in-out;
 }
 
-@keyframes p5LightSweep {
+@keyframes spLightSweep {
     0% { transform: translateX(-100%); }
     60%, 100% { transform: translateX(1200px); }
 }
 
-.p5-gauge-stripes {
+.sp-gauge-stripes {
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -395,40 +395,40 @@
 }
 
 /* Puces de cadence */
-.p5-cadence-grid {
+.sp-cadence-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
     margin-top: 24px;
 }
 
-.p5-chip {
+.sp-chip {
     padding: 12px 18px;
-    border: 2px solid var(--p5-white);
+    border: 2px solid var(--sp-white);
     transform: skewX(-12deg);
     box-shadow: 4px 4px 0px #000;
     display: flex;
     flex-direction: column;
     gap: 2px;
-    transition: var(--p5-snap);
+    transition: var(--sp-snap);
 }
 
-.p5-chip:hover {
+.sp-chip:hover {
     transform: skewX(-12deg) translateY(-3px);
 }
 
 .chip-red {
-    background: var(--p5-red);
-    color: var(--p5-white);
+    background: var(--sp-red);
+    color: var(--sp-white);
 }
 .chip-black {
     background: #000;
-    color: var(--p5-white);
-    border-color: var(--p5-gray);
+    color: var(--sp-white);
+    border-color: var(--sp-gray);
 }
 .chip-yellow {
-    background: var(--p5-yellow);
-    color: var(--p5-black);
+    background: var(--sp-yellow);
+    color: var(--sp-black);
     border-color: #000;
 }
 
@@ -448,7 +448,7 @@
 /* ==========================================================================
    10. GRILLE KPI (4 MODULES ASYMÉTRIQUES ÉLARGIS)
    ========================================================================== */
-.p5-panels-grid {
+.sp-panels-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
@@ -456,30 +456,30 @@
 }
 
 @media (max-width: 1024px) {
-    .p5-panels-grid {
+    .sp-panels-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
 @media (max-width: 580px) {
-    .p5-panels-grid {
+    .sp-panels-grid {
         grid-template-columns: 1fr;
     }
 }
 
-.p5-game-panel {
-    background: var(--p5-card-bg);
-    border: 3px solid var(--p5-white);
-    box-shadow: var(--shadow-black);
+.sp-game-panel {
+    background: var(--sp-card-bg);
+    border: 3px solid var(--sp-white);
+    box-shadow: var(--sp-shadow-black);
     padding: 24px 20px;
     position: relative;
-    transition: transform var(--p5-snap), box-shadow var(--p5-snap), border-color var(--p5-snap);
+    transition: transform var(--sp-snap), box-shadow var(--sp-snap), border-color var(--sp-snap);
 }
 
-.p5-game-panel:hover {
+.sp-game-panel:hover {
     transform: translate(-4px, -4px) rotate(-0.5deg);
-    box-shadow: var(--shadow-red);
-    border-color: var(--p5-yellow);
+    box-shadow: var(--sp-shadow-red);
+    border-color: var(--sp-yellow);
 }
 
 .panel-month { transform: rotate(-1deg); }
@@ -495,8 +495,8 @@
 }
 
 .panel-badge-red {
-    background: var(--p5-red);
-    color: var(--p5-white);
+    background: var(--sp-red);
+    color: var(--sp-white);
     font-family: var(--font-display);
     font-size: 1.05rem;
     letter-spacing: 0.06em;
@@ -505,8 +505,8 @@
 }
 
 .panel-badge-yellow {
-    background: var(--p5-yellow);
-    color: var(--p5-black);
+    background: var(--sp-yellow);
+    color: var(--sp-black);
     font-family: var(--font-display);
     font-size: 1.05rem;
     letter-spacing: 0.06em;
@@ -516,8 +516,8 @@
 
 .panel-badge-black {
     background: #000;
-    color: var(--p5-white);
-    border: 1px solid var(--p5-gray);
+    color: var(--sp-white);
+    border: 1px solid var(--sp-gray);
     font-family: var(--font-display);
     font-size: 1.05rem;
     letter-spacing: 0.06em;
@@ -527,14 +527,14 @@
 
 .panel-icon-star {
     font-size: 1.2rem;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
 }
 
 .panel-label {
     font-size: 0.8rem;
     font-weight: 800;
     letter-spacing: 0.06em;
-    color: var(--p5-gray);
+    color: var(--sp-gray);
     margin-bottom: 6px;
 }
 
@@ -542,7 +542,7 @@
     font-family: var(--font-mono);
     font-size: 2.3rem;
     font-weight: 800;
-    color: var(--p5-white);
+    color: var(--sp-white);
     letter-spacing: -0.03em;
     font-variant-numeric: tabular-nums;
     display: flex;
@@ -557,48 +557,48 @@
 .panel-unit {
     font-family: var(--font-display);
     font-size: 1.5rem;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
 }
 
 .panel-sub-label {
     font-size: 0.78rem;
-    color: var(--p5-offwhite);
+    color: var(--sp-offwhite);
     margin-top: 10px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.p5-tag-inline {
-    background: var(--p5-red);
-    color: var(--p5-white);
+.sp-tag-inline {
+    background: var(--sp-red);
+    color: var(--sp-white);
     font-weight: 900;
     font-size: 0.68rem;
     padding: 2px 7px;
     transform: skewX(-10deg);
 }
 
-.p5-tag-inline.tag-yellow {
-    background: var(--p5-yellow);
+.sp-tag-inline.tag-yellow {
+    background: var(--sp-yellow);
     color: #000;
 }
 
 /* ==========================================================================
    11. SECTION ANALYSE DU SALAIRE (TIMELINE & SVG)
    ========================================================================== */
-.p5-section-title-wrap {
+.sp-section-title-wrap {
     margin-bottom: 18px;
 }
 
-.p5-section-title {
+.sp-section-title {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 
 .title-bg-red {
-    background: var(--p5-red);
-    color: var(--p5-white);
+    background: var(--sp-red);
+    color: var(--sp-white);
     font-family: var(--font-display);
     font-size: 1.6rem;
     letter-spacing: 0.06em;
@@ -611,8 +611,8 @@
 
 .title-bg-black {
     background: #000;
-    color: var(--p5-white);
-    border: 2px solid var(--p5-white);
+    color: var(--sp-white);
+    border: 2px solid var(--sp-white);
     font-family: var(--font-display);
     font-size: 1.6rem;
     letter-spacing: 0.06em;
@@ -620,12 +620,12 @@
     display: inline-block;
     width: fit-content;
     transform: skewX(-12deg);
-    box-shadow: 4px 4px 0px var(--p5-red);
+    box-shadow: 4px 4px 0px var(--sp-red);
 }
 
 .title-bg-yellow {
-    background: var(--p5-yellow);
-    color: var(--p5-black);
+    background: var(--sp-yellow);
+    color: var(--sp-black);
     font-family: var(--font-display);
     font-size: 1.6rem;
     letter-spacing: 0.06em;
@@ -639,32 +639,29 @@
 .title-sub-text {
     font-size: 0.85rem;
     font-weight: 700;
-    color: var(--p5-gray);
+    color: var(--sp-gray);
     letter-spacing: 0.05em;
     margin-top: 4px;
 }
 
-.p5-deco-line {
-    height: 4px;
-    background: repeating-linear-gradient(
-        90deg,
-        var(--p5-red),
-        var(--p5-red) 18px,
-        transparent 18px,
-        transparent 26px
-    );
+.sp-deco-line {
+    height: 14px;
     margin-top: 10px;
+    /* Ligne de pouls (signature Salary Pulse) puis pointillés rouges */
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14' preserveAspectRatio='none'%3E%3Cpath d='M0 7H40L46 1L54 13L60 7H64L68 4L72 7H120' fill='none' stroke='%23e50914' stroke-width='2'/%3E%3C/svg%3E") left center / 120px 14px no-repeat,
+        repeating-linear-gradient(90deg, var(--sp-red) 0 8px, transparent 8px 14px) 120px 50% / calc(100% - 120px) 3px no-repeat;
 }
 
-.p5-analysis-card {
-    background: var(--p5-card-bg);
-    border: 3px solid var(--p5-white);
-    box-shadow: var(--shadow-p5-combo);
+.sp-analysis-card {
+    background: var(--sp-card-bg);
+    border: 3px solid var(--sp-white);
+    box-shadow: var(--sp-shadow-combo);
     padding: 28px 24px;
     transform: rotate(0.4deg);
 }
 
-.p5-chart-header {
+.sp-chart-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -679,18 +676,18 @@
     gap: 10px;
     font-size: 0.82rem;
     font-weight: 800;
-    color: var(--p5-offwhite);
+    color: var(--sp-offwhite);
 }
 
 .legend-box.red-box {
     width: 14px;
     height: 14px;
-    background: var(--p5-red);
-    border: 1px solid var(--p5-white);
+    background: var(--sp-red);
+    border: 1px solid var(--sp-white);
 }
 
 .chart-target-badge {
-    background: var(--p5-yellow);
+    background: var(--sp-yellow);
     color: #000;
     font-family: var(--font-display);
     font-size: 1.05rem;
@@ -699,23 +696,34 @@
     font-weight: 800;
 }
 
-.p5-svg-chart-wrapper {
+.sp-svg-chart-wrapper {
     width: 100%;
     background: #080808;
-    border: 2px solid var(--p5-white);
+    border: 2px solid var(--sp-white);
     padding: 14px 8px 6px;
     position: relative;
-    overflow: hidden;
+    overflow-x: auto;
 }
 
-.p5-svg-canvas {
-    width: 100%;
-    height: 240px;
+.sp-svg-canvas {
     display: block;
+    width: 100%;
+    height: auto;
+    min-width: 560px; /* sous cette largeur, le wrapper défile plutôt que d'écraser le texte */
 }
+
+
+/* Étiquettes et jalons générés par script.js */
+.sp-svg-canvas text { font-family: var(--font-display); letter-spacing: 0.02em; }
+.sp-svg-canvas .axis-label { fill: #ccc; font-size: 14px; }
+.sp-svg-canvas .axis-end { fill: var(--sp-red); }
+.sp-svg-canvas .axis-target { fill: var(--sp-yellow); font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
+.sp-svg-canvas .axis-lunch { fill: #888; font-size: 12px; }
+.sp-svg-canvas .mark { fill: var(--sp-white); stroke: var(--sp-red); stroke-width: 3; }
+.sp-svg-canvas .mark-key { fill: var(--sp-yellow); }
 
 /* Décomposition des créneaux (Matin & Après-midi) */
-.p5-slots-analysis-grid {
+.sp-slots-analysis-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
@@ -723,21 +731,21 @@
 }
 
 @media (max-width: 640px) {
-    .p5-slots-analysis-grid {
+    .sp-slots-analysis-grid {
         grid-template-columns: 1fr;
     }
 }
 
 .slot-card {
     background: #0d0d0d;
-    border: 2px solid var(--p5-gray);
+    border: 2px solid var(--sp-gray);
     padding: 16px 18px;
     transform: skewX(-6deg);
-    transition: var(--p5-snap);
+    transition: var(--sp-snap);
 }
 
 .slot-card:hover {
-    border-color: var(--p5-yellow);
+    border-color: var(--sp-yellow);
     transform: skewX(-6deg) translateY(-2px);
 }
 
@@ -751,20 +759,20 @@
 .slot-badge {
     font-family: var(--font-display);
     font-size: 1rem;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
 }
 
 .slot-time {
     font-size: 0.78rem;
     font-family: var(--font-mono);
-    color: var(--p5-gray);
+    color: var(--sp-gray);
 }
 
 .slot-amount {
     font-family: var(--font-mono);
     font-size: 1.45rem;
     font-weight: 800;
-    color: var(--p5-white);
+    color: var(--sp-white);
     margin-bottom: 10px;
 }
 
@@ -779,13 +787,13 @@
 .slot-bar {
     height: 100%;
     width: 0%;
-    background: var(--p5-red);
+    background: var(--sp-red);
     transition: width 0.6s ease;
 }
 
 .slot-footer-text {
     font-size: 0.76rem;
-    color: var(--p5-gray);
+    color: var(--sp-gray);
     margin-top: 8px;
     font-family: var(--font-mono);
 }
@@ -793,30 +801,30 @@
 /* ==========================================================================
    12. SECTION CONTRAT (PANNEAU TECHNIQUE)
    ========================================================================== */
-.p5-contract-card {
-    background: var(--p5-card-bg);
-    border: 3px solid var(--p5-white);
-    box-shadow: var(--shadow-black);
+.sp-contract-card {
+    background: var(--sp-card-bg);
+    border: 3px solid var(--sp-white);
+    box-shadow: var(--sp-shadow-black);
     padding: 26px;
     transform: rotate(-0.4deg);
 }
 
-.p5-contract-grid {
+.sp-contract-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 18px;
 }
 
-.p5-contract-cell {
+.sp-contract-cell {
     background: #0a0a0a;
     border: 2px solid #222;
     padding: 16px 18px;
     transform: skewX(-6deg);
-    transition: var(--p5-snap);
+    transition: var(--sp-snap);
 }
 
-.p5-contract-cell:hover {
-    border-color: var(--p5-red);
+.sp-contract-cell:hover {
+    border-color: var(--sp-red);
     transform: skewX(-6deg) translateY(-3px);
 }
 
@@ -824,27 +832,27 @@
     font-size: 0.74rem;
     font-weight: 800;
     letter-spacing: 0.08em;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
     margin-bottom: 6px;
 }
 
 .cell-highlight {
     font-family: var(--font-display);
     font-size: 1.5rem;
-    color: var(--p5-white);
+    color: var(--sp-white);
     letter-spacing: 0.04em;
     margin-bottom: 4px;
 }
 
 .cell-desc {
     font-size: 0.78rem;
-    color: var(--p5-gray);
+    color: var(--sp-gray);
 }
 
 /* ==========================================================================
    13. SECTION ACTIONS & CONTRÔLES (TACTILE FEEDBACK)
    ========================================================================== */
-.p5-actions-panel {
+.sp-actions-panel {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
@@ -852,26 +860,27 @@
     flex-wrap: wrap;
 }
 
-.p5-btn-action {
+.sp-btn-action {
     position: relative;
-    background: var(--p5-yellow);
-    color: var(--p5-black);
+    background: var(--sp-yellow);
+    color: var(--sp-black);
     border: 3px solid #000;
     padding: 18px 28px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 6px 6px 0px var(--p5-red), 12px 12px 0px #000;
+    box-shadow: 6px 6px 0px var(--sp-red), 12px 12px 0px #000;
     transform: skewX(-12deg);
-    transition: var(--p5-snap);
+    transition: var(--sp-snap);
     outline: none;
-    flex: 2 1 340px;
+    flex: 2 1 min(340px, 100%);
+    min-width: 0;
 }
 
-.p5-btn-action .btn-icon {
+.sp-btn-action .btn-icon {
     font-size: 1.8rem;
-    color: var(--p5-red);
+    color: var(--sp-red);
     transition: transform 0.2s ease;
 }
 
@@ -897,22 +906,22 @@
     display: block;
 }
 
-.p5-btn-action:hover {
+.sp-btn-action:hover {
     transform: skewX(-12deg) translate(-4px, -4px);
-    box-shadow: 10px 10px 0px var(--p5-red), 16px 16px 0px #000;
+    box-shadow: 10px 10px 0px var(--sp-red), 16px 16px 0px #000;
     background: #ffea79;
 }
 
-.p5-btn-action:hover .btn-icon {
+.sp-btn-action:hover .btn-icon {
     transform: rotate(20deg) scale(1.25);
 }
 
-.p5-btn-action:active,
-.p5-btn-action.btn-vibrating {
-    animation: p5ButtonShake 0.35s ease-in-out;
+.sp-btn-action:active,
+.sp-btn-action.btn-vibrating {
+    animation: spButtonShake 0.35s ease-in-out;
 }
 
-@keyframes p5ButtonShake {
+@keyframes spButtonShake {
     0%, 100% { transform: skewX(-12deg) translate(0, 0); }
     20% { transform: skewX(-12deg) translate(-4px, 2px); }
     40% { transform: skewX(-12deg) translate(4px, -2px); }
@@ -920,10 +929,10 @@
     80% { transform: skewX(-12deg) translate(2px, 1px); }
 }
 
-.p5-btn-toggle {
+.sp-btn-toggle {
     background: #111;
-    color: var(--p5-white);
-    border: 2px solid var(--p5-white);
+    color: var(--sp-white);
+    border: 2px solid var(--sp-white);
     padding: 14px 20px;
     cursor: pointer;
     display: inline-flex;
@@ -931,20 +940,21 @@
     gap: 14px;
     transform: skewX(-10deg);
     box-shadow: 5px 5px 0px #000;
-    transition: var(--p5-snap);
-    flex: 1 1 200px;
+    transition: var(--sp-snap);
+    flex: 1 1 min(200px, 100%);
+    min-width: 0;
 }
 
-.p5-btn-toggle .toggle-icon {
+.sp-btn-toggle .toggle-icon {
     width: 32px;
     height: 32px;
     background: #000;
-    border: 1px solid var(--p5-gray);
+    border: 1px solid var(--sp-gray);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1rem;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
 }
 
 .toggle-text-block {
@@ -962,29 +972,29 @@
     font-family: var(--font-mono);
     font-size: 0.76rem;
     font-weight: 700;
-    color: var(--p5-gray);
+    color: var(--sp-gray);
 }
 
-.p5-btn-toggle:hover {
+.sp-btn-toggle:hover {
     background: #1c1c1c;
-    border-color: var(--p5-yellow);
+    border-color: var(--sp-yellow);
     transform: skewX(-10deg) translateY(-2px);
 }
 
-.p5-btn-toggle.active {
-    background: var(--p5-red);
-    border-color: var(--p5-white);
-    box-shadow: 5px 5px 0px var(--p5-yellow);
+.sp-btn-toggle.active {
+    background: var(--sp-red);
+    border-color: var(--sp-white);
+    box-shadow: 5px 5px 0px var(--sp-yellow);
 }
 
-.p5-btn-toggle.active .toggle-state {
-    color: var(--p5-yellow);
+.sp-btn-toggle.active .toggle-state {
+    color: var(--sp-yellow);
 }
 
 /* ==========================================================================
    14. FOOTER / BARRE D'ÉTAT SYSTÈME
    ========================================================================== */
-.p5-footer {
+.sp-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -992,24 +1002,24 @@
     gap: 14px;
     padding: 18px 24px;
     background: #000;
-    border: 2px solid var(--p5-gray);
+    border: 2px solid var(--sp-gray);
     margin-top: 12px;
     transform: skewX(-6deg);
 }
 
-.p5-footer-badge {
-    background: var(--p5-red);
-    color: var(--p5-white);
+.sp-footer-badge {
+    background: var(--sp-red);
+    color: var(--sp-white);
     font-family: var(--font-display);
     font-size: 1.15rem;
     letter-spacing: 0.08em;
     padding: 3px 12px;
 }
 
-.p5-footer-text {
+.sp-footer-text {
     font-size: 0.78rem;
     font-weight: 700;
-    color: var(--p5-gray);
+    color: var(--sp-gray);
     letter-spacing: 0.04em;
     display: flex;
     align-items: center;
@@ -1020,47 +1030,59 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--p5-red);
-    box-shadow: 0 0 8px var(--p5-red);
+    background: var(--sp-red);
+    box-shadow: 0 0 8px var(--sp-red);
     display: inline-block;
-    animation: p5LiveDotPulse 1.5s infinite;
+    animation: spLiveDotPulse 1.5s infinite;
 }
 
-@keyframes p5LiveDotPulse {
+@keyframes spLiveDotPulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.4; transform: scale(0.7); }
 }
 
-.p5-footer-version {
+.sp-footer-version {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 700;
-    color: var(--p5-yellow);
+    color: var(--sp-yellow);
 }
 
 /* Responsive Dashboard */
 @media (max-width: 650px) {
-    .p5-nav-tabs {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .p5-tab-btn {
-        width: 100%;
-        justify-content: center;
-    }
-    .p5-hero-card {
+    .sp-tab-btn { flex: 0 0 auto; } /* les onglets défilent horizontalement dans leur barre */
+    .sp-hero-card {
         padding: 20px 16px;
     }
-    .p5-huge-digits {
+    .sp-huge-digits {
         font-size: 3.4rem;
     }
-    .p5-actions-panel {
+    .sp-actions-panel {
         flex-direction: column;
         align-items: stretch;
     }
-    .p5-btn-action, .p5-btn-toggle {
+    .sp-btn-action, .sp-btn-toggle {
         width: 100%;
         justify-content: center;
     }
 }
 
+
+/* ==========================================================================
+   15. IDENTITÉ SALARY PULSE (cohérence avec le menu principal)
+   ========================================================================== */
+/* Pan rouge diagonal + halftone derrière le compteur */
+.sp-hero-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(circle, rgba(0, 0, 0, 0.5) 2px, transparent 2.6px) 0 0 / 14px 14px,
+        linear-gradient(118deg, transparent 52%, var(--sp-red) 52.2%, #9c0710 100%);
+    opacity: 0.32;
+    -webkit-mask-image: linear-gradient(to left, #000 0%, transparent 70%);
+    mask-image: linear-gradient(to left, #000 0%, transparent 70%);
+}
+.sp-hero-card > * { position: relative; z-index: 1; }
