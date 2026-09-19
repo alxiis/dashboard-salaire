@@ -107,12 +107,15 @@
     document.getElementById('mmRate').textContent = CONFIG.TAUX_HORAIRE_NET.toFixed(2);
     document.getElementById('mmMinute').textContent = `+${CONFIG.TAUX_MINUTE.toFixed(4)} € / MIN`;
 
-    const live = document.getElementById('mmLive');
+    const live = document.getElementById('mmGtaCount');
+    const liveEl = document.getElementById('mmLive');
     onTick((now) => {
         const statut = work.statutCourant(now);
         hud.update(now, statut);
         hud.setText('mmLiveText', statut.enPoste ? 'EN DIRECT' : statut.label);
-        live.classList.toggle('is-live', statut.enPoste);
+        liveEl.classList.toggle('is-live', statut.enPoste);
+        const reste = window.GtaCountdown.compute(window.GTA_CONFIG.RELEASE_DATE, now);
+        live.textContent = reste.done ? 'DISPONIBLE' : `J-${reste.days}`;
     });
 
     /* ---------- init ---------- */

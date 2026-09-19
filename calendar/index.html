@@ -9,48 +9,67 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="calendar.css">
 </head>
-<body data-sp-page="calendar" data-sp-hud="auto" style="--module-accent: var(--sp-yellow)">
+<body data-sp-page="calendar" data-sp-hud="auto">
     <div class="sp-app-container">
         <header class="sp-header" data-sp-header="module"></header>
 
-        <main class="sp-module-main">
-            <section class="sp-hero-banner-slab">
-                <div class="slab-tag">MODULE 02 // SCHEDULE</div>
-                <h1 class="slab-title">CALENDRIER</h1>
-                <div class="slab-sub">GESTION DES CYCLES &amp; HORAIRES CONTRACTUELS</div>
+        <main class="cal-main">
+            <h1 class="sp-sr-only">Calendrier</h1>
+
+            <!-- Jour actuel : chiffre monumental sur pan rouge déchiré -->
+            <section class="cal-today" aria-label="Jour actuel">
+                <div class="cal-today-block">
+                    <span class="cal-dow" id="calTodayDow">—</span>
+                    <span class="cal-today-num sp-glitch" id="calTodayNum">--</span>
+                    <span class="cal-today-month" id="calTodayMonth">—</span>
+                </div>
+                <p class="cal-today-info" id="calTodayInfo"></p>
+
+                <div class="cal-detail sp-slab sp-slab--black" id="calDetail" aria-live="polite">
+                    <span class="cal-detail-tag">JOUR SÉLECTIONNÉ</span>
+                    <span class="cal-detail-date" id="calDetailDate">—</span>
+                    <span class="cal-detail-kind" id="calDetailKind">—</span>
+                    <dl class="cal-detail-rows">
+                        <div><dt>HORAIRES</dt><dd id="calDetailHours">—</dd></div>
+                        <div><dt>SALAIRE</dt><dd id="calDetailAmount">—</dd></div>
+                    </dl>
+                </div>
             </section>
 
-            <section class="sp-module-card" aria-labelledby="calStatus">
-                <div class="sp-status-sticker" id="calStatus"><span aria-hidden="true">★</span><span>MODULE EN PRÉPARATION</span></div>
+            <!-- Grille du mois -->
+            <section class="cal-board" aria-labelledby="calTitle">
+                <div class="cal-toolbar">
+                    <button type="button" class="cal-nav sp-slab sp-slab--white" id="calPrev" aria-label="Mois précédent">◀</button>
+                    <h2 class="cal-title" id="calTitle" data-ransom>CALENDRIER</h2>
+                    <button type="button" class="cal-nav sp-slab sp-slab--white" id="calNext" aria-label="Mois suivant">▶</button>
+                    <button type="button" class="cal-today-btn sp-slab sp-slab--red" id="calToday">AUJOURD'HUI</button>
+                </div>
 
-                <p class="sp-lead">
-                    L'infrastructure de navigation est connectée. Cet espace accueillera le calendrier synchronisé sur vos plages de travail (08h30-12h30 et 13h30-16h30), les décomptes de jours ouvrés, les congés et les cycles de paie.
-                </p>
+                <div class="cal-weekdays" aria-hidden="true">
+                    <span>LUN</span><span>MAR</span><span>MER</span><span>JEU</span><span>VEN</span><span class="we">SAM</span><span class="we">DIM</span>
+                </div>
+                <div class="cal-grid" id="calGrid" role="group" aria-label="Jours du mois"></div>
 
-                <ul class="sp-feature-grid" role="list">
-                    <li class="sp-feature-slot">
-                        <span class="slot-idx">01</span>
-                        <span class="slot-title">CYCLES DE PAIE</span>
-                        <span class="slot-desc">Suivi des échéances et des cumuls salariaux mensuels</span>
-                    </li>
-                    <li class="sp-feature-slot">
-                        <span class="slot-idx">02</span>
-                        <span class="slot-title">HORAIRES DU CONTRAT</span>
-                        <span class="slot-desc">Planification des sessions de 7h (08h30-12h30 / 13h30-16h30)</span>
-                    </li>
-                    <li class="sp-feature-slot">
-                        <span class="slot-idx">03</span>
-                        <span class="slot-title">CONGÉS &amp; JOURS FÉRIÉS</span>
-                        <span class="slot-desc">Intégration du calendrier chômé et maintien du taux net</span>
-                    </li>
-                </ul>
-
-                <a href="../main-menu/" class="sp-btn-return" data-sp-back><span aria-hidden="true">◀</span><span>MENU PRINCIPAL [ESC]</span></a>
+                <div class="cal-stats">
+                    <div class="cal-stat"><b id="calStatDays">0</b><span>JOURS OUVRÉS</span></div>
+                    <div class="cal-stat"><b id="calStatHours">0H</b><span>HEURES</span></div>
+                    <div class="cal-stat cal-stat--red"><b id="calStatAmount">0 €</b><span>NET MAX DU MOIS</span></div>
+                </div>
             </section>
         </main>
     </div>
 
+    <!-- Intro « changement de jour » -->
+    <div class="cal-intro" id="calIntro" aria-hidden="true">
+        <div class="cal-intro-prev"><span id="calIntroPrev">--</span><s></s></div>
+        <div class="cal-intro-next"><em id="calIntroDow">—</em><span id="calIntroNext">--</span></div>
+        <div class="cal-intro-slash"></div>
+    </div>
+
     <script src="../shared/shared.js" defer></script>
+    <script src="calendar-engine.js" defer></script>
+    <script src="calendar-ui.js" defer></script>
 </body>
 </html>

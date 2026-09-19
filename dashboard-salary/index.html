@@ -25,365 +25,167 @@
              ==================================================================== -->
         <main class="sp-dashboard-container">
 
-            <!-- NAVIGATION EN ONGLETS BISEAUTÉS (JRPG TABS) -->
-            <nav class="sp-nav-tabs" aria-label="Navigation du dashboard">
-                <button type="button" class="sp-tab-btn active" data-target="sectionOverview">
-                    <span class="tab-index">01</span>
-                    <span class="tab-label">VUE GLOBALE</span>
-                </button>
-                <button type="button" class="sp-tab-btn" data-target="sectionAnalyse">
-                    <span class="tab-index">02</span>
-                    <span class="tab-label">ANALYSE DU SALAIRE</span>
-                </button>
-                <button type="button" class="sp-tab-btn" data-target="sectionContrat">
-                    <span class="tab-index">03</span>
-                    <span class="tab-label">DONNÉES DU CONTRAT</span>
-                </button>
-                <button type="button" class="sp-tab-btn" data-target="sectionActions">
-                    <span class="tab-index">04</span>
-                    <span class="tab-label">ACTIONS &amp; DÉMO</span>
-                </button>
+            <nav class="sp-nav-tabs" aria-label="Sections du dashboard">
+                <button type="button" class="sp-tab-btn sp-slab sp-slab--black active" data-target="sectionOverview"><span class="tab-index">01</span><span class="tab-label">VUE GLOBALE</span></button>
+                <button type="button" class="sp-tab-btn sp-slab sp-slab--black" data-target="sectionAnalyse"><span class="tab-index">02</span><span class="tab-label">ANALYSE</span></button>
+                <button type="button" class="sp-tab-btn sp-slab sp-slab--black" data-target="sectionContrat"><span class="tab-index">03</span><span class="tab-label">CONTRAT</span></button>
+                <button type="button" class="sp-tab-btn sp-slab sp-slab--black" data-target="sectionActions"><span class="tab-index">04</span><span class="tab-label">ACTIONS</span></button>
             </nav>
 
-            <!-- ================================================================
-                 SECTION 1 : VUE GLOBALE // HERO CARD DU SALAIRE (MONUMENTAL)
-                 ================================================================ -->
-            <section class="sp-section" id="sectionOverview">
-                
-                <div class="sp-hero-card" id="mainHeroCard">
-                    <!-- En-tête biseauté de la carte maîtresse -->
-                    <div class="sp-hero-banner">
-                        <div class="sp-cut-ribbon">
-                            <span class="ribbon-icon">▶</span>
-                            <span class="ribbon-text">// GAGNÉ AUJOURD'HUI — EXTRACTION EN TEMPS RÉEL</span>
-                        </div>
-                        <div class="sp-card-code">CODE // 09-14-ACTIVE</div>
+            <!-- 01 // VUE GLOBALE -->
+            <section class="sp-section" id="sectionOverview" aria-label="Vue globale">
+                <div class="sp-hero-card sp-slab sp-slab--black" id="mainHeroCard">
+                    <div class="hero-torn" aria-hidden="true"></div>
+                    <p class="hero-kicker" data-ransom>GAGNÉ AUJOURD'HUI</p>
+                    <span class="hero-net" aria-hidden="true">NET<b>EUR</b></span>
+
+                    <div class="sp-main-amount-wrap" id="mainAmountWrap">
+                        <span id="jour" class="sp-huge-digits sp-glitch">0.0000</span>
+                        <span class="sp-euro-sym">€</span>
                     </div>
+                    <div class="sp-floating-anchor" id="floatingGainAnchor" aria-hidden="true"></div>
 
-                    <!-- Zone du compteur colossal avec devise et badge flottant -->
-                    <div class="sp-hero-viewport" id="balanceViewport">
-                        <div class="sp-currency-badge">
-                            <span class="badge-sub">NET</span>
-                            <span class="badge-curr">EUR</span>
-                        </div>
-                        
-                        <div class="sp-main-amount-wrap" id="mainAmountWrap">
-                            <span id="jour" class="sp-huge-digits">0.0000</span>
-                            <span class="sp-euro-sym">€</span>
-                        </div>
-
-                        <!-- Point d'ancrage dynamique pour l'effet de gain jaillissant (+0.1315 €) -->
-                        <div class="sp-floating-anchor" id="floatingGainAnchor"></div>
-                    </div>
-
-                    <!-- Jauge de progression vivante -->
-                    <div class="sp-progress-block">
-                        <div class="sp-progress-meta">
-                            <div class="sp-progress-title">
-                                <span class="sp-yellow-star">★</span>
-                                <span>PROGRESSION DE LA JOURNÉE (7H EFFECTIVES)</span>
-                            </div>
-                            <div class="sp-progress-badge">
-                                <span id="progressionPourcent">0.0 %</span>
-                                <span class="sub-hours" id="heuresTravaillees">(0.0h / 7h)</span>
-                            </div>
-                        </div>
-
-                        <div class="sp-gauge-track">
-                            <div class="sp-gauge-fill" id="progressBarFill">
-                                <div class="sp-gauge-sweep-light"></div>
-                            </div>
-                            <div class="sp-gauge-stripes"></div>
-                        </div>
-                    </div>
-
-                    <!-- Puces de Cadence & Rythme financier -->
-                    <div class="sp-cadence-grid">
-                        <div class="sp-chip chip-red">
-                            <span class="chip-label">CADENCE / MINUTE</span>
-                            <span class="chip-val" id="gainMinute">+0.1315 € / min</span>
-                        </div>
-                        <div class="sp-chip chip-black">
-                            <span class="chip-label">TAUX HORAIRE NET</span>
-                            <span class="chip-val" id="tauxHoraire">7.89 € / heure</span>
-                        </div>
-                        <div class="sp-chip chip-yellow">
-                            <span class="chip-label">OBJECTIF JOUR COMPLET</span>
-                            <span class="chip-val" id="objectifJour">55.23 € net</span>
-                        </div>
+                    <!-- Barre façon HP : le libellé dépasse de la jauge -->
+                    <div class="sp-hp sp-hp--main">
+                        <span class="hp-label">PROGRESSION <em>7H</em></span>
+                        <div class="hp-track"><div class="hp-fill" id="progressBarFill"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                        <span class="hp-value"><b id="progressionPourcent">0.0 %</b><i id="heuresTravaillees">(0.0h / 7h)</i></span>
                     </div>
                 </div>
 
-                <!-- Grille KPI Desktop (4 Panneaux Asymétriques) -->
+                <div class="sp-cadence-grid">
+                    <div class="sp-chip sp-slab sp-slab--red"><span class="chip-label">CADENCE / MINUTE</span><span class="chip-val" id="gainMinute">+0.1315 € / min</span></div>
+                    <div class="sp-chip sp-slab sp-slab--black"><span class="chip-label">TAUX HORAIRE NET</span><span class="chip-val" id="tauxHoraire">7.89 € / heure</span></div>
+                    <div class="sp-chip sp-slab sp-slab--white"><span class="chip-label">OBJECTIF JOUR COMPLET</span><span class="chip-val" id="objectifJour">55.23 € net</span></div>
+                </div>
+
                 <div class="sp-panels-grid">
-                    
-                    <!-- KPI 1 : Ce mois-ci -->
-                    <div class="sp-game-panel panel-month" id="panelMois">
-                        <div class="panel-header">
-                            <div class="panel-badge-red">01 // MENSUEL</div>
-                            <span class="panel-icon-star">★</span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="panel-label">CUMUL CE MOIS-CI</div>
-                            <div class="panel-value">
-                                <span id="mois">0.00</span>
-                                <span class="panel-unit">€</span>
-                            </div>
-                            <div class="panel-sub-label">
-                                <span class="sp-tag-inline">VALIDÉ</span>
-                                <span>Total net perçu ce mois</span>
-                            </div>
-                        </div>
+                    <div class="sp-game-panel panel-month sp-slab sp-slab--red" id="panelMois">
+                        <span class="panel-tag">01 // MENSUEL</span>
+                        <span class="panel-label">CUMUL CE MOIS-CI</span>
+                        <span class="panel-value"><span id="mois">0.00</span><span class="panel-unit">€</span></span>
+                        <span class="panel-sub">Total net perçu ce mois</span>
                     </div>
-
-                    <!-- KPI 2 : Total Contrat -->
-                    <div class="sp-game-panel panel-total" id="panelTotal">
-                        <div class="panel-header">
-                            <div class="panel-badge-yellow">02 // CONTRAT</div>
-                            <span class="panel-icon-star">★</span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="panel-label">TOTAL CONTRAT CUMULÉ</div>
-                            <div class="panel-value">
-                                <span id="total">0.00</span>
-                                <span class="panel-unit">€</span>
-                            </div>
-                            <div class="panel-sub-label">
-                                <span class="sp-tag-inline tag-yellow">DEPUIS</span>
-                                <span>14/09/2026 à 08h30</span>
-                            </div>
-                        </div>
+                    <div class="sp-game-panel panel-total sp-slab sp-slab--white" id="panelTotal">
+                        <span class="panel-tag">02 // CONTRAT</span>
+                        <span class="panel-label">TOTAL CONTRAT CUMULÉ</span>
+                        <span class="panel-value"><span id="total">0.00</span><span class="panel-unit">€</span></span>
+                        <span class="panel-sub">Depuis le 14/09/2026 à 08h30</span>
                     </div>
-
-                    <!-- KPI 3 : Rythme Seconde -->
-                    <div class="sp-game-panel panel-tempo">
-                        <div class="panel-header">
-                            <div class="panel-badge-black">03 // VITESSE</div>
-                            <span class="panel-icon-star">⚡</span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="panel-label">GAIN PAR SECONDE</div>
-                            <div class="panel-value panel-medium">
-                                <span id="gainSeconde">≈ 0.00219</span>
-                                <span class="panel-unit">€ / s</span>
-                            </div>
-                            <div class="panel-sub-label">
-                                <span>Flux financier en temps réel</span>
-                            </div>
-                        </div>
+                    <div class="sp-game-panel panel-tempo sp-slab sp-slab--black">
+                        <span class="panel-tag">03 // VITESSE</span>
+                        <span class="panel-label">GAIN PAR SECONDE</span>
+                        <span class="panel-value panel-medium"><span id="gainSeconde">≈ 0.00219</span><span class="panel-unit">€ / s</span></span>
+                        <span class="panel-sub">Flux financier en temps réel</span>
                     </div>
-
-                    <!-- KPI 4 : Objectif Journalier -->
-                    <div class="sp-game-panel panel-target">
-                        <div class="panel-header">
-                            <div class="panel-badge-red">04 // PALIER</div>
-                            <span class="panel-icon-star">🎯</span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="panel-label">OBJECTIF JOUR MAX</div>
-                            <div class="panel-value panel-medium">
-                                <span>55.23</span>
-                                <span class="panel-unit">€ NET</span>
-                            </div>
-                            <div class="panel-sub-label">
-                                <span>Équivalent 7h = 25 200 s</span>
-                            </div>
-                        </div>
+                    <div class="sp-game-panel panel-target sp-slab sp-slab--red">
+                        <span class="panel-tag">04 // PALIER</span>
+                        <span class="panel-label">OBJECTIF JOUR MAX</span>
+                        <span class="panel-value panel-medium"><span>55.23</span><span class="panel-unit">€ NET</span></span>
+                        <span class="panel-sub">Équivalent 7h = 25 200 s</span>
                     </div>
-
                 </div>
             </section>
 
-            <!-- ================================================================
-                 SECTION 2 : ANALYSE DU SALAIRE (TIMELINE & COURBE SVG)
-                 ================================================================ -->
-            <section class="sp-section sp-analysis-section" id="sectionAnalyse">
-                <div class="sp-section-title-wrap">
-                    <h2 class="sp-section-title">
-                        <span class="title-bg-red">02 // ANALYSE DU SALAIRE</span>
-                        <span class="title-sub-text">COURBE D'ÉVOLUTION DE LA JOURNÉE &amp; SUIVI DES CRÉNEAUX</span>
-                    </h2>
-                    <div class="sp-deco-line"></div>
-                </div>
+            <!-- 02 // ANALYSE -->
+            <section class="sp-section" id="sectionAnalyse" aria-labelledby="titreAnalyse">
+                <h2 class="sp-section-title" id="titreAnalyse"><span class="sec-num" aria-hidden="true">02</span><span data-ransom>ANALYSE DU SALAIRE</span></h2>
 
-                <div class="sp-analysis-card">
+                <div class="sp-analysis-card sp-slab sp-slab--black">
                     <div class="sp-chart-header">
-                        <div class="chart-legend">
-                            <span class="legend-box red-box"></span>
-                            <span>PROGRESSION DU SALAIRE EN DIRECT DE 08H30 À 16H30</span>
-                        </div>
-                        <div class="chart-target-badge">
-                            <span>PALIER FINAL : 55.23 €</span>
-                        </div>
+                        <span class="chart-legend">PROGRESSION EN DIRECT // 08H30 → 16H30</span>
+                        <span class="chart-target-badge">PALIER FINAL : 55.23 €</span>
                     </div>
 
-                    <!-- Graphique SVG Dynamique en Pleine Largeur -->
                     <div class="sp-svg-chart-wrapper">
                         <svg viewBox="0 0 800 240" class="sp-svg-canvas" id="salarySvgChart" role="img" aria-label="Courbe de progression du salaire net de 08h30 à 16h30, avec pause déjeuner de 12h30 à 13h30">
                             <defs>
                                 <linearGradient id="spRedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                    <stop offset="0%" stop-color="#E50914" stop-opacity="0.75" />
-                                    <stop offset="60%" stop-color="#8F0008" stop-opacity="0.25" />
+                                    <stop offset="0%" stop-color="#E50914" stop-opacity="0.8" />
+                                    <stop offset="65%" stop-color="#8F0008" stop-opacity="0.3" />
                                     <stop offset="100%" stop-color="#050505" stop-opacity="0" />
                                 </linearGradient>
                                 <pattern id="spHalftoneChart" width="8" height="8" patternUnits="userSpaceOnUse">
-                                    <circle cx="2" cy="2" r="1.2" fill="rgba(245, 213, 71, 0.25)" />
+                                    <circle cx="2" cy="2" r="1.3" fill="rgba(245, 245, 240, 0.22)" />
                                 </pattern>
                             </defs>
-
-                            <!-- Grille : palier final (y=35) puis repères -->
-                            <line x1="60" y1="35" x2="760" y2="35" stroke="rgba(245, 213, 71, 0.3)" stroke-width="1.5" stroke-dasharray="6,4" />
+                            <line x1="60" y1="35" x2="760" y2="35" stroke="rgba(245, 245, 240, 0.4)" stroke-width="1.5" stroke-dasharray="6,4" />
                             <text id="svgTargetLabel" x="758" y="27" text-anchor="end" class="axis-target">OBJECTIF</text>
                             <line x1="60" y1="85" x2="760" y2="85" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4,4" />
                             <line x1="60" y1="135" x2="760" y2="135" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4,4" />
-                            <line x1="60" y1="185" x2="760" y2="185" stroke="rgba(255,255,255,0.12)" />
-
-                            <!-- Pause déjeuner (géométrie calculée par script.js) -->
-                            <rect id="chartLunch" x="410" y="35" width="87" height="150" fill="rgba(229, 9, 20, 0.08)" stroke="rgba(229, 9, 20, 0.25)" stroke-dasharray="3,3" />
+                            <line x1="60" y1="185" x2="760" y2="185" stroke="rgba(255,255,255,0.15)" />
+                            <rect id="chartLunch" x="410" y="35" width="87" height="150" fill="rgba(229, 9, 20, 0.1)" stroke="rgba(229, 9, 20, 0.4)" stroke-dasharray="3,3" />
                             <text id="chartLunchLabel" x="424" y="115" class="axis-lunch">PAUSE 12:30-13:30</text>
-
-                            <!-- Courbe : aire, trame halftone, ligne (points calculés par script.js) -->
                             <polygon id="chartFill" points="" fill="url(#spRedGradient)" />
                             <polygon id="chartFillDots" points="" fill="url(#spHalftoneChart)" />
-                            <polyline id="chartLine" points="" fill="none" stroke="#E50914" stroke-width="4" stroke-linecap="square" stroke-linejoin="round" />
-
-                            <!-- Jalons + étiquettes horaires -->
+                            <polyline id="chartLine" points="" fill="none" stroke="#E50914" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter" />
                             <g id="chartMarks"></g>
-
-                            <!-- Curseur temps réel -->
-                            <line id="svgLiveCursor" x1="60" y1="10" x2="60" y2="195" stroke="#F5D547" stroke-width="2.5" stroke-dasharray="4,2" />
-                            <circle id="svgLiveDot" cx="60" cy="185" r="6" fill="#F5D547" stroke="#000" stroke-width="2.5" />
+                            <line id="svgLiveCursor" x1="60" y1="10" x2="60" y2="195" stroke="#F5F5F0" stroke-width="2.5" stroke-dasharray="4,2" />
+                            <circle id="svgLiveDot" cx="60" cy="185" r="7" fill="#F5F5F0" stroke="#E50914" stroke-width="3" />
                         </svg>
                     </div>
 
-                    <!-- Analyse des Sessions de Travail (Matin vs Après-midi) -->
+                    <!-- Barres de sessions façon « Social Stats » -->
                     <div class="sp-slots-analysis-grid">
-                        <div class="slot-card slot-morning">
-                            <div class="slot-header">
-                                <span class="slot-badge">SESSION 01 // MATIN</span>
-                                <span class="slot-time">08:30 → 12:30 (4H)</span>
-                            </div>
-                            <div class="slot-amount">31.56 € NET</div>
-                            <div class="slot-progress-wrap">
-                                <div class="slot-bar" id="slotBarMorning"></div>
-                            </div>
-                            <div class="slot-footer-text" id="slotMorningText">Calcul en direct...</div>
+                        <div class="slot-card sp-hp">
+                            <span class="hp-label">SESSION 01 <em>MATIN</em></span>
+                            <div class="hp-track"><div class="hp-fill" id="slotBarMorning"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                            <span class="hp-value"><b>31.56 € NET</b><i>08:30 → 12:30 (4H)</i></span>
+                            <span class="slot-footer-text" id="slotMorningText">Calcul en direct...</span>
                         </div>
-
-                        <div class="slot-card slot-afternoon">
-                            <div class="slot-header">
-                                <span class="slot-badge">SESSION 02 // APRÈS-MIDI</span>
-                                <span class="slot-time">13:30 → 16:30 (3H)</span>
-                            </div>
-                            <div class="slot-amount">23.67 € NET</div>
-                            <div class="slot-progress-wrap">
-                                <div class="slot-bar" id="slotBarAfternoon"></div>
-                            </div>
-                            <div class="slot-footer-text" id="slotAfternoonText">Calcul en direct...</div>
+                        <div class="slot-card sp-hp">
+                            <span class="hp-label">SESSION 02 <em>APRÈS-MIDI</em></span>
+                            <div class="hp-track"><div class="hp-fill" id="slotBarAfternoon"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                            <span class="hp-value"><b>23.67 € NET</b><i>13:30 → 16:30 (3H)</i></span>
+                            <span class="slot-footer-text" id="slotAfternoonText">Calcul en direct...</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- ================================================================
-                 SECTION 3 : DONNÉES DU CONTRAT (PANNEAU TECHNIQUE)
-                 ================================================================ -->
-            <section class="sp-section" id="sectionContrat">
-                <div class="sp-section-title-wrap">
-                    <h2 class="sp-section-title">
-                        <span class="title-bg-black">03 // DONNÉES DU CONTRAT</span>
-                        <span class="title-sub-text">SPÉCIFICATIONS LÉGALES &amp; PARAMÈTRES STATIQUES</span>
-                    </h2>
-                    <div class="sp-deco-line"></div>
-                </div>
+            <!-- 03 // CONTRAT -->
+            <section class="sp-section" id="sectionContrat" aria-labelledby="titreContrat">
+                <h2 class="sp-section-title" id="titreContrat"><span class="sec-num" aria-hidden="true">03</span><span data-ransom>DONNÉES DU CONTRAT</span></h2>
 
-                <div class="sp-contract-card">
-                    <div class="sp-contract-grid">
-                        <div class="sp-contract-cell">
-                            <div class="cell-tag">TAUX HORAIRE NET</div>
-                            <div class="cell-highlight">7.89 € / HEURE</div>
-                            <div class="cell-desc">Net payé à la seconde (≈ 0.00219 €/s)</div>
-                        </div>
-
-                        <div class="sp-contract-cell">
-                            <div class="cell-tag">DURÉE QUOTIDIENNE</div>
-                            <div class="cell-highlight">7 HEURES / JOUR</div>
-                            <div class="cell-desc">Du Lundi au Vendredi (jours ouvrés)</div>
-                        </div>
-
-                        <div class="sp-contract-cell">
-                            <div class="cell-tag">PLAGES DE TRAVAIL</div>
-                            <div class="cell-highlight">08:30-12:30 &amp; 13:30-16:30</div>
-                            <div class="cell-desc">Pause déjeuner méridienne : 1h00</div>
-                        </div>
-
-                        <div class="sp-contract-cell">
-                            <div class="cell-tag">DATE DE PRISE D'EFFET</div>
-                            <div class="cell-highlight">14 SEPTEMBRE 2026</div>
-                            <div class="cell-desc">Début effectif de mission : 08h30</div>
-                        </div>
-                    </div>
+                <div class="sp-contract-grid">
+                    <div class="sp-contract-cell sp-slab sp-slab--white"><span class="cell-tag">TAUX HORAIRE NET</span><span class="cell-highlight">7.89 € / HEURE</span><span class="cell-desc">Net payé à la seconde (≈ 0.00219 €/s)</span></div>
+                    <div class="sp-contract-cell sp-slab sp-slab--black"><span class="cell-tag">DURÉE QUOTIDIENNE</span><span class="cell-highlight">7 HEURES / JOUR</span><span class="cell-desc">Du lundi au vendredi (jours ouvrés)</span></div>
+                    <div class="sp-contract-cell sp-slab sp-slab--red"><span class="cell-tag">PLAGES DE TRAVAIL</span><span class="cell-highlight">08:30-12:30 &amp; 13:30-16:30</span><span class="cell-desc">Pause déjeuner méridienne : 1h00</span></div>
+                    <div class="sp-contract-cell sp-slab sp-slab--white"><span class="cell-tag">PRISE D'EFFET</span><span class="cell-highlight">14 SEPTEMBRE 2026</span><span class="cell-desc">Début effectif de mission : 08h30</span></div>
                 </div>
             </section>
 
-            <!-- ================================================================
-                 SECTION 4 : ACTIONS &amp; CONTRÔLES INTERACTIFS
-                 ================================================================ -->
-            <section class="sp-section" id="sectionActions">
-                <div class="sp-section-title-wrap">
-                    <h2 class="sp-section-title">
-                        <span class="title-bg-yellow">04 // ACTIONS &amp; CONTRÔLES</span>
-                        <span class="title-sub-text">SIMULATION TEMPS RÉEL, DÉMO &amp; EXPÉRIENCE AUDIO</span>
-                    </h2>
-                    <div class="sp-deco-line"></div>
-                </div>
+            <!-- 04 // ACTIONS -->
+            <section class="sp-section" id="sectionActions" aria-labelledby="titreActions">
+                <h2 class="sp-section-title" id="titreActions"><span class="sec-num" aria-hidden="true">04</span><span data-ransom>ACTIONS &amp; DÉMO</span></h2>
 
                 <div class="sp-actions-panel">
-                    <!-- Bouton principal agressif (Simuler gain +1 min avec vibration) -->
-                    <button type="button" class="sp-btn-action" id="btnSimulerGain" title="Simuler l'extraction d'une minute de travail">
-                        <span class="btn-icon">⚡</span>
-                        <div class="btn-text-group">
-                            <span class="btn-main-text">SIMULER GAIN (+1 MIN)</span>
-                            <span class="btn-sub-text">AJOUTE +0.1315 € IMMÉDIATEMENT</span>
-                        </div>
+                    <button type="button" class="sp-btn-action sp-slab sp-slab--white" id="btnSimulerGain">
+                        <span class="btn-icon" aria-hidden="true">⚡</span>
+                        <span class="btn-text-group"><span class="btn-main-text">SIMULER GAIN (+1 MIN)</span><span class="btn-sub-text">AJOUTE +0.1315 € IMMÉDIATEMENT</span></span>
                     </button>
-
-                    <!-- Bouton Démo Live -->
-                    <button type="button" class="sp-btn-toggle" id="btnDemoToggle" aria-pressed="false" title="Activer la simulation continue en temps réel">
-                        <span class="toggle-icon">▶</span>
-                        <div class="toggle-text-block">
-                            <span class="toggle-title">DÉMO EN CONTINU</span>
-                            <span class="toggle-state" id="demoLabel">INACTIVE</span>
-                        </div>
+                    <button type="button" class="sp-btn-toggle sp-slab sp-slab--black" id="btnDemoToggle" aria-pressed="false">
+                        <span class="toggle-icon" aria-hidden="true">▶</span>
+                        <span class="toggle-text-block"><span class="toggle-title">DÉMO EN CONTINU</span><span class="toggle-state" id="demoLabel">INACTIVE</span></span>
                     </button>
-
-                    <!-- Bouton Audio SFX JRPG -->
-                    <button type="button" class="sp-btn-toggle" id="btnAudioToggle" aria-pressed="false" >
-                        <span class="toggle-icon" id="audioIcon">♪</span>
-                        <div class="toggle-text-block">
-                            <span class="toggle-title">AUDIO SFX</span>
-                            <span class="toggle-state" id="audioLabel" data-sp-audio-state>DÉSACTIVÉ</span>
-                        </div>
+                    <button type="button" class="sp-btn-toggle sp-slab sp-slab--black" id="btnAudioToggle" aria-pressed="false">
+                        <span class="toggle-icon" aria-hidden="true">♪</span>
+                        <span class="toggle-text-block"><span class="toggle-title">AUDIO SFX</span><span class="toggle-state" id="audioLabel" data-sp-audio-state>DÉSACTIVÉ</span></span>
                     </button>
                 </div>
             </section>
 
-            <!-- FOOTER / BARRE D'ÉTAT SYSTÈME -->
             <footer class="sp-footer">
-                <div class="sp-footer-badge">PULSE ONLINE</div>
-                <div class="sp-footer-text">
-                    <span class="footer-live-dot"></span>
-                    <span>SYSTEM STATUS // ONLINE • MOTEUR SALARIAL HAUTE PRÉCISION TEMPS RÉEL</span>
-                </div>
-                <div class="sp-footer-version">SALARY PULSE // V3</div>
+                <span class="sp-footer-badge">PULSE ONLINE</span>
+                <span class="sp-footer-text">SYSTEM STATUS // ONLINE • MOTEUR SALARIAL TEMPS RÉEL</span>
+                <span class="sp-footer-version">SALARY PULSE // V3</span>
             </footer>
 
         </main>
     </div>
 
-    <!-- Scripts : Moteur Partagé + Contrôleur Dashboard -->
     <script src="../shared/shared.js" defer></script>
+    <script src="salary-ui.js" defer></script>
     <script src="script.js" defer></script>
 </body>
 </html>
-

@@ -301,7 +301,7 @@
         el.className = 'sp-transition-wipe';
         el.setAttribute('aria-hidden', 'true');
         el.innerHTML = `
-            <div class="wipe-band band-yellow"></div>
+            <div class="wipe-band band-a"></div>
             <div class="wipe-band band-white"></div>
             <div class="wipe-band band-black"></div>
             <div class="wipe-band band-red">
@@ -375,6 +375,38 @@
         navigationEnCours = false;
         if (wipeEl) wipeEl.classList.remove('is-covering', 'is-revealing');
     });
+
+    /* ---------------------------------------------------------------------
+       7b. HELPERS D'AFFICHAGE (lettres découpées, glitch)
+       --------------------------------------------------------------------- */
+    /** Transforme le texte d'un élément en tuiles « lettre anonyme » (lisible par les lecteurs d'écran). */
+    function ransom(el) {
+        const texte = el.textContent.trim();
+        el.setAttribute('aria-label', texte);
+        el.classList.add('sp-ransom');
+        el.textContent = '';
+        texte.split(/\s+/).forEach((mot) => {
+            const w = document.createElement('span');
+            w.className = 'w';
+            w.setAttribute('aria-hidden', 'true');
+            [...mot].forEach((c) => {
+                const l = document.createElement('span');
+                l.className = 'l';
+                l.textContent = c;
+                w.appendChild(l);
+            });
+            el.appendChild(w);
+        });
+    }
+
+    /** Petit glitch ponctuel sur un élément .sp-glitch (data-text requis). */
+    function glitch(el) {
+        if (prefersReducedMotion() || !el) return;
+        el.dataset.text = el.textContent; // les calques du glitch recopient le texte courant
+        el.classList.remove('is-glitching');
+        void el.offsetWidth;
+        el.classList.add('is-glitching');
+    }
 
     /* ---------------------------------------------------------------------
        8. SHELL (fond, header, bouton audio, touche ESC)
@@ -506,8 +538,11 @@
         }
     }
 
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountShell);
-    else mountShell();
+    // Les éléments [data-ransom] deviennent des tuiles découpées
+    const initRansom = () => document.querySelectorAll('[data-ransom]').forEach(ransom);
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { mountShell(); initRansom(); });
+    else { mountShell(); initRansom(); }
 
     window.SP = {
         CONFIG, MODULES, MENU_URL,
@@ -517,6 +552,7 @@
         hud: { update: updateHUD, start: startHUD, setText },
         nav: { go, goMenu, goModule },
         onTick,
+        ui: { ransom, glitch },
         prefersReducedMotion
     };
 })();
