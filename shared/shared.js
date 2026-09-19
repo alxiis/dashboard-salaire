@@ -2,7 +2,8 @@
  * ==========================================================================
  * SALARY PULSE // NOYAU PARTAGÉ  (window.SP)
  *
- *   SP.CONFIG   contrat & constantes du moteur salarial
+ *   SP.CONFIG   constantes issues du planning (voir scheduleConfig.js)
+ *   SP.Schedule moteur de planning (window.Schedule)
  *   SP.store    persistance LocalStorage défensive
  *   SP.audio    SFX Web Audio (aucun fichier externe, activé après un geste)
  *   SP.work     statut de travail + calculs de temps
@@ -20,19 +21,13 @@
     /* ---------------------------------------------------------------------
        1. CONFIGURATION DU CONTRAT
        --------------------------------------------------------------------- */
-    const TAUX_HORAIRE_NET = 7.89;
+    // Données issues de shared/scheduleConfig.js + schedule-engine.js (à charger avant ce fichier)
+    const Schedule = window.Schedule;
     const CONFIG = Object.freeze({
-        TAUX_HORAIRE_NET,
-        TAUX_SECONDE: TAUX_HORAIRE_NET / 3600,
-        TAUX_MINUTE: TAUX_HORAIRE_NET / 60, // ≈ 0.1315 €
-        MAX_MINUTES_JOUR: 420, // 7 h
-        GAIN_JOUR_MAX: 7 * TAUX_HORAIRE_NET, // 55.23 €
-        DATE_DEBUT_CONTRAT: new Date(2026, 8, 14, 8, 30, 0),
-        // minutes depuis minuit
-        PLAGES: Object.freeze([
-            Object.freeze({ debut: 8 * 60 + 30, fin: 12 * 60 + 30 }),
-            Object.freeze({ debut: 13 * 60 + 30, fin: 16 * 60 + 30 })
-        ])
+        MONTHLY_NET: Schedule.CONFIG.MONTHLY_NET,
+        MAX_MINUTES_JOUR: Schedule.MINUTES_PAR_JOUR, // minutes de bureau par jour d'entreprise
+        PLAGES: Schedule.PLAGES,
+        DATE_DEBUT_CONTRAT: Schedule.START
     });
 
     const MODULES = Object.freeze([
@@ -175,45 +170,51 @@
     /* ---------------------------------------------------------------------
        4. STATUT DE TRAVAIL & TEMPS
        --------------------------------------------------------------------- */
-    const estJourOuvre = (date) => date.getDay() >= 1 && date.getDay() <= 5;
+    const fmtH = (min) => `${String(Math.floor(min / 60)).padStart(2, '0')}H${String(min % 60).padStart(2, '0')}`;
+    const PAUSE = 'ACQUISITION EN PAUSE';
 
     const STATUTS = {
-        working: (desc) => ({ label: 'WORKING', desc, badgeClass: 'status-working', contextText: 'WORKING', contextClass: 'context-working', enPoste: true }),
-        offduty: (desc) => ({ label: 'OFF DUTY', desc, badgeClass: 'status-offduty', contextText: 'OFF DUTY', contextClass: 'context-offduty', enPoste: false }),
-        break: () => ({ label: 'LUNCH BREAK', desc: 'PAUSE DÉJEUNER // REPRISE À 13H30', badgeClass: 'status-break', contextText: 'LUNCH BREAK', contextClass: 'context-break', enPoste: false }),
+        working: (desc, contextText = 'WORKING') => ({ label: 'WORKING', desc, badgeClass: 'status-working', contextText, contextClass: 'context-working', enPoste: true }),
+        offduty: (desc, label = 'OFF DUTY') => ({ label, desc, badgeClass: 'status-offduty', contextText: label, contextClass: 'context-offduty', enPoste: false }),
+        break: (reprise) => ({ label: 'LUNCH BREAK', desc: `PAUSE // REPRISE À ${fmtH(reprise)}`, badgeClass: 'status-break', contextText: 'LUNCH BREAK', contextClass: 'context-break', enPoste: false }),
         complete: (label, desc) => ({ label, desc, badgeClass: 'status-complete', contextText: 'AFTER WORK', contextClass: 'context-afterwork', enPoste: false })
     };
 
+    /**
+     * Statut selon le type de jour (entreprise / école / week-end / férié) et l'heure.
+     * Un jour non payé (week-end, ou type absent de PAID_DAY_TYPES) met l'acquisition en pause.
+     * creditedMinutes + bonusSimule : minutes déjà comptées aujourd'hui (réelles + simulées).
+     */
     function getWorkStatus(date, creditedMinutes = 0, bonusSimule = 0, demoActive = false) {
-        const [matin, apresMidi] = CONFIG.PLAGES;
         if (demoActive) return { ...STATUTS.working('DÉMO ACTIVE // FLUX EN CONTINU'), contextText: 'DEMO MODE' };
-        if (!estJourOuvre(date)) return STATUTS.offduty('WEEK-END // SYSTÈME EN VEILLE');
+
+        const type = Schedule.dayType(date);
+        if (!Schedule.isPaidDay(date)) {
+            const noms = { weekend: 'WEEK-END', holiday: 'JOUR FÉRIÉ', school: "JOUR D'ÉCOLE", outside: 'HORS ALTERNANCE' };
+            const contexte = type === 'school' ? 'SCHOOL DAY' : type === 'holiday' ? 'HOLIDAY' : 'OFF DUTY';
+            return STATUTS.offduty(`${noms[type] || 'JOUR NON PAYÉ'} // ${PAUSE}`, contexte);
+        }
         if (creditedMinutes + bonusSimule >= CONFIG.MAX_MINUTES_JOUR) {
-            return STATUTS.complete('DAY COMPLETE', 'MISSION ACCOMPLIE // 7H EFFECTUÉES');
+            return STATUTS.complete('DAY COMPLETE', `MISSION ACCOMPLIE // ${CONFIG.MAX_MINUTES_JOUR / 60}H EFFECTUÉES`);
         }
         const minutes = date.getHours() * 60 + date.getMinutes();
-        if (minutes < matin.debut) return STATUTS.offduty('HORS HORAIRES // DÉBUT À 08H30');
-        if (minutes < matin.fin) return STATUTS.working('SESSION MATIN // POSTE ACTIF');
-        if (minutes < apresMidi.debut) return STATUTS.break();
-        if (minutes < apresMidi.fin) return STATUTS.working('SESSION APRÈS-MIDI // POSTE ACTIF');
-        return STATUTS.complete('AFTER WORK', 'JOURNÉE TERMINÉE // 16H30 DÉPASSÉ');
+        const plages = CONFIG.PLAGES;
+        if (minutes < plages[0].debut) return STATUTS.offduty(`HORS HORAIRES // DÉBUT À ${fmtH(plages[0].debut)}`);
+        const lieu = type === 'school' ? "JOUR D'ÉCOLE" : "JOUR D'ENTREPRISE";
+        const contexte = type === 'school' ? 'SCHOOL DAY' : 'WORKING';
+        for (let i = 0; i < plages.length; i++) {
+            if (minutes < plages[i].fin) {
+                if (minutes >= plages[i].debut) return STATUTS.working(`${lieu} // POSTE ACTIF`, contexte);
+                return STATUTS.break(plages[i].debut);
+            }
+        }
+        return STATUTS.complete('AFTER WORK', `JOURNÉE TERMINÉE // ${fmtH(plages[plages.length - 1].fin)} DÉPASSÉ`);
     }
 
     /** Statut à partir de l'état persistant (menu, calendrier, GTA). */
     function statutCourant(date = new Date()) {
         const e = charger();
         return getWorkStatus(date, e.creditedMinutes, e.bonusSimuleMinutes, e.modeDemo);
-    }
-
-    /** Secondes travaillées un jour donné (0 hors jours ouvrés / avant le contrat). */
-    function secondesTravaillees(date) {
-        if (!estJourOuvre(date) || date < new Date(CONFIG.DATE_DEBUT_CONTRAT.getFullYear(), CONFIG.DATE_DEBUT_CONTRAT.getMonth(), CONFIG.DATE_DEBUT_CONTRAT.getDate())) return 0;
-        const minutesNow = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
-        let total = 0;
-        for (const plage of CONFIG.PLAGES) {
-            if (minutesNow > plage.debut) total += (Math.min(minutesNow, plage.fin) - plage.debut) * 60;
-        }
-        return Math.min(CONFIG.MAX_MINUTES_JOUR * 60, total);
     }
 
     /* ---------------------------------------------------------------------
@@ -548,7 +549,8 @@
         CONFIG, MODULES, MENU_URL,
         store: { charger, sauvegarder, patch, jourCle },
         audio,
-        work: { getWorkStatus, statutCourant, secondesTravaillees, estJourOuvre },
+        work: { getWorkStatus, statutCourant },
+        Schedule,
         hud: { update: updateHUD, start: startHUD, setText },
         nav: { go, goMenu, goModule },
         onTick,

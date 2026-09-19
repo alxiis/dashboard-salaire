@@ -16,7 +16,26 @@
         <header class="sp-header" data-sp-header="module"></header>
 
         <main class="cal-main">
-            <h1 class="sp-sr-only">Calendrier</h1>
+            <h1 class="sp-sr-only">Calendrier de l'alternance</h1>
+
+            <!-- Progression de l'alternance : 3 barres façon « Social Stats » -->
+            <section class="cal-bars" aria-label="Progression de l'alternance">
+                <div class="sp-hp sp-hp--red" id="barCompany">
+                    <span class="hp-label">ENTREPRISE <em>SAS NOOUS</em></span>
+                    <div class="hp-track"><div class="hp-fill"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                    <span class="hp-value"><b data-bar-pct>0.0 %</b><i data-bar-days>0 / 0 jours</i></span>
+                </div>
+                <div class="sp-hp sp-hp--white" id="barSchool">
+                    <span class="hp-label">ÉCOLE <em>IGENSIA</em></span>
+                    <div class="hp-track"><div class="hp-fill"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                    <span class="hp-value"><b data-bar-pct>0.0 %</b><i data-bar-days>0 / 71 jours</i></span>
+                </div>
+                <div class="sp-hp sp-hp--mix" id="barOverall">
+                    <span class="hp-label">ALTERNANCE <em>TOTALE</em></span>
+                    <div class="hp-track"><div class="hp-fill"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                    <span class="hp-value"><b data-bar-pct>0.0 %</b><i data-bar-days>0 / 0 jours</i></span>
+                </div>
+            </section>
 
             <!-- Jour actuel : chiffre monumental sur pan rouge déchiré -->
             <section class="cal-today" aria-label="Jour actuel">
@@ -38,25 +57,42 @@
                 </div>
             </section>
 
-            <!-- Grille du mois -->
+            <!-- Calendrier : vue Mois ou Année -->
             <section class="cal-board" aria-labelledby="calTitle">
                 <div class="cal-toolbar">
-                    <button type="button" class="cal-nav sp-slab sp-slab--white" id="calPrev" aria-label="Mois précédent">◀</button>
+                    <div class="cal-nav-group" id="calNavGroup">
+                        <button type="button" class="cal-nav sp-slab sp-slab--white" id="calPrev" aria-label="Mois précédent">◀</button>
+                        <button type="button" class="cal-nav sp-slab sp-slab--white" id="calNext" aria-label="Mois suivant">▶</button>
+                    </div>
                     <h2 class="cal-title" id="calTitle" data-ransom>CALENDRIER</h2>
-                    <button type="button" class="cal-nav sp-slab sp-slab--white" id="calNext" aria-label="Mois suivant">▶</button>
                     <button type="button" class="cal-today-btn sp-slab sp-slab--red" id="calToday">AUJOURD'HUI</button>
+                    <div class="cal-switch" role="group" aria-label="Type de vue">
+                        <button type="button" class="cal-switch-btn is-active" id="viewMonth" data-view="month" aria-pressed="true">MOIS</button>
+                        <button type="button" class="cal-switch-btn" id="viewYear" data-view="year" aria-pressed="false">ANNÉE</button>
+                    </div>
                 </div>
 
-                <div class="cal-weekdays" aria-hidden="true">
-                    <span>LUN</span><span>MAR</span><span>MER</span><span>JEU</span><span>VEN</span><span class="we">SAM</span><span class="we">DIM</span>
-                </div>
-                <div class="cal-grid" id="calGrid" role="group" aria-label="Jours du mois"></div>
+                <ul class="cal-legend" aria-label="Légende">
+                    <li><i class="lg t-company"></i>ENTREPRISE (SAS NOOUS)</li>
+                    <li><i class="lg t-school"></i>ÉCOLE (IGENSIA)</li>
+                    <li><i class="lg t-weekend"></i>WEEK-END</li>
+                    <li><i class="lg t-holiday"></i>FÉRIÉ</li>
+                </ul>
 
-                <div class="cal-stats">
-                    <div class="cal-stat"><b id="calStatDays">0</b><span>JOURS OUVRÉS</span></div>
-                    <div class="cal-stat"><b id="calStatHours">0H</b><span>HEURES</span></div>
-                    <div class="cal-stat cal-stat--red"><b id="calStatAmount">0 €</b><span>NET MAX DU MOIS</span></div>
+                <div id="calMonthView">
+                    <div class="cal-weekdays" aria-hidden="true">
+                        <span>LUN</span><span>MAR</span><span>MER</span><span>JEU</span><span>VEN</span><span class="we">SAM</span><span class="we">DIM</span>
+                    </div>
+                    <div class="cal-grid" id="calGrid" role="group" aria-label="Jours du mois"></div>
+
+                    <div class="cal-stats">
+                        <div class="cal-stat cal-stat--red"><b id="calStatCompany">0</b><span>JOURS ENTREPRISE</span></div>
+                        <div class="cal-stat"><b id="calStatSchool">0</b><span>JOURS ÉCOLE</span></div>
+                        <div class="cal-stat"><b id="calStatAmount">0 €</b><span>SALAIRE DU MOIS</span></div>
+                    </div>
                 </div>
+
+                <div id="calYearView" class="cal-year" hidden></div>
             </section>
         </main>
     </div>
@@ -68,6 +104,8 @@
         <div class="cal-intro-slash"></div>
     </div>
 
+    <script src="../shared/scheduleConfig.js" defer></script>
+    <script src="../shared/schedule-engine.js" defer></script>
     <script src="../shared/shared.js" defer></script>
     <script src="calendar-engine.js" defer></script>
     <script src="calendar-ui.js" defer></script>

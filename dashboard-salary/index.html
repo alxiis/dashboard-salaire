@@ -36,53 +36,57 @@
             <section class="sp-section" id="sectionOverview" aria-label="Vue globale">
                 <div class="sp-hero-card sp-slab sp-slab--black" id="mainHeroCard">
                     <div class="hero-torn" aria-hidden="true"></div>
-                    <p class="hero-kicker" data-ransom>GAGNÉ AUJOURD'HUI</p>
+                    <p class="hero-kicker" data-ransom>CUMUL DU MOIS</p>
                     <span class="hero-net" aria-hidden="true">NET<b>EUR</b></span>
 
                     <div class="sp-main-amount-wrap" id="mainAmountWrap">
-                        <span id="jour" class="sp-huge-digits sp-glitch">0.0000</span>
+                        <span id="mois" class="sp-huge-digits sp-glitch">0.00</span>
                         <span class="sp-euro-sym">€</span>
                     </div>
                     <div class="sp-floating-anchor" id="floatingGainAnchor" aria-hidden="true"></div>
 
-                    <!-- Barre façon HP : le libellé dépasse de la jauge -->
+                    <!-- Étiquette affichée quand le cumul est figé (week-end, hors heures…) -->
+                    <p class="hero-pause" id="heroPause" role="status" hidden>
+                        <b>ACQUISITION EN PAUSE</b><span id="heroPauseReason">—</span>
+                    </p>
+
                     <div class="sp-hp sp-hp--main">
-                        <span class="hp-label">PROGRESSION <em>7H</em></span>
+                        <span class="hp-label">PROGRESSION <em>DU MOIS</em></span>
                         <div class="hp-track"><div class="hp-fill" id="progressBarFill"></div><div class="hp-ticks" aria-hidden="true"></div></div>
-                        <span class="hp-value"><b id="progressionPourcent">0.0 %</b><i id="heuresTravaillees">(0.0h / 7h)</i></span>
+                        <span class="hp-value"><b id="progressionPourcent">0.0 %</b><i id="heuresTravaillees">(0 / 0 jours payés)</i></span>
                     </div>
                 </div>
 
                 <div class="sp-cadence-grid">
-                    <div class="sp-chip sp-slab sp-slab--red"><span class="chip-label">CADENCE / MINUTE</span><span class="chip-val" id="gainMinute">+0.1315 € / min</span></div>
-                    <div class="sp-chip sp-slab sp-slab--black"><span class="chip-label">TAUX HORAIRE NET</span><span class="chip-val" id="tauxHoraire">7.89 € / heure</span></div>
-                    <div class="sp-chip sp-slab sp-slab--white"><span class="chip-label">OBJECTIF JOUR COMPLET</span><span class="chip-val" id="objectifJour">55.23 € net</span></div>
+                    <div class="sp-chip sp-slab sp-slab--red"><span class="chip-label">CADENCE / MINUTE</span><span class="chip-val" id="gainMinute">+0.00 € / min</span></div>
+                    <div class="sp-chip sp-slab sp-slab--black"><span class="chip-label">TAUX JOURNALIER</span><span class="chip-val" id="tauxJournalier">0 € / jour</span></div>
+                    <div class="sp-chip sp-slab sp-slab--white"><span class="chip-label">SALAIRE MENSUEL</span><span class="chip-val" id="salaireMensuel">0 € net</span></div>
                 </div>
 
                 <div class="sp-panels-grid">
                     <div class="sp-game-panel panel-month sp-slab sp-slab--red" id="panelMois">
-                        <span class="panel-tag">01 // MENSUEL</span>
-                        <span class="panel-label">CUMUL CE MOIS-CI</span>
-                        <span class="panel-value"><span id="mois">0.00</span><span class="panel-unit">€</span></span>
-                        <span class="panel-sub">Total net perçu ce mois</span>
+                        <span class="panel-tag">01 // AUJOURD'HUI</span>
+                        <span class="panel-label">GAGNÉ AUJOURD'HUI</span>
+                        <span class="panel-value"><span id="jour">0.00</span><span class="panel-unit">€</span></span>
+                        <span class="panel-sub">Figé les jours non payés (week-end)</span>
                     </div>
                     <div class="sp-game-panel panel-total sp-slab sp-slab--white" id="panelTotal">
-                        <span class="panel-tag">02 // CONTRAT</span>
-                        <span class="panel-label">TOTAL CONTRAT CUMULÉ</span>
+                        <span class="panel-tag">02 // ALTERNANCE</span>
+                        <span class="panel-label">TOTAL DEPUIS LE 14/09/2026</span>
                         <span class="panel-value"><span id="total">0.00</span><span class="panel-unit">€</span></span>
-                        <span class="panel-sub">Depuis le 14/09/2026 à 08h30</span>
+                        <span class="panel-sub">Cumul de tous les mois</span>
                     </div>
                     <div class="sp-game-panel panel-tempo sp-slab sp-slab--black">
                         <span class="panel-tag">03 // VITESSE</span>
-                        <span class="panel-label">GAIN PAR SECONDE</span>
-                        <span class="panel-value panel-medium"><span id="gainSeconde">≈ 0.00219</span><span class="panel-unit">€ / s</span></span>
-                        <span class="panel-sub">Flux financier en temps réel</span>
+                        <span class="panel-label">GAIN PAR HEURE</span>
+                        <span class="panel-value panel-medium"><span id="gainHeure">≈ 0</span><span class="panel-unit">€ / h</span></span>
+                        <span class="panel-sub">Pendant les heures de bureau</span>
                     </div>
                     <div class="sp-game-panel panel-target sp-slab sp-slab--red">
-                        <span class="panel-tag">04 // PALIER</span>
-                        <span class="panel-label">OBJECTIF JOUR MAX</span>
-                        <span class="panel-value panel-medium"><span>55.23</span><span class="panel-unit">€ NET</span></span>
-                        <span class="panel-sub">Équivalent 7h = 25 200 s</span>
+                        <span class="panel-tag">04 // JOURS PAYÉS</span>
+                        <span class="panel-label">JOURS PAYÉS CE MOIS-CI</span>
+                        <span class="panel-value panel-medium"><span id="paidDaysCount">0</span><span class="panel-unit">JOURS</span></span>
+                        <span class="panel-sub">1 170 € ÷ ce nombre = taux journalier</span>
                     </div>
                 </div>
             </section>
@@ -93,29 +97,29 @@
 
                 <div class="sp-analysis-card sp-slab sp-slab--black">
                     <div class="sp-chart-header">
-                        <span class="chart-legend">PROGRESSION EN DIRECT // 08H30 → 16H30</span>
-                        <span class="chart-target-badge">PALIER FINAL : 55.23 €</span>
+                        <span class="chart-legend">CUMUL DU MOIS // JOUR PAR JOUR</span>
+                        <span class="chart-target-badge chart-legend-types"><i class="lg lg-company"></i>ENTREPRISE <i class="lg lg-school"></i>ÉCOLE <i class="lg lg-weekend"></i>WEEK-END</span>
                     </div>
 
                     <div class="sp-svg-chart-wrapper">
-                        <svg viewBox="0 0 800 240" class="sp-svg-canvas" id="salarySvgChart" role="img" aria-label="Courbe de progression du salaire net de 08h30 à 16h30, avec pause déjeuner de 12h30 à 13h30">
+                        <svg viewBox="0 0 800 240" class="sp-svg-canvas" id="salarySvgChart" role="img" aria-label="Courbe du salaire cumulé du mois, jour par jour : la courbe est plate les week-ends">
                             <defs>
                                 <linearGradient id="spRedGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                                     <stop offset="0%" stop-color="#E50914" stop-opacity="0.8" />
                                     <stop offset="65%" stop-color="#8F0008" stop-opacity="0.3" />
                                     <stop offset="100%" stop-color="#050505" stop-opacity="0" />
                                 </linearGradient>
+                                <pattern id="spSchoolHatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#0d0d0d"/><rect width="3" height="8" fill="#3a3a3a"/></pattern>
                                 <pattern id="spHalftoneChart" width="8" height="8" patternUnits="userSpaceOnUse">
                                     <circle cx="2" cy="2" r="1.3" fill="rgba(245, 245, 240, 0.22)" />
                                 </pattern>
                             </defs>
                             <line x1="60" y1="35" x2="760" y2="35" stroke="rgba(245, 245, 240, 0.4)" stroke-width="1.5" stroke-dasharray="6,4" />
-                            <text id="svgTargetLabel" x="758" y="27" text-anchor="end" class="axis-target">OBJECTIF</text>
+                            <text id="svgTargetLabel" x="758" y="27" text-anchor="end" class="axis-target">MENSUEL</text>
                             <line x1="60" y1="85" x2="760" y2="85" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4,4" />
                             <line x1="60" y1="135" x2="760" y2="135" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4,4" />
                             <line x1="60" y1="185" x2="760" y2="185" stroke="rgba(255,255,255,0.15)" />
-                            <rect id="chartLunch" x="410" y="35" width="87" height="150" fill="rgba(229, 9, 20, 0.1)" stroke="rgba(229, 9, 20, 0.4)" stroke-dasharray="3,3" />
-                            <text id="chartLunchLabel" x="424" y="115" class="axis-lunch">PAUSE 12:30-13:30</text>
+                            <g id="chartBands"></g>
                             <polygon id="chartFill" points="" fill="url(#spRedGradient)" />
                             <polygon id="chartFillDots" points="" fill="url(#spHalftoneChart)" />
                             <polyline id="chartLine" points="" fill="none" stroke="#E50914" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter" />
@@ -125,19 +129,13 @@
                         </svg>
                     </div>
 
-                    <!-- Barres de sessions façon « Social Stats » -->
+                    <!-- Journée en cours -->
                     <div class="sp-slots-analysis-grid">
                         <div class="slot-card sp-hp">
-                            <span class="hp-label">SESSION 01 <em>MATIN</em></span>
-                            <div class="hp-track"><div class="hp-fill" id="slotBarMorning"></div><div class="hp-ticks" aria-hidden="true"></div></div>
-                            <span class="hp-value"><b>31.56 € NET</b><i>08:30 → 12:30 (4H)</i></span>
-                            <span class="slot-footer-text" id="slotMorningText">Calcul en direct...</span>
-                        </div>
-                        <div class="slot-card sp-hp">
-                            <span class="hp-label">SESSION 02 <em>APRÈS-MIDI</em></span>
-                            <div class="hp-track"><div class="hp-fill" id="slotBarAfternoon"></div><div class="hp-ticks" aria-hidden="true"></div></div>
-                            <span class="hp-value"><b>23.67 € NET</b><i>13:30 → 16:30 (3H)</i></span>
-                            <span class="slot-footer-text" id="slotAfternoonText">Calcul en direct...</span>
+                            <span class="hp-label">JOURNÉE <em>EN COURS</em></span>
+                            <div class="hp-track"><div class="hp-fill" id="barToday"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                            <span class="hp-value"><b>HEURES DE BUREAU</b><i>08:30 → 16:30</i></span>
+                            <span class="slot-footer-text" id="barTodayText">Calcul en direct...</span>
                         </div>
                     </div>
                 </div>
@@ -148,10 +146,10 @@
                 <h2 class="sp-section-title" id="titreContrat"><span class="sec-num" aria-hidden="true">03</span><span data-ransom>DONNÉES DU CONTRAT</span></h2>
 
                 <div class="sp-contract-grid">
-                    <div class="sp-contract-cell sp-slab sp-slab--white"><span class="cell-tag">TAUX HORAIRE NET</span><span class="cell-highlight">7.89 € / HEURE</span><span class="cell-desc">Net payé à la seconde (≈ 0.00219 €/s)</span></div>
-                    <div class="sp-contract-cell sp-slab sp-slab--black"><span class="cell-tag">DURÉE QUOTIDIENNE</span><span class="cell-highlight">7 HEURES / JOUR</span><span class="cell-desc">Du lundi au vendredi (jours ouvrés)</span></div>
-                    <div class="sp-contract-cell sp-slab sp-slab--red"><span class="cell-tag">PLAGES DE TRAVAIL</span><span class="cell-highlight">08:30-12:30 &amp; 13:30-16:30</span><span class="cell-desc">Pause déjeuner méridienne : 1h00</span></div>
-                    <div class="sp-contract-cell sp-slab sp-slab--white"><span class="cell-tag">PRISE D'EFFET</span><span class="cell-highlight">14 SEPTEMBRE 2026</span><span class="cell-desc">Début effectif de mission : 08h30</span></div>
+                    <div class="sp-contract-cell sp-slab sp-slab--white"><span class="cell-tag">SALAIRE NET</span><span class="cell-highlight" id="cellMensuel">— € / MOIS</span><span class="cell-desc" id="cellSalaireMois">—</span></div>
+                    <div class="sp-contract-cell sp-slab sp-slab--black"><span class="cell-tag">TAUX JOURNALIER</span><span class="cell-highlight" id="cellTaux">—</span><span class="cell-desc">Salaire mensuel ÷ jours payés du mois</span></div>
+                    <div class="sp-contract-cell sp-slab sp-slab--red"><span class="cell-tag">HORAIRES</span><span class="cell-highlight" id="cellHoraires">—</span><span class="cell-desc">Jours d'entreprise (SAS NOOUS) et jours d'école (Igensia)</span></div>
+                    <div class="sp-contract-cell sp-slab sp-slab--white"><span class="cell-tag">ALTERNANCE</span><span class="cell-highlight">14/09/2026 → 15/09/2027</span><span class="cell-desc">Aucun salaire acquis le week-end</span></div>
                 </div>
             </section>
 
@@ -162,7 +160,7 @@
                 <div class="sp-actions-panel">
                     <button type="button" class="sp-btn-action sp-slab sp-slab--white" id="btnSimulerGain">
                         <span class="btn-icon" aria-hidden="true">⚡</span>
-                        <span class="btn-text-group"><span class="btn-main-text">SIMULER GAIN (+1 MIN)</span><span class="btn-sub-text">AJOUTE +0.1315 € IMMÉDIATEMENT</span></span>
+                        <span class="btn-text-group"><span class="btn-main-text">SIMULER GAIN (+1 MIN)</span><span class="btn-sub-text" id="btnSimSub">AJOUTE UNE MINUTE IMMÉDIATEMENT</span></span>
                     </button>
                     <button type="button" class="sp-btn-toggle sp-slab sp-slab--black" id="btnDemoToggle" aria-pressed="false">
                         <span class="toggle-icon" aria-hidden="true">▶</span>
@@ -177,13 +175,15 @@
 
             <footer class="sp-footer">
                 <span class="sp-footer-badge">PULSE ONLINE</span>
-                <span class="sp-footer-text">SYSTEM STATUS // ONLINE • MOTEUR SALARIAL TEMPS RÉEL</span>
+                <span class="sp-footer-text">SYSTEM STATUS // ONLINE • SALAIRE NET TEMPS RÉEL</span>
                 <span class="sp-footer-version">SALARY PULSE // V3</span>
             </footer>
 
         </main>
     </div>
 
+    <script src="../shared/scheduleConfig.js" defer></script>
+    <script src="../shared/schedule-engine.js" defer></script>
     <script src="../shared/shared.js" defer></script>
     <script src="salary-ui.js" defer></script>
     <script src="script.js" defer></script>

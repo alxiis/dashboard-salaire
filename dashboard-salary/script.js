@@ -1,27 +1,26 @@
 /**
- * DASHBOARD SALARY // moteur salarial à la minute
+ * DASHBOARD SALARY // moteur salarial
  *
  * Moteur : calculs, persistance, événements. Tout l'affichage passe par window.SalaryUI (salary-ui.js).
+ * Planning et paramètres : shared/scheduleConfig.js — calculs de jours : shared/schedule-engine.js.
  *
- * Règles (inchangées) :
- *   - 7,89 €/h ≈ 0,1315 €/min ; le compteur ne bouge qu'à la minute entière travaillée
- *   - plages 08h30–12h30 et 13h30–16h30, lundi–vendredi, plafond 420 min/jour
- *   - les minutes « simulées » (bouton +1 min, démo) s'ajoutent au réel dans la limite du plafond
+ * Règles :
+ *   - MONTHLY_NET est réparti sur les jours payés du mois (tous sauf le week-end, cf. PAID_DAY_TYPES)
+ *   - taux journalier = MONTHLY_NET / nombre de jours payés du mois
+ *   - le compteur ne monte qu'un jour payé, pendant les heures de bureau, à la minute entière
+ *   - week-end (ou jour non payé) : le cumul est figé → « acquisition en pause »
+ *   - les minutes « simulées » (bouton +1 min, démo) s'ajoutent au réel dans la limite d'une journée
  */
 (function () {
     'use strict';
 
-    const { CONFIG, store, audio, work, hud, onTick } = window.SP;
-    const { TAUX_HORAIRE_NET, TAUX_MINUTE, TAUX_SECONDE, MAX_MINUTES_JOUR, GAIN_JOUR_MAX, PLAGES } = CONFIG;
+    const { CONFIG, store, audio, work, hud, onTick, Schedule } = window.SP;
+    const { MAX_MINUTES_JOUR } = CONFIG;
 
     const DEMO_INTERVAL_MS = 5000;
-    const [MATIN, APRES_MIDI] = PLAGES;
-    const DUREE_MATIN = MATIN.fin - MATIN.debut; // 240
-    const DUREE_APRES_MIDI = APRES_MIDI.fin - APRES_MIDI.debut; // 180
-
     const UI = window.SalaryUI;
     const $ = (id) => document.getElementById(id);
-    const euros = (minutes) => (minutes * TAUX_MINUTE).toFixed(2);
+    const eur = (n, d = 2) => n.toFixed(d);
 
     /* ---------- état ---------- */
     const sauvegarde = store.charger(); // déjà remis à zéro si la date a changé
@@ -31,9 +30,6 @@
     let jourCourant = store.jourCle();
     let premierPassage = true;
     let demoTimer = null;
-
-    // Cumul des jours strictement passés : ne change qu'une fois par jour
-    let cachePasse = { jour: null, mois: 0, total: 0 };
 
     const totalMinutes = () => Math.min(MAX_MINUTES_JOUR, creditedMinutes + bonusSimuleMinutes);
 
@@ -47,117 +43,104 @@
         });
     }
 
-    /* ---------- calculs ---------- */
-    function secondesJoursPrecedents(debut, fin) {
-        if (fin <= debut) return 0;
-        let cumul = 0;
-        const curseur = new Date(debut.getFullYear(), debut.getMonth(), debut.getDate());
-        const limite = new Date(fin.getFullYear(), fin.getMonth(), fin.getDate());
-        while (curseur < limite) {
-            if (work.estJourOuvre(curseur)) cumul += MAX_MINUTES_JOUR * 60;
-            curseur.setDate(curseur.getDate() + 1);
-        }
-        return cumul;
-    }
-
-    function actualiserCachePasse(date) {
-        const jour = store.jourCle(date);
-        if (cachePasse.jour === jour) return;
-        const debutMois = new Date(date.getFullYear(), date.getMonth(), 1);
-        const debutMoisEffectif = debutMois < CONFIG.DATE_DEBUT_CONTRAT ? CONFIG.DATE_DEBUT_CONTRAT : debutMois;
-        cachePasse = {
-            jour,
-            mois: secondesJoursPrecedents(debutMoisEffectif, date) * TAUX_SECONDE,
-            total: secondesJoursPrecedents(CONFIG.DATE_DEBUT_CONTRAT, date) * TAUX_SECONDE
-        };
-    }
-
     /* ---------- valeurs à afficher ---------- */
-    function rafraichirMontants(date) {
-        actualiserCachePasse(date);
+    /** Raison de la pause d'acquisition, ou null si le compteur tourne / peut tourner. */
+    function raisonPause(now, gains) {
+        if (modeDemo) return null;
+        if (!gains.active) {
+            const type = Schedule.dayType(now);
+            return { weekend: 'WEEK-END', holiday: 'JOUR FÉRIÉ', school: "JOUR D'ÉCOLE", outside: 'HORS ALTERNANCE' }[type] || 'JOUR NON PAYÉ';
+        }
+        const minutes = now.getHours() * 60 + now.getMinutes();
+        const { debut } = Schedule.PLAGES[0];
+        const { fin } = Schedule.PLAGES[Schedule.PLAGES.length - 1];
+        if (minutes < debut) return 'AVANT LES HEURES DE BUREAU';
+        if (minutes >= fin) return 'JOURNÉE TERMINÉE';
+        return null;
+    }
+
+    function rafraichirMontants(now) {
         const minutes = totalMinutes();
-        const gagneAujourdhui = minutes * TAUX_MINUTE;
-        const ratio = Math.min(1, minutes / MAX_MINUTES_JOUR);
+        const g = Schedule.earnings(now, minutes);
+        const jourMoisPasses = g.paidDaysDone + (g.active || minutes > 0 ? minutes / MAX_MINUTES_JOUR : 0);
+        const ratioMois = g.paidDaysMonth ? Math.min(1, jourMoisPasses / g.paidDaysMonth) : 0;
+        const ratioJour = minutes / MAX_MINUTES_JOUR;
 
-        UI.setAmounts({
-            jour: gagneAujourdhui,
-            mois: cachePasse.mois + gagneAujourdhui,
-            total: cachePasse.total + gagneAujourdhui
-        });
+        UI.setAmounts({ mois: g.month, jour: g.today, total: g.total });
+        UI.setPause(raisonPause(now, g));
 
-        const minMatin = Math.min(DUREE_MATIN, minutes);
-        const minApresMidi = Math.max(0, Math.min(DUREE_APRES_MIDI, minutes - DUREE_MATIN));
-        const session = (barId, textId, fait, duree) => ({
-            barId,
-            textId,
-            ratio: fait / duree,
-            texte: `${((fait / duree) * 100).toFixed(1)}% accompli • ${euros(fait)} € / ${euros(duree)} €`
-        });
         UI.setProgress({
-            ratio,
-            pctTexte: `${(ratio * 100).toFixed(1)} %`,
-            heuresTexte: `(${(minutes / 60).toFixed(1)}h / 7h)`,
+            ratio: ratioMois,
+            pctTexte: `${(ratioMois * 100).toFixed(1)} %`,
+            heuresTexte: `(${g.paidDaysDone} / ${g.paidDaysMonth} jours payés)`,
             sessions: [
-                session('slotBarMorning', 'slotMorningText', minMatin, DUREE_MATIN),
-                session('slotBarAfternoon', 'slotAfternoonText', minApresMidi, DUREE_APRES_MIDI)
+                {
+                    barId: 'barToday',
+                    textId: 'barTodayText',
+                    ratio: ratioJour,
+                    texte: `${(ratioJour * 100).toFixed(1)}% accompli • ${eur(g.today)} € / ${eur(g.daily)} €`
+                }
             ]
         });
+        UI.setStaticTexts({ paidDaysCount: String(g.paidDaysMonth) });
     }
 
-    /* ---------- courbe SVG : coordonnées dérivées du contrat ---------- */
+    /* ---------- courbe du mois : cumul par jour, plat quand l'acquisition est en pause ---------- */
     const CHART = { x0: 60, x1: 760, yBase: 185, yMax: 35 };
-    const minuteX = (m) => CHART.x0 + ((m - MATIN.debut) / (APRES_MIDI.fin - MATIN.debut)) * (CHART.x1 - CHART.x0);
-    const euroY = (e) => CHART.yBase - (e / GAIN_JOUR_MAX) * (CHART.yBase - CHART.yMax);
-    /** minutes travaillées à l'heure `m` (minutes depuis minuit) */
-    const travailleA = (m) =>
-        Math.max(0, Math.min(m, MATIN.fin) - MATIN.debut) + Math.max(0, Math.min(m, APRES_MIDI.fin) - APRES_MIDI.debut);
-    const pointA = (m) => [minuteX(m), euroY(travailleA(m) * TAUX_MINUTE)];
-    const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
-    function construireCourbe() {
-        const sommets = [MATIN.debut, MATIN.fin, APRES_MIDI.debut, APRES_MIDI.fin].map(pointA);
-        const ligne = sommets.map((p) => p.map((v) => v.toFixed(1)).join(',')).join(' ');
-        const [xPauseDebut] = pointA(MATIN.fin);
-        const [xPauseFin] = pointA(APRES_MIDI.debut);
-        // jalons horaires : [minute, afficher le montant]
-        const jalons = [[MATIN.debut, true], [630, true], [MATIN.fin, true], [APRES_MIDI.debut, false], [900, true], [APRES_MIDI.fin, true]];
+    function construireCourbe(now) {
+        const y = now.getFullYear();
+        const m = now.getMonth();
+        const n = new Date(y, m + 1, 0).getDate();
+        const daily = Schedule.dailyRate(y, m);
+        const colonne = (CHART.x1 - CHART.x0) / n;
+        const yDe = (euros) => CHART.yBase - (euros / CONFIG.MONTHLY_NET) * (CHART.yBase - CHART.yMax);
 
-        UI.buildChart({
-            ligne,
-            aire: `${CHART.x0},${CHART.yBase} ${ligne} ${CHART.x1},${CHART.yBase}`,
-            pause: { x: xPauseDebut, largeur: xPauseFin - xPauseDebut },
-            marks: jalons.map(([m, avecMontant], i) => {
-                const [x, y] = pointA(m);
-                return {
-                    x, y,
-                    texte: avecMontant ? `${hhmm(m)} (${euros(travailleA(m))}€)` : hhmm(m),
-                    cle: i === 2 || i === jalons.length - 1,
-                    fin: i === jalons.length - 1
-                };
-            })
-        });
+        let cumul = 0;
+        const points = [[CHART.x0, CHART.yBase]];
+        const bandes = [];
+        const marks = [];
+        for (let d = 1; d <= n; d++) {
+            const date = new Date(y, m, d);
+            const type = Schedule.dayType(date);
+            if (Schedule.isPaidDay(date)) cumul += daily;
+            const x = CHART.x0 + d * colonne;
+            points.push([x, yDe(cumul)]);
+            bandes.push({ x: CHART.x0 + (d - 1) * colonne, largeur: colonne, type });
+            if (d === 1 || d % 5 === 0 || d === n) marks.push({ x: x - colonne / 2, y: 214, texte: String(d), cle: d === now.getDate(), fin: d === n });
+        }
+        const ligne = points.map((p) => `${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ');
+        UI.buildChart({ ligne, aire: `${ligne} ${CHART.x1},${CHART.yBase}`, bandes, marks, objectif: `MENSUEL ${eur(CONFIG.MONTHLY_NET, 0)}€` });
+        return { colonne, yDe, n };
     }
 
-    function deplacerCurseur(date) {
-        const minuteJour = work.estJourOuvre(date)
-            ? Math.min(APRES_MIDI.fin, Math.max(MATIN.debut, date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60))
-            : MATIN.debut;
-        UI.moveCursor(minuteX(minuteJour), euroY((work.secondesTravaillees(date) / 60) * TAUX_MINUTE));
+    let geometrie = null;
+    function deplacerCurseur(now, gains) {
+        if (!geometrie || geometrie.mois !== now.getMonth()) return;
+        const { colonne, yDe } = geometrie;
+        const x = CHART.x0 + (now.getDate() - 1) * colonne + Schedule.dayFraction(now) * colonne;
+        UI.moveCursor(x, yDe(gains.month));
     }
 
+    /* ---------- animation de gain ---------- */
     function animerGain(montant, estSimulation) {
         UI.playGain(montant, estSimulation);
         audio.play('gain');
     }
 
     /* ---------- crédit de minutes ---------- */
+    function gainParMinute(now) {
+        return Schedule.dailyRate(now.getFullYear(), now.getMonth()) / MAX_MINUTES_JOUR;
+    }
+
     function crediterReel(nbMinutes) {
         const avant = creditedMinutes;
         creditedMinutes = Math.min(MAX_MINUTES_JOUR, creditedMinutes + nbMinutes);
         if (creditedMinutes === avant) return;
         persister();
-        animerGain((creditedMinutes - avant) * TAUX_MINUTE, false);
-        rafraichirMontants(new Date());
+        const now = new Date();
+        animerGain((creditedMinutes - avant) * gainParMinute(now), false);
+        rafraichirMontants(now);
     }
 
     function crediterSimule(nbMinutes) {
@@ -165,8 +148,9 @@
         if (ajout <= 0) return;
         bonusSimuleMinutes += ajout;
         persister();
-        animerGain(ajout * TAUX_MINUTE, true);
-        rafraichirMontants(new Date());
+        const now = new Date();
+        animerGain(ajout * gainParMinute(now), true);
+        rafraichirMontants(now);
     }
 
     /* ---------- boucle temps réel ---------- */
@@ -178,12 +162,14 @@
             bonusSimuleMinutes = 0;
             arreterDemo();
             persister();
+            geometrie = { ...construireCourbe(now), mois: now.getMonth() };
+            initialiserTextes(now);
             rafraichirMontants(now);
         }
 
         hud.update(now, work.getWorkStatus(now, creditedMinutes, bonusSimuleMinutes, modeDemo));
 
-        const termine = Math.min(MAX_MINUTES_JOUR, Math.floor(work.secondesTravaillees(now) / 60));
+        const termine = Schedule.workedMinutesToday(now);
         if (premierPassage) {
             creditedMinutes = termine;
             premierPassage = false;
@@ -191,13 +177,14 @@
             rafraichirMontants(now);
         } else if (termine > creditedMinutes) {
             crediterReel(termine - creditedMinutes);
+        } else if (termine === creditedMinutes) {
+            rafraichirMontants(now); // met à jour l'état « pause » aux changements d'heure
         }
-        deplacerCurseur(now);
+        deplacerCurseur(now, Schedule.earnings(now, totalMinutes()));
     }
 
     /* ---------- démo continue ---------- */
     const btnDemo = $('btnDemoToggle');
-
     const afficherDemo = () => UI.setDemo(modeDemo);
 
     function demarrerDemo() {
@@ -224,7 +211,6 @@
             crediterSimule(1);
         }
         persister();
-        rafraichirMontants(new Date());
         tick(new Date());
     });
 
@@ -256,15 +242,26 @@
     }
 
     /* ---------- init ---------- */
-    UI.setStaticTexts({
-        gainMinute: `+${TAUX_MINUTE.toFixed(4)} € / min`,
-        tauxHoraire: `${TAUX_HORAIRE_NET.toFixed(2)} € / heure`,
-        objectifJour: `${GAIN_JOUR_MAX.toFixed(2)} € net`,
-        gainSeconde: `≈ ${TAUX_SECONDE.toFixed(5)}`,
-        svgTargetLabel: `OBJECTIF ${GAIN_JOUR_MAX.toFixed(2)}€`
-    });
+    function initialiserTextes(now) {
+        const daily = Schedule.dailyRate(now.getFullYear(), now.getMonth());
+        const [debut, fin] = Schedule.CONFIG.WORK_HOURS[0];
+        UI.setStaticTexts({
+            gainMinute: `+${(daily / MAX_MINUTES_JOUR).toFixed(4)} € / min`,
+            tauxJournalier: `${eur(daily)} € / jour`,
+            salaireMensuel: `${eur(CONFIG.MONTHLY_NET, 0)} € net`,
+            gainHeure: `≈ ${eur((daily / MAX_MINUTES_JOUR) * 60)}`,
+            btnSimSub: `AJOUTE +${(daily / MAX_MINUTES_JOUR).toFixed(4)} € IMMÉDIATEMENT`,
+            cellMensuel: `${eur(CONFIG.MONTHLY_NET, 0)} € / MOIS`,
+            cellTaux: `${eur(daily)} € / JOUR PAYÉ`,
+            cellHoraires: `${debut.replace(':', 'H')} → ${fin.replace(':', 'H')}`,
+            cellSalaireMois: `Total du mois : ${eur(CONFIG.MONTHLY_NET, 0)} € (sauf premier mois, proratisé)`,
+            svgTargetLabel: `MENSUEL ${eur(CONFIG.MONTHLY_NET, 0)}€`
+        });
+    }
 
-    construireCourbe();
+    const maintenant = new Date();
+    initialiserTextes(maintenant);
+    geometrie = { ...construireCourbe(maintenant), mois: maintenant.getMonth() };
     afficherDemo();
     if (modeDemo) demarrerDemo();
     window.addEventListener('pagehide', () => clearInterval(demoTimer));
