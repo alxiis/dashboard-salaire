@@ -10,6 +10,7 @@
  *   - le compteur ne monte qu'un jour payé, pendant les heures de bureau, à la minute entière
  *   - week-end (ou jour non payé) : le cumul est figé → « acquisition en pause »
  *   - les minutes « simulées » (bouton +1 min, démo) s'ajoutent au réel dans la limite d'une journée
+ *     et ne sont PAS persistées : un rechargement remet le compteur à sa valeur réelle
  */
 (function () {
     'use strict';
@@ -25,8 +26,8 @@
     /* ---------- état ---------- */
     const sauvegarde = store.charger(); // déjà remis à zéro si la date a changé
     let creditedMinutes = sauvegarde.creditedMinutes;
-    let bonusSimuleMinutes = sauvegarde.bonusSimuleMinutes;
-    let modeDemo = sauvegarde.modeDemo;
+    let bonusSimuleMinutes = 0; // simulation : en mémoire seulement, jamais persistée
+    let modeDemo = false;
     let jourCourant = store.jourCle();
     let premierPassage = true;
     let demoTimer = null;
@@ -36,11 +37,9 @@
     function persister() {
         store.sauvegarder({
             creditedMinutes,
-            bonusSimuleMinutes,
             dateJour: jourCourant,
-            audioActif: audio.isOn(),
-            modeDemo
-        });
+            audioActif: audio.isOn()
+        }); // bonusSimuleMinutes et modeDemo restent à leur valeur vide (voir etatVide)
     }
 
     /* ---------- valeurs à afficher ---------- */
