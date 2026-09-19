@@ -1,0 +1,48 @@
+<!-- Silhouette originale (placeholder). Remplacer ce fichier, ou changer le src de .mm-figure, pour intégrer une illustration finale. -->
+<svg viewBox="0 0 500 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="coatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#141414" />
+                                <stop offset="60%" stop-color="#050505" />
+                                <stop offset="100%" stop-color="#E50914" />
+                            </linearGradient>
+                            <linearGradient id="redFlare" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#990000" />
+                                <stop offset="50%" stop-color="#E50914" />
+                                <stop offset="100%" stop-color="#F5D547" />
+                            </linearGradient>
+                            <pattern id="coatDots" width="12" height="12" patternUnits="userSpaceOnUse">
+                                <circle cx="2" cy="2" r="1.5" fill="rgba(229,9,20,0.3)" />
+                            </pattern>
+                        </defs>
+                        
+                        <!-- Halo & Étoile d'Arrière-Plan -->
+                        <polygon points="250,60 280,180 400,180 305,250 340,370 250,295 160,370 195,250 100,180 220,180" fill="rgba(229,9,20,0.22)" transform="scale(1.2) translate(-40, 40)" />
+                        <circle cx="270" cy="280" r="190" fill="url(#coatDots)" />
+
+                        <!-- Manteau Long Volant (Pans arrière rouge vif découpés) -->
+                        <path d="M120 420 L40 680 L180 620 L160 480 Z" fill="url(#redFlare)" stroke="#000" stroke-width="4" />
+                        <path d="M360 440 L480 670 L340 590 L320 460 Z" fill="url(#redFlare)" stroke="#000" stroke-width="4" />
+
+                        <!-- Silhouette Corps Principal (Trenchcoat Noir Élégant) -->
+                        <path d="M220 180 L290 185 L350 310 L390 530 L320 690 L240 690 L180 540 L160 310 Z" fill="url(#coatGrad)" stroke="#FFFFFF" stroke-width="3" />
+                        
+                        <!-- Revers & Col Haut Stylisé -->
+                        <path d="M190 195 L250 290 L200 380 L160 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
+                        <path d="M310 195 L250 290 L300 380 L340 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
+                        <polygon points="250,210 262,280 250,330 238,280" fill="#E50914" stroke="#FFF" stroke-width="2" />
+                        <polygon points="250,195 268,225 250,240 232,225" fill="#FFFFFF" stroke="#000" stroke-width="2" />
+
+                        <!-- Tête, Masque Angulaire & Regard Flamboyant -->
+                        <path d="M210 145 L250 85 L290 145 L270 195 L230 195 Z" fill="#050505" stroke="#FFF" stroke-width="3" />
+                        <path d="M190 130 L160 170 L210 160 L180 200 L230 180 L250 70 L285 100 L320 130 L290 165 L330 185 L280 185" fill="#000000" stroke="#E50914" stroke-width="3" />
+                        <path d="M215 135 Q250 160 285 135 Q270 175 250 180 Q230 175 215 135 Z" fill="#FFFFFF" stroke="#000" stroke-width="3" />
+                        <polygon points="228,146 242,152 232,156" fill="#F5D547" />
+                        <polygon points="272,146 258,152 268,156" fill="#F5D547" />
+
+                        <!-- Gants Blancs & Étoile Tenue -->
+                        <path d="M150 280 L90 410 L130 430 L180 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
+                        <path d="M350 280 L410 400 L370 425 L320 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
+                        <ellipse cx="85" cy="425" rx="20" ry="16" fill="#FFF" stroke="#000" stroke-width="3" transform="rotate(-15 85 425)" />
+                        <polygon points="85,385 92,405 112,405 96,418 102,438 85,425 68,438 74,418 58,405 78,405" fill="#F5D547" stroke="#000" stroke-width="2" />
+                    </svg>

@@ -1,450 +1,522 @@
 /**
  * ==========================================================================
- * SALARY PULSE // SHARED JAVASCRIPT (PERSONA 5 ROYAL JRPG × FINTECH)
- * Moteur audio Web Audio API, horloge Date HUD, persistance et transitions
+ * SALARY PULSE // NOYAU PARTAGÉ  (window.SP)
+ *
+ *   SP.CONFIG   contrat & constantes du moteur salarial
+ *   SP.store    persistance LocalStorage défensive
+ *   SP.audio    SFX Web Audio (aucun fichier externe, activé après un geste)
+ *   SP.work     statut de travail + calculs de temps
+ *   SP.hud      sticker date/heure + badge de statut
+ *   SP.nav      transition « module access » + retour ESC
+ *   SP.onTick   horloge unique (1 Hz, alignée sur la seconde)
+ *
+ * Les pages déclarent <body data-sp-page="menu|dashboard|calendar|gta"> et
+ * un <header data-sp-header> ; le shell (fond, header, transition) est monté ici.
  * ==========================================================================
  */
+(function () {
+    'use strict';
 
-// 1. CONFIGURATION & DONNÉES DU CONTRAT
-const TAUX_HORAIRE_NET = 7.89;
-const TAUX_SECONDE = TAUX_HORAIRE_NET / 3600;
-const TAUX_MINUTE = TAUX_HORAIRE_NET / 60; // ≈ 0.1315 €
-const GAIN_JOUR_MAX = 7 * TAUX_HORAIRE_NET; // 55.23 €
-const MAX_MINUTES_JOUR = 420; // 7h * 60 = 420 minutes
-const DATE_DEBUT_CONTRAT = new Date(2026, 8, 14, 8, 30, 0); // 14 septembre 2026 à 08h30
+    /* ---------------------------------------------------------------------
+       1. CONFIGURATION DU CONTRAT
+       --------------------------------------------------------------------- */
+    const TAUX_HORAIRE_NET = 7.89;
+    const CONFIG = Object.freeze({
+        TAUX_HORAIRE_NET,
+        TAUX_SECONDE: TAUX_HORAIRE_NET / 3600,
+        TAUX_MINUTE: TAUX_HORAIRE_NET / 60, // ≈ 0.1315 €
+        MAX_MINUTES_JOUR: 420, // 7 h
+        GAIN_JOUR_MAX: 7 * TAUX_HORAIRE_NET, // 55.23 €
+        DATE_DEBUT_CONTRAT: new Date(2026, 8, 14, 8, 30, 0),
+        // minutes depuis minuit
+        PLAGES: Object.freeze([
+            Object.freeze({ debut: 8 * 60 + 30, fin: 12 * 60 + 30 }),
+            Object.freeze({ debut: 13 * 60 + 30, fin: 16 * 60 + 30 })
+        ])
+    });
 
-// Plages quotidiennes (08h30-12h30 = 240 min ; 13h30-16h30 = 180 min => 7h = 420 min)
-const PLAGES = [
-    { debut: 8 * 60 + 30, fin: 12 * 60 + 30, dureeSec: 4 * 3600, maxGain: 31.56 }, // Session Matin (4h)
-    { debut: 13 * 60 + 30, fin: 16 * 60 + 30, dureeSec: 3 * 3600, maxGain: 23.67 }  // Session Après-midi (3h)
-];
+    const MODULES = Object.freeze([
+        { id: 'dashboard', url: '../dashboard-salary/', title: 'DASHBOARD', sub: 'SALARY', kicker: 'MODULE ACCESS // 01' },
+        { id: 'calendar', url: '../calendar/', title: 'CALENDRIER', sub: '', kicker: 'MODULE ACCESS // 02' },
+        { id: 'gta', url: '../gta-countdown/', title: 'GTA 6', sub: 'COUNTDOWN', kicker: 'MODULE ACCESS // 03' }
+    ]);
+    const MENU_URL = '../main-menu/';
 
-// 2. PERSISTANCE D'ÉTAT GLOBALE (LOCALSTORAGE)
-const STORAGE_KEY = 'salary_pulse_state_v2';
+    const prefersReducedMotion = () =>
+        Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-function chargerEtatPartage() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-            const data = JSON.parse(raw);
-            return {
-                creditedMinutes: Number(data.creditedMinutes) || 0,
-                bonusSimuleMinutes: Number(data.bonusSimuleMinutes) || 0,
-                dateJour: data.dateJour || null,
-                audioActif: Boolean(data.audioActif),
-                modeDemo: Boolean(data.modeDemo)
-            };
-        }
-    } catch (e) {
-        console.warn('Erreur lecture localStorage:', e);
+    /* ---------------------------------------------------------------------
+       2. PERSISTANCE (LocalStorage défensif)
+       Une seule clé ; toute lecture est validée, toute écriture protégée.
+       --------------------------------------------------------------------- */
+    const STORAGE_KEY = 'salary_pulse_state_v2';
+
+    const jourCle = (date = new Date()) => date.toDateString();
+
+    function entierBorne(valeur, max) {
+        const n = Math.floor(Number(valeur));
+        return Number.isFinite(n) ? Math.min(max, Math.max(0, n)) : 0;
     }
-    return {
+
+    const etatVide = () => ({
         creditedMinutes: 0,
         bonusSimuleMinutes: 0,
         dateJour: null,
         audioActif: false,
         modeDemo: false
-    };
-}
+    });
 
-function sauvegarderEtatPartage(etat) {
-    try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(etat));
-    } catch (e) {
-        console.warn('Erreur sauvegarde localStorage:', e);
+    function lireBrut() {
+        try {
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+            if (data && typeof data === 'object' && !Array.isArray(data)) return data;
+        } catch (e) { /* JSON corrompu ou storage indisponible : état vide */ }
+        return null;
     }
-}
 
-// 3. SYNTHÉTISEUR AUDIO WEB AUDIO API (EFFETS JRPG HAUTE FIDÉLITÉ)
-let audioActif = false;
-let audioCtx = null;
+    /** État persistant validé. Les minutes d'un autre jour sont remises à zéro. */
+    function charger() {
+        const data = lireBrut();
+        if (!data) return etatVide();
+        const dateJour = typeof data.dateJour === 'string' ? data.dateJour : null;
+        const memeJour = dateJour === jourCle();
+        return {
+            creditedMinutes: memeJour ? entierBorne(data.creditedMinutes, CONFIG.MAX_MINUTES_JOUR) : 0,
+            bonusSimuleMinutes: memeJour ? entierBorne(data.bonusSimuleMinutes, CONFIG.MAX_MINUTES_JOUR) : 0,
+            dateJour: memeJour ? dateJour : null,
+            audioActif: data.audioActif === true,
+            modeDemo: memeJour && data.modeDemo === true
+        };
+    }
 
-// Restauration de la préférence audio
-const etatInitialAudio = chargerEtatPartage();
-audioActif = etatInitialAudio.audioActif;
+    function sauvegarder(etat) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...etatVide(), ...etat }));
+        } catch (e) { /* quota / navigation privée : on continue sans persistance */ }
+    }
 
-function initialiserAudioContext() {
-    if (!audioCtx) {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (AudioContextClass) {
-            audioCtx = new AudioContextClass();
+    /** Met à jour quelques champs sans écraser les autres. */
+    function patch(champs) {
+        sauvegarder({ ...charger(), ...champs });
+    }
+
+    /* ---------------------------------------------------------------------
+       3. AUDIO (Web Audio, synthèse pure)
+       Le contexte n'est créé qu'après un geste utilisateur (autoplay policy).
+       --------------------------------------------------------------------- */
+    const audio = (() => {
+        let ctx = null;
+        let actif = charger().audioActif;
+        const abonnes = new Set();
+
+        function debloquer() {
+            try {
+                if (!ctx) {
+                    const Ctor = window.AudioContext || window.webkitAudioContext;
+                    if (!Ctor) return;
+                    ctx = new Ctor();
+                }
+                if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+            } catch (e) { ctx = null; }
+        }
+
+        // Débloque au premier geste, quel que soit le module
+        ['pointerdown', 'keydown', 'touchstart'].forEach((type) =>
+            window.addEventListener(type, debloquer, { once: true, passive: true, capture: true }));
+
+        /** voix : { type, f0, f1?, at? } ; enveloppe commune */
+        function jouer(voix, vol, dur) {
+            if (!actif || !ctx || ctx.state !== 'running') return;
+            try {
+                const t = ctx.currentTime;
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(vol, t);
+                gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+                gain.connect(ctx.destination);
+                voix.forEach(({ type, f0, f1, at = 0 }) => {
+                    const osc = ctx.createOscillator();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(f0, t + at);
+                    if (f1) osc.frequency.exponentialRampToValueAtTime(f1, t + at + Math.min(dur, 0.15));
+                    osc.connect(gain);
+                    osc.start(t + at);
+                    osc.stop(t + dur);
+                });
+            } catch (e) { /* SFX best-effort */ }
+        }
+
+        const sons = {
+            hover: () => jouer([{ type: 'sine', f0: 850, f1: 1300 }], 0.025, 0.04),
+            menu: () => jouer([{ type: 'sawtooth', f0: 650, f1: 1800 }], 0.04, 0.07),
+            confirm: () => jouer([
+                { type: 'triangle', f0: 523.25 }, { type: 'triangle', f0: 659.25, at: 0.06 },
+                { type: 'triangle', f0: 1046.5, at: 0.12 }, { type: 'sawtooth', f0: 261.63 }
+            ], 0.045, 0.28),
+            back: () => jouer([{ type: 'sawtooth', f0: 920, f1: 360 }], 0.035, 0.14),
+            gain: () => jouer([{ type: 'sine', f0: 880, f1: 1760 }, { type: 'triangle', f0: 1318.5 }], 0.09, 0.55)
+        };
+
+        const notifier = () => abonnes.forEach((fn) => fn(actif));
+
+        return {
+            play: (nom) => { if (sons[nom]) sons[nom](); },
+            isOn: () => actif,
+            toggle() {
+                actif = !actif;
+                patch({ audioActif: actif });
+                if (actif) { debloquer(); sons.gain(); }
+                notifier();
+            },
+            /** appelle fn(actif) immédiatement puis à chaque changement */
+            subscribe(fn) { abonnes.add(fn); fn(actif); }
+        };
+    })();
+
+    /* ---------------------------------------------------------------------
+       4. STATUT DE TRAVAIL & TEMPS
+       --------------------------------------------------------------------- */
+    const estJourOuvre = (date) => date.getDay() >= 1 && date.getDay() <= 5;
+
+    const STATUTS = {
+        working: (desc) => ({ label: 'WORKING', desc, badgeClass: 'status-working', contextText: 'WORKING', contextClass: 'context-working', enPoste: true }),
+        offduty: (desc) => ({ label: 'OFF DUTY', desc, badgeClass: 'status-offduty', contextText: 'OFF DUTY', contextClass: 'context-offduty', enPoste: false }),
+        break: () => ({ label: 'LUNCH BREAK', desc: 'PAUSE DÉJEUNER // REPRISE À 13H30', badgeClass: 'status-break', contextText: 'LUNCH BREAK', contextClass: 'context-break', enPoste: false }),
+        complete: (label, desc) => ({ label, desc, badgeClass: 'status-complete', contextText: 'AFTER WORK', contextClass: 'context-afterwork', enPoste: false })
+    };
+
+    function getWorkStatus(date, creditedMinutes = 0, bonusSimule = 0, demoActive = false) {
+        const [matin, apresMidi] = CONFIG.PLAGES;
+        if (demoActive) return { ...STATUTS.working('DÉMO ACTIVE // FLUX EN CONTINU'), contextText: 'DEMO MODE' };
+        if (!estJourOuvre(date)) return STATUTS.offduty('WEEK-END // SYSTÈME EN VEILLE');
+        if (creditedMinutes + bonusSimule >= CONFIG.MAX_MINUTES_JOUR) {
+            return STATUTS.complete('DAY COMPLETE', 'MISSION ACCOMPLIE // 7H EFFECTUÉES');
+        }
+        const minutes = date.getHours() * 60 + date.getMinutes();
+        if (minutes < matin.debut) return STATUTS.offduty('HORS HORAIRES // DÉBUT À 08H30');
+        if (minutes < matin.fin) return STATUTS.working('SESSION MATIN // POSTE ACTIF');
+        if (minutes < apresMidi.debut) return STATUTS.break();
+        if (minutes < apresMidi.fin) return STATUTS.working('SESSION APRÈS-MIDI // POSTE ACTIF');
+        return STATUTS.complete('AFTER WORK', 'JOURNÉE TERMINÉE // 16H30 DÉPASSÉ');
+    }
+
+    /** Statut à partir de l'état persistant (menu, calendrier, GTA). */
+    function statutCourant(date = new Date()) {
+        const e = charger();
+        return getWorkStatus(date, e.creditedMinutes, e.bonusSimuleMinutes, e.modeDemo);
+    }
+
+    /** Secondes travaillées un jour donné (0 hors jours ouvrés / avant le contrat). */
+    function secondesTravaillees(date) {
+        if (!estJourOuvre(date) || date < new Date(CONFIG.DATE_DEBUT_CONTRAT.getFullYear(), CONFIG.DATE_DEBUT_CONTRAT.getMonth(), CONFIG.DATE_DEBUT_CONTRAT.getDate())) return 0;
+        const minutesNow = date.getHours() * 60 + date.getMinutes() + date.getSeconds() / 60;
+        let total = 0;
+        for (const plage of CONFIG.PLAGES) {
+            if (minutesNow > plage.debut) total += (Math.min(minutesNow, plage.fin) - plage.debut) * 60;
+        }
+        return Math.min(CONFIG.MAX_MINUTES_JOUR * 60, total);
+    }
+
+    /* ---------------------------------------------------------------------
+       5. HORLOGE UNIQUE (1 Hz, alignée sur la seconde)
+       --------------------------------------------------------------------- */
+    const tickers = new Set();
+    let tickTimer = null;
+
+    function tick() {
+        const now = new Date();
+        tickers.forEach((fn) => fn(now));
+        tickTimer = setTimeout(tick, 1000 - now.getMilliseconds() + 5);
+    }
+
+    function onTick(fn) {
+        tickers.add(fn);
+        fn(new Date());
+        if (!tickTimer) tickTimer = setTimeout(tick, 1000);
+    }
+
+    // Les onglets en arrière-plan sont bridés : on rattrape immédiatement au retour
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && tickers.size) {
+            clearTimeout(tickTimer);
+            tick();
+        }
+    });
+
+    /* ---------------------------------------------------------------------
+       6. HUD (sticker date + statut)
+       --------------------------------------------------------------------- */
+    const JOURS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+    const MOIS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+    const pad2 = (n) => String(n).padStart(2, '0');
+
+    const hudRefs = {};
+    function hudRef(id) {
+        if (!(id in hudRefs) || (hudRefs[id] && !hudRefs[id].isConnected)) hudRefs[id] = document.getElementById(id);
+        return hudRefs[id];
+    }
+    function setText(id, valeur) {
+        const el = hudRef(id);
+        if (el && el.textContent !== String(valeur)) el.textContent = valeur;
+    }
+
+    function updateHUD(date, statut) {
+        setText('hudDayVal', pad2(date.getDate()));
+        setText('hudMonthNum', pad2(date.getMonth() + 1));
+        setText('hudMonthName', MOIS[date.getMonth()]);
+        setText('hudWeekdayText', JOURS[date.getDay()]);
+        setText('hudLiveClock', `${pad2(date.getHours())}:${pad2(date.getMinutes())}:${pad2(date.getSeconds())}`);
+        setText('hudYearVal', date.getFullYear());
+
+        const pill = hudRef('hudContextPill');
+        if (pill) {
+            const cls = `sticker-context-pill ${statut.contextClass}`;
+            if (pill.className !== cls) pill.className = cls;
+            setText('hudContextText', statut.contextText);
+        }
+        const badge = hudRef('statutBadge');
+        if (badge) {
+            const cls = `sp-status-badge ${statut.badgeClass}`;
+            if (badge.className !== cls) badge.className = cls;
+            setText('statutTexte', statut.label);
+            setText('statutDescription', statut.desc);
         }
     }
-    if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume();
+
+    /** HUD autonome pour les pages sans moteur (menu, calendrier, GTA). */
+    function startHUD() {
+        onTick((now) => updateHUD(now, statutCourant(now)));
     }
-}
 
-function jouerSonMenu() {
-    if (!audioActif) return;
-    try {
-        initialiserAudioContext();
-        const t = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+    /* ---------------------------------------------------------------------
+       7. NAVIGATION & TRANSITION « MODULE ACCESS »
+       --------------------------------------------------------------------- */
+    const WIPE_FLAG = 'sp_wipe_reveal';
+    let navigationEnCours = false;
+    let wipeEl = null;
 
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(650, t);
-        osc.frequency.exponentialRampToValueAtTime(1800, t + 0.05);
+    const PULSE_PATH = 'M0 30 H120 L140 30 L158 4 L182 56 L200 30 H220 L232 18 L244 30 H400';
 
-        gain.gain.setValueAtTime(0.04, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.07);
+    function buildWipe() {
+        const el = document.createElement('div');
+        el.className = 'sp-transition-wipe';
+        el.setAttribute('aria-hidden', 'true');
+        el.innerHTML = `
+            <div class="wipe-band band-yellow"></div>
+            <div class="wipe-band band-white"></div>
+            <div class="wipe-band band-black"></div>
+            <div class="wipe-band band-red">
+                <div class="wipe-content">
+                    <span class="wipe-kicker" id="wipeKicker">SALARY PULSE // ACCESS</span>
+                    <span class="wipe-text" id="wipeText">SYSTEM</span>
+                    <svg class="wipe-pulse" viewBox="0 0 400 60" preserveAspectRatio="xMidYMid meet"><path pathLength="400" d="${PULSE_PATH}"/></svg>
+                </div>
+            </div>
+        </div>`;
+        document.body.appendChild(el);
+        return el;
+    }
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+    function setWipeText(kicker, titre) {
+        const k = document.getElementById('wipeKicker');
+        const t = document.getElementById('wipeText');
+        if (k) k.textContent = kicker;
+        if (t) t.textContent = titre;
+    }
 
-        osc.start(t);
-        osc.stop(t + 0.07);
-    } catch (e) {}
-}
+    /**
+     * Ferme l'écran avec la transition puis navigue.
+     * Sur la page suivante, le shell rejoue la sortie (voir mountShell).
+     */
+    function go(url, { sfx = 'confirm', kicker = 'SALARY PULSE // ACCESS', title = 'SYSTEM' } = {}) {
+        if (navigationEnCours) return;
+        navigationEnCours = true;
+        audio.play(sfx);
 
-function jouerSonSurvol() {
-    if (!audioActif) return;
-    try {
-        initialiserAudioContext();
-        const t = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        if (prefersReducedMotion() || !wipeEl) {
+            window.location.href = url;
+            return;
+        }
+        setWipeText(kicker, title);
+        try { sessionStorage.setItem(WIPE_FLAG, JSON.stringify({ kicker, title })); } catch (e) { /* facultatif */ }
+        wipeEl.classList.remove('is-revealing');
+        wipeEl.classList.add('is-covering');
+        setTimeout(() => { window.location.href = url; }, 340);
+    }
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(850, t);
-        osc.frequency.exponentialRampToValueAtTime(1300, t + 0.035);
+    function goMenu() {
+        go(MENU_URL, { sfx: 'back', kicker: 'SALARY PULSE // RETOUR', title: 'MENU PRINCIPAL' });
+    }
 
-        gain.gain.setValueAtTime(0.025, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
+    function goModule(index) {
+        const m = MODULES[index];
+        if (!m) return;
+        go(m.url, { sfx: 'confirm', kicker: m.kicker, title: `${m.title}${m.sub ? ' ' + m.sub : ''}` });
+    }
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+    /** Rejoue la sortie de transition si la page précédente en a lancé une. */
+    function playReveal() {
+        let payload = null;
+        try {
+            payload = sessionStorage.getItem(WIPE_FLAG);
+            sessionStorage.removeItem(WIPE_FLAG);
+        } catch (e) { /* facultatif */ }
+        if (!payload || !wipeEl || prefersReducedMotion()) return;
+        try {
+            const { kicker, title } = JSON.parse(payload);
+            setWipeText(String(kicker), String(title));
+        } catch (e) { return; }
+        wipeEl.classList.add('is-revealing');
+        setTimeout(() => wipeEl.classList.remove('is-revealing'), 560);
+    }
 
-        osc.start(t);
-        osc.stop(t + 0.04);
-    } catch (e) {}
-}
+    // Retour arrière navigateur (bfcache) : on nettoie l'état de transition
+    window.addEventListener('pageshow', (e) => {
+        if (!e.persisted) return;
+        navigationEnCours = false;
+        if (wipeEl) wipeEl.classList.remove('is-covering', 'is-revealing');
+    });
 
-function jouerSonConfirmation() {
-    if (!audioActif) return;
-    try {
-        initialiserAudioContext();
-        const t = audioCtx.currentTime;
-        const osc1 = audioCtx.createOscillator();
-        const osc2 = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+    /* ---------------------------------------------------------------------
+       8. SHELL (fond, header, bouton audio, touche ESC)
+       --------------------------------------------------------------------- */
+    function stickerMarkup() {
+        return `
+        <div class="sp-date-hud-sticker" role="group" aria-label="Date et heure">
+            <div class="hud-sticker-daybox">
+                <span class="sticker-pin" aria-hidden="true">★</span>
+                <div class="sticker-num-row">
+                    <span class="sticker-big-day" id="hudDayVal">--</span>
+                    <div class="sticker-month-col">
+                        <span class="sticker-month-tag" id="hudMonthNum">--</span>
+                        <div class="sticker-month-name" id="hudMonthName">------</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hud-sticker-slash-group">
+                <div class="sticker-weekday-banner"><span class="weekday-text" id="hudWeekdayText">-------</span></div>
+                <div class="sticker-context-pill context-afterwork" id="hudContextPill">
+                    <span class="context-dot" aria-hidden="true">◆</span>
+                    <span class="context-text" id="hudContextText">AFTER WORK</span>
+                </div>
+                <div class="sticker-time-tag">
+                    <span class="time-clock-icon" aria-hidden="true">◷</span>
+                    <span class="time-clock-val" id="hudLiveClock">--:--:--</span>
+                    <span class="time-year-val" id="hudYearVal">----</span>
+                </div>
+            </div>
+        </div>`;
+    }
 
-        osc1.type = 'triangle';
-        osc1.frequency.setValueAtTime(523.25, t); // C5
-        osc1.frequency.setValueAtTime(659.25, t + 0.06); // E5
-        osc1.frequency.setValueAtTime(1046.50, t + 0.12); // C6
+    const audioButtonMarkup = () => `
+        <button type="button" class="sp-btn-audio-header" id="btnHeaderAudio" aria-pressed="false" aria-label="Effets sonores">
+            <span id="headerAudioIcon" aria-hidden="true">♪</span>
+            <span id="headerAudioLabel">SFX OFF</span>
+        </button>`;
 
-        osc2.type = 'sawtooth';
-        osc2.frequency.setValueAtTime(261.63, t); // C4
-        osc2.frequency.setValueAtTime(523.25, t + 0.12); // C5
+    const statusMarkup = () => `
+        <div class="hud-status-wrapper">
+            <div id="statutBadge" class="sp-status-badge status-offduty">
+                <span class="sp-status-radar" aria-hidden="true">◆</span>
+                <div class="sp-status-text-block">
+                    <span class="status-prefix">STATUS //</span>
+                    <span id="statutTexte" class="status-main">--</span>
+                </div>
+            </div>
+            <div class="hud-status-caption" id="statutDescription"></div>
+        </div>`;
 
-        gain.gain.setValueAtTime(0.045, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+    function moduleHeaderMarkup() {
+        return `
+        ${stickerMarkup()}
+        <div class="sp-header-right-group">
+            <a href="${MENU_URL}" id="btnBackToMenu" class="sp-btn-back" aria-keyshortcuts="Escape">
+                <span class="back-arrow" aria-hidden="true">◀</span>
+                <span class="back-text">MENU PRINCIPAL</span>
+                <kbd class="back-kbd">ESC</kbd>
+            </a>
+            <div class="sp-brand-block" aria-hidden="true">
+                <div class="sp-logo-icon"><span class="sp-star">★</span></div>
+                <div class="sp-brand-text">
+                    <div class="sp-brand-title"><span class="title-main">SALARY</span><span class="title-sub">PULSE</span></div>
+                    <div class="sp-tag-ribbon"><span class="sp-pill-black">SYSTEM // V3</span><span class="sp-pill-red">PULSE OS</span></div>
+                </div>
+            </div>
+            ${statusMarkup()}
+            ${audioButtonMarkup()}
+        </div>`;
+    }
 
-        osc1.connect(gain);
-        osc2.connect(gain);
-        gain.connect(audioCtx.destination);
+    function mountShell() {
+        const page = document.body.dataset.spPage || '';
 
-        osc1.start(t);
-        osc2.start(t);
-        osc1.stop(t + 0.28);
-        osc2.stop(t + 0.28);
-    } catch (e) {}
-}
+        // Fond partagé (le menu apporte le sien)
+        if (document.body.dataset.spBg !== 'custom') {
+            const bg = document.createElement('div');
+            bg.className = 'sp-bg-overlay';
+            bg.setAttribute('aria-hidden', 'true');
+            bg.innerHTML = '<div class="sp-stripe-band"></div><div class="sp-halftone"></div><div class="sp-action-slash slash-1"></div><div class="sp-action-slash slash-2"></div>';
+            document.body.prepend(bg);
+        }
 
-function jouerSonRetour() {
-    if (!audioActif) return;
-    try {
-        initialiserAudioContext();
-        const t = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+        // Lien d'évitement
+        const main = document.querySelector('main');
+        if (main) {
+            if (!main.id) main.id = 'spMain';
+            main.tabIndex = -1;
+            const skip = document.createElement('a');
+            skip.className = 'sp-skip';
+            skip.href = `#${main.id}`;
+            skip.textContent = 'Aller au contenu';
+            document.body.prepend(skip);
+        }
 
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(920, t);
-        osc.frequency.exponentialRampToValueAtTime(360, t + 0.12);
+        // Header : le menu fournit le sien, les modules utilisent le gabarit commun
+        const header = document.querySelector('[data-sp-header]');
+        if (header && header.dataset.spHeader === 'module') header.innerHTML = moduleHeaderMarkup();
+        if (header && header.dataset.spHeader === 'menu') {
+            header.innerHTML = `${stickerMarkup()}<div class="mm-hud-right">${statusMarkup()}${audioButtonMarkup()}</div>`;
+        }
 
-        gain.gain.setValueAtTime(0.035, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+        wipeEl = buildWipe();
+        playReveal();
 
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
+        // Pages sans moteur propre (calendrier, GTA 6) : HUD piloté par l'état persistant
+        if (document.body.dataset.spHud === 'auto') startHUD();
 
-        osc.start(t);
-        osc.stop(t + 0.14);
-    } catch (e) {}
-}
+        // Bouton SFX (présent dans tous les headers)
+        const btn = document.getElementById('btnHeaderAudio');
+        if (btn) {
+            btn.addEventListener('click', () => audio.toggle());
+            audio.subscribe((on) => {
+                btn.setAttribute('aria-pressed', String(on));
+                setText('headerAudioLabel', on ? 'SFX ON' : 'SFX OFF');
+                setText('headerAudioIcon', on ? '♪' : '✕');
+                document.querySelectorAll('[data-sp-audio-state]').forEach((el) => { el.textContent = on ? 'ACTIVÉ // STÉRÉO' : 'DÉSACTIVÉ'; });
+            });
+        }
 
-function emettreSonGain() {
-    if (!audioActif) return;
-    try {
-        initialiserAudioContext();
-        const t = audioCtx.currentTime;
-
-        const osc1 = audioCtx.createOscillator();
-        const osc2 = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(880, t); // A5
-        osc1.frequency.exponentialRampToValueAtTime(1760, t + 0.15); // A6
-
-        osc2.type = 'triangle';
-        osc2.frequency.setValueAtTime(1318.5, t); // E6
-
-        gain.gain.setValueAtTime(0.09, t);
-        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
-
-        osc1.connect(gain);
-        osc2.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc1.start(t);
-        osc2.start(t);
-        osc1.stop(t + 0.55);
-        osc2.stop(t + 0.55);
-    } catch (e) {}
-}
-
-function synchroniserHeaderAudio() {
-    const btnHeaderAudio = document.getElementById('btnHeaderAudio');
-    const headerAudioIcon = document.getElementById('headerAudioIcon');
-    const headerAudioLabel = document.getElementById('headerAudioLabel');
-
-    if (btnHeaderAudio && headerAudioIcon && headerAudioLabel) {
-        if (audioActif) {
-            btnHeaderAudio.classList.add('active');
-            headerAudioIcon.innerText = '🔊';
-            headerAudioLabel.innerText = 'SFX ON';
-        } else {
-            btnHeaderAudio.classList.remove('active');
-            headerAudioIcon.innerText = '🔈';
-            headerAudioLabel.innerText = 'SFX OFF';
+        // Retour au menu (lien + touche ESC) depuis tout module
+        if (page && page !== 'menu') {
+            const back = document.getElementById('btnBackToMenu');
+            [back, ...document.querySelectorAll('[data-sp-back]')].filter(Boolean).forEach((el) =>
+                el.addEventListener('click', (e) => { e.preventDefault(); goMenu(); }));
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !e.defaultPrevented && !e.repeat) { e.preventDefault(); goMenu(); }
+            });
         }
     }
-}
 
-function basculerAudioGlobale() {
-    audioActif = !audioActif;
-    if (audioActif) {
-        initialiserAudioContext();
-        emettreSonGain();
-    }
-    const etat = chargerEtatPartage();
-    etat.audioActif = audioActif;
-    sauvegarderEtatPartage(etat);
-    synchroniserHeaderAudio();
-}
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountShell);
+    else mountShell();
 
-// 4. LOGIQUE DE STATUT DE TRAVAIL & ÉVALUATION DES DATES
-function estJourOuvre(date) {
-    const jour = date.getDay();
-    return jour >= 1 && jour <= 5;
-}
-
-function getWorkStatus(date, creditedMinutes = 0, bonusSimule = 0, demoActive = false) {
-    if (demoActive) {
-        return {
-            status: 'WORKING',
-            label: 'WORKING',
-            desc: 'DÉMO ACTIVE // FLUX EN CONTINU',
-            badgeClass: 'status-working',
-            bodyClass: 'state-working',
-            enPoste: true,
-            contextText: 'DEMO MODE',
-            contextClass: 'context-working'
-        };
-    }
-
-    if (!estJourOuvre(date)) {
-        return {
-            status: 'OFF DUTY',
-            label: 'OFF DUTY',
-            desc: 'WEEK-END // SYSTÈME EN VEILLE',
-            badgeClass: 'status-offduty',
-            bodyClass: 'state-offduty',
-            enPoste: false,
-            contextText: 'OFF DUTY',
-            contextClass: 'context-offduty'
-        };
-    }
-
-    if ((creditedMinutes + bonusSimule) >= MAX_MINUTES_JOUR) {
-        return {
-            status: 'DAY COMPLETE',
-            label: 'DAY COMPLETE',
-            desc: 'MISSION ACCOMPLIE // 7H EFFECTUÉES',
-            badgeClass: 'status-complete',
-            bodyClass: 'state-complete',
-            enPoste: false,
-            contextText: 'AFTER WORK',
-            contextClass: 'context-afterwork'
-        };
-    }
-
-    const minutes = date.getHours() * 60 + date.getMinutes();
-
-    if (minutes < PLAGES[0].debut) {
-        return {
-            status: 'OFF DUTY',
-            label: 'OFF DUTY',
-            desc: 'HORS HORAIRES // DÉBUT À 08H30',
-            badgeClass: 'status-offduty',
-            bodyClass: 'state-offduty',
-            enPoste: false,
-            contextText: 'OFF DUTY',
-            contextClass: 'context-offduty'
-        };
-    }
-
-    if (minutes >= PLAGES[0].debut && minutes < PLAGES[0].fin) {
-        return {
-            status: 'WORKING',
-            label: 'WORKING',
-            desc: 'SESSION MATIN // POSTE ACTIF',
-            badgeClass: 'status-working',
-            bodyClass: 'state-working',
-            enPoste: true,
-            contextText: 'WORKING',
-            contextClass: 'context-working'
-        };
-    }
-
-    if (minutes >= PLAGES[0].fin && minutes < PLAGES[1].debut) {
-        return {
-            status: 'BREAK',
-            label: 'LUNCH BREAK',
-            desc: 'PAUSE DÉJEUNER // REPRISE À 13H30',
-            badgeClass: 'status-break',
-            bodyClass: 'state-break',
-            enPoste: false,
-            contextText: 'LUNCH BREAK',
-            contextClass: 'context-break'
-        };
-    }
-
-    if (minutes >= PLAGES[1].debut && minutes < PLAGES[1].fin) {
-        return {
-            status: 'WORKING',
-            label: 'WORKING',
-            desc: 'SESSION APRÈS-MIDI // POSTE ACTIF',
-            badgeClass: 'status-working',
-            bodyClass: 'state-working',
-            enPoste: true,
-            contextText: 'WORKING',
-            contextClass: 'context-working'
-        };
-    }
-
-    return {
-        status: 'DAY COMPLETE',
-        label: 'AFTER WORK',
-        desc: 'JOURNÉE TERMINÉE // 16H30 DÉPASSÉ',
-        badgeClass: 'status-complete',
-        bodyClass: 'state-complete',
-        enPoste: false,
-        contextText: 'AFTER WORK',
-        contextClass: 'context-afterwork'
+    window.SP = {
+        CONFIG, MODULES, MENU_URL,
+        store: { charger, sauvegarder, patch, jourCle },
+        audio,
+        work: { getWorkStatus, statutCourant, secondesTravaillees, estJourOuvre },
+        hud: { update: updateHUD, start: startHUD, setText },
+        nav: { go, goMenu, goModule },
+        onTick,
+        prefersReducedMotion
     };
-}
-
-// 5. RAFRAÎCHISSEMENT DU STICKER DATE HUD (COLLAGE P5R)
-const JOURS_SEMAINE = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-const MOIS_NOMS = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
-
-function mettreAJourDateHUD(date, statusInfo) {
-    const jourIndex = date.getDay();
-    const jourNom = JOURS_SEMAINE[jourIndex];
-    const moisIndex = date.getMonth();
-    const moisNum = String(moisIndex + 1).padStart(2, '0');
-    const moisNom = MOIS_NOMS[moisIndex];
-    const jourNum = String(date.getDate()).padStart(2, '0');
-    const annee = date.getFullYear();
-
-    const hh = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    const ss = String(date.getSeconds()).padStart(2, '0');
-
-    // Éléments du sticker
-    const hudDayVal = document.getElementById('hudDayVal');
-    const hudMonthNum = document.getElementById('hudMonthNum');
-    const hudMonthName = document.getElementById('hudMonthName');
-    const hudWeekdayText = document.getElementById('hudWeekdayText');
-    const hudContextPill = document.getElementById('hudContextPill');
-    const hudContextText = document.getElementById('hudContextText');
-    const hudLiveClock = document.getElementById('hudLiveClock');
-    const hudYearVal = document.getElementById('hudYearVal');
-
-    if (hudDayVal) hudDayVal.innerText = jourNum;
-    if (hudMonthNum) hudMonthNum.innerText = moisNum;
-    if (hudMonthName) hudMonthName.innerText = moisNom;
-    if (hudWeekdayText) hudWeekdayText.innerText = jourNom;
-
-    if (hudContextPill && hudContextText) {
-        hudContextPill.className = `sticker-context-pill ${statusInfo.contextClass}`;
-        hudContextText.innerText = statusInfo.contextText;
-    }
-
-    if (hudLiveClock) hudLiveClock.innerText = `${hh}:${mm}:${ss}`;
-    if (hudYearVal) hudYearVal.innerText = annee;
-
-    // Statut header
-    const badge = document.getElementById('statutBadge');
-    const texteStatut = document.getElementById('statutTexte');
-    const descStatut = document.getElementById('statutDescription');
-
-    if (badge && texteStatut && descStatut) {
-        badge.className = `p5-status-badge ${statusInfo.badgeClass}`;
-        texteStatut.innerText = statusInfo.label;
-        descStatut.innerText = statusInfo.desc;
-    }
-}
-
-// 6. RIDEAU DE TRANSITION UNIVERSEL (WIPE SLASH CINÉMATIQUE)
-let transitionEnCours = false;
-
-function declencherWipe(cibleUrl, typeSfx = 'confirm', wipeText = 'TAKE YOUR TIME', wipeSub = 'SYSTEM SHIFTING...') {
-    if (transitionEnCours) return;
-    transitionEnCours = true;
-
-    if (typeSfx === 'return') {
-        jouerSonRetour();
-    } else {
-        jouerSonConfirmation();
-    }
-
-    const wipeEl = document.getElementById('p5TransitionWipe');
-    const wipeTextEl = document.getElementById('wipeText');
-    const wipeSubEl = document.getElementById('wipeSub');
-
-    if (wipeTextEl) wipeTextEl.innerText = wipeText;
-    if (wipeSubEl) wipeSubEl.innerText = wipeSub;
-
-    if (wipeEl) wipeEl.classList.add('is-wiping');
-
-    // Navigation au zénith de la transition (~240ms)
-    setTimeout(() => {
-        window.location.href = cibleUrl;
-    }, 240);
-}
-
-// 7. INITIALISATION DU BOUTON AUDIO HEADER PAR DÉFAUT
-document.addEventListener('DOMContentLoaded', () => {
-    synchroniserHeaderAudio();
-    const btnHeaderAudio = document.getElementById('btnHeaderAudio');
-    if (btnHeaderAudio) {
-        btnHeaderAudio.addEventListener('click', () => {
-            basculerAudioGlobale();
-        });
-    }
-
-    // Gestion du boot screen rapide
-    const bootScreen = document.getElementById('p5BootScreen');
-    if (bootScreen) {
-        setTimeout(() => {
-            bootScreen.classList.add('boot-done');
-        }, 420);
-    }
-});
-
+})();

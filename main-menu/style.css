@@ -1,627 +1,551 @@
 /* ==========================================================================
-   MAIN MENU // FULL-SCREEN JRPG COMMAND SCREEN (PERSONA 5 ROYAL)
-   Direction artistique : Scène de jeu vidéo, silhouette manga, commandes asymétriques
+   MAIN MENU // écran de sélection
+   Mobile-first : composition empilée par défaut, composition plein écran
+   asymétrique dès que l'écran est large ET paysage (voir §6).
+   1. Fond   2. Stage & HUD   3. Marque   4. Commandes   5. États & lancement
+   6. Composition large   7. Accessibilité
    ========================================================================== */
 
-/* 1. Header Transparent en Mode Menu Principal */
-.p5-header {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    transform: none !important;
-    margin-bottom: 0 !important;
+.mm {
+    --u: min(1vw, 1.6vh); /* unité de composition : tout le desktop en dépend */
+    --sel: 0;
+    background: var(--sp-black);
 }
 
-.p5-header::before {
-    display: none !important;
+/* 1. FOND ================================================================== */
+.mm-bg {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-bg);
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--sp-black);
+}
+.mm-layer { position: absolute; inset: 0; }
+
+/* Couche 2 : grand pan rouge (réagit à la sélection) */
+.mm-red {
+    background: linear-gradient(118deg, #9c0710 0%, var(--sp-red) 45%, #ff2f3a 100%);
+    clip-path: polygon(46% 0, 100% 0, 100% 100%, 8% 100%);
+    transform: translate3d(calc(var(--sel) * -1.6vw), 0, 0);
+    transition: transform var(--sp-t-slow) var(--sp-ease-out);
 }
 
-.p5-header .p5-brand-block {
-    display: none !important;
+/* Couche 3 : halftone noir fondu dans le rouge + spot jaune bas-gauche */
+.mm-halftone {
+    background:
+        radial-gradient(circle, rgba(0, 0, 0, 0.55) 2.4px, transparent 3px) 0 0 / 15px 15px,
+        radial-gradient(circle, rgba(245, 213, 71, 0.35) 2px, transparent 2.6px) 0 0 / 17px 17px;
+    -webkit-mask-image: linear-gradient(to left, #000 8%, transparent 62%), linear-gradient(to top right, #000 0%, transparent 34%);
+    mask-image: linear-gradient(to left, #000 8%, transparent 62%), linear-gradient(to top right, #000 0%, transparent 34%);
 }
 
-.p5-header #btnBackToMenu {
-    display: none !important;
+/* Couche 4 : diagonales (trame fine + barres blanche et jaune) */
+.mm-diag {
+    background: repeating-linear-gradient(115deg, transparent 0 46px, rgba(255, 255, 255, 0.05) 46px 48px);
+}
+.mm-diag::before,
+.mm-diag::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    bottom: -10%;
+    transform: skewX(-24deg);
+    transition: transform var(--sp-t-slow) var(--sp-ease-out);
+}
+.mm-diag::before { left: 44%; width: 1.4vw; background: var(--sp-white); transform: skewX(-24deg) translateX(calc(var(--sel) * -1vw)); }
+.mm-diag::after { left: 47%; width: 0.4vw; background: var(--sp-yellow); transform: skewX(-24deg) translateX(calc(var(--sel) * -1.4vw)); }
+
+/* Couche 5 : lignes de mouvement rayonnantes */
+.mm-burst {
+    inset: -40%;
+    background: repeating-conic-gradient(from 0deg at 68% 52%, rgba(255, 255, 255, 0.09) 0 2.4deg, transparent 2.4deg 8deg);
+    -webkit-mask-image: radial-gradient(circle at 68% 52%, transparent 8%, #000 45%, transparent 78%);
+    mask-image: radial-gradient(circle at 68% 52%, transparent 8%, #000 45%, transparent 78%);
+    transform: rotate(calc(var(--sel) * 6deg));
+    transition: transform var(--sp-t-slow) var(--sp-ease-out);
 }
 
-/* 2. Scène Plein Écran du Jeu */
-.p5-game-stage {
+/* Couche 6 : formes géométriques */
+.mm-geo { width: 100%; height: 100%; }
+.mm-euro {
+    font-family: var(--font-display);
+    fill: rgba(245, 213, 71, 0.14);
+    stroke: rgba(245, 213, 71, 0.5);
+    stroke-width: 3;
+}
+
+/* Couche 7 : éléments secondaires — mot fantôme + électrocardiogramme */
+.mm-ghost {
+    inset: auto auto 0 4vw;
+    font-family: var(--font-display);
+    font-size: 46vh;
+    line-height: 0.8;
+    letter-spacing: 0.02em;
+    color: transparent;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.07);
+    transform: rotate(-90deg);
+    transform-origin: left bottom;
+    white-space: nowrap;
+}
+.mm-ecg { top: auto; height: 12vh; bottom: 2vh; width: 100%; }
+.mm-ecg path {
+    fill: none;
+    stroke: var(--sp-red);
+    stroke-width: 4;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: mmEcg 7s linear 0.6s infinite;
+    filter: drop-shadow(0 0 4px var(--sp-red-glow));
+}
+@keyframes mmEcg {
+    0% { stroke-dashoffset: 1000; opacity: 1; }
+    55% { stroke-dashoffset: 0; opacity: 1; }
+    80% { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 1000; opacity: 0; }
+}
+
+.mm-vignette { background: radial-gradient(ellipse at 40% 45%, transparent 45%, rgba(0, 0, 0, 0.7) 100%); }
+
+/* 2. STAGE & HUD =========================================================== */
+.mm-stage {
     position: relative;
-    width: 100%;
-    min-height: calc(100vh - 120px);
+    z-index: var(--z-app);
+    min-height: 100vh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-    padding: 10px 0 16px;
+    padding: max(12px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+    isolation: isolate;
+    overflow-x: clip; /* figure et stickers peuvent déborder du cadre sans créer de scroll */
 }
 
-/* Calques Graphiques d'Arrière-Plan (Halftones, Diagonales, Action Lines) */
-.p5-stage-bg-layers {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-}
-
-.bg-halftone-circle {
-    position: absolute;
-    border-radius: 50%;
-    background-image: radial-gradient(circle, rgba(229, 9, 20, 0.4) 2.2px, transparent 2.2px);
-    background-size: 18px 18px;
-}
-
-.bg-halftone-circle.circle-1 {
-    width: 580px;
-    height: 580px;
-    right: 6%;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.35;
-    animation: p5RotateSlow 45s linear infinite;
-}
-
-.bg-halftone-circle.circle-2 {
-    width: 320px;
-    height: 320px;
-    left: 4%;
-    bottom: 8%;
-    opacity: 0.22;
-}
-
-@keyframes p5RotateSlow {
-    from { transform: translateY(-50%) rotate(0deg); }
-    to { transform: translateY(-50%) rotate(360deg); }
-}
-
-.bg-slash-geometry {
-    position: absolute;
-    transform: skewX(-20deg) rotate(-10deg);
-}
-
-.bg-slash-geometry.slash-red {
-    top: -20%;
-    right: 12%;
-    width: 380px;
-    height: 140%;
-    background: linear-gradient(135deg, rgba(229, 9, 20, 0.22) 0%, rgba(143, 0, 8, 0.04) 100%);
-    border-left: 4px solid rgba(229, 9, 20, 0.4);
-}
-
-.bg-slash-geometry.slash-dark {
-    bottom: -15%;
-    left: 20%;
-    width: 260px;
-    height: 90%;
-    background: rgba(0, 0, 0, 0.45);
-    border-right: 3px solid rgba(245, 213, 71, 0.25);
-}
-
-.bg-action-burst {
-    position: absolute;
-    right: -10%;
-    top: -10%;
-    width: 700px;
-    height: 700px;
-    background: radial-gradient(circle, rgba(245, 213, 71, 0.08) 0%, transparent 65%);
-}
-
-.bg-caution-diagonal-strip {
-    position: absolute;
-    bottom: 60px;
-    right: -5%;
-    width: 480px;
-    height: 12px;
-    background: repeating-linear-gradient(
-        -45deg,
-        var(--p5-yellow),
-        var(--p5-yellow) 14px,
-        #000000 14px,
-        #000000 28px
-    );
-    transform: rotate(-12deg);
-    opacity: 0.6;
-}
-
-/* 3. Visuel Central Original (Silhouette Voleur Fantôme Manga) */
-.p5-menu-figure-stage {
-    position: absolute;
-    right: 6%;
-    top: 52%;
-    transform: translateY(-50%);
-    width: 480px;
-    height: 640px;
-    z-index: 1;
-    pointer-events: none;
+.mm-hud {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
-}
-
-.figure-graphic-wrap {
-    width: 100%;
-    height: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--sp-s3);
     position: relative;
-    filter: drop-shadow(8px 8px 0px rgba(0, 0, 0, 0.85)) drop-shadow(0 0 24px rgba(229, 9, 20, 0.35));
-    animation: p5FigureFloat 4s infinite ease-in-out;
+    z-index: 20;
+}
+.mm-hud .sp-date-hud-sticker { --hud-fs: 12px; }
+.mm-hud-right { display: flex; flex-direction: column; align-items: flex-end; gap: var(--sp-s2); }
+.mm-hud .hud-status-wrapper { display: none; } /* remonte en composition large */
+.mm-hud .sp-btn-audio-header { background: rgba(0, 0, 0, 0.8); }
+
+.mm-figure {
+    position: absolute;
+    z-index: -1;
+    right: -14vw;
+    bottom: 0;
+    height: 62%;
+    width: auto;
+    opacity: 0.4;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(8px 8px 0 rgba(0, 0, 0, 0.6));
 }
 
-@keyframes p5FigureFloat {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-8px) rotate(0.8deg); }
-}
+.mm-help { display: none; }
 
-.p5-character-svg {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    overflow: visible;
-}
-
-/* 4. Logo Titre Monumental Flottant */
-.p5-stage-title-block {
+/* 3. MARQUE ================================================================ */
+.mm-brand {
+    order: 3;
+    margin-top: auto;
+    padding-top: var(--sp-s5);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    transform: rotate(-3deg);
+    transform-origin: left bottom;
     position: relative;
     z-index: 4;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding-top: 6px;
-    width: fit-content;
 }
-
-.stage-tag-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: #000;
-    color: var(--p5-yellow);
-    border: 1.5px solid var(--p5-yellow);
-    box-shadow: 4px 4px 0px var(--p5-red);
-    padding: 4px 14px;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
+.mm-brand-kicker {
+    font-family: var(--font-body);
     font-weight: 800;
-    letter-spacing: 0.12em;
-    transform: skewX(-12deg);
-    width: fit-content;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--sp-yellow);
+    background: #000;
+    padding: 3px 10px;
+    transform: skewX(var(--sp-skew));
 }
-
-.badge-star {
-    color: var(--p5-yellow);
-    font-size: 1rem;
-    animation: p5StarSpin 2s infinite ease-in-out;
+.mm-brand-title { display: flex; flex-direction: column; align-items: flex-start; font-family: var(--font-display); line-height: 0.82; }
+.mm-b1 {
+    font-size: clamp(2.6rem, 13vw, 4.4rem);
+    color: var(--sp-white);
+    -webkit-text-stroke: 2px #000;
+    paint-order: stroke fill;
+    text-shadow: 4px 4px 0 var(--sp-red), 7px 7px 0 #000;
+    letter-spacing: 0.03em;
 }
-
-.stage-brand-title {
-    position: relative;
-    line-height: 0.85;
-    margin: 4px 0;
-}
-
-.title-layer-back {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    font-family: var(--font-display);
-    font-size: clamp(3.2rem, 7vw, 5.8rem);
-    letter-spacing: 0.04em;
+.mm-b2 {
+    font-size: clamp(3.4rem, 17vw, 5.6rem);
     color: #000;
-    -webkit-text-stroke: 4px var(--p5-red);
-    transform: skewX(-14deg);
-    user-select: none;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.title-layer-front {
-    position: relative;
-    font-family: var(--font-display);
-    font-size: clamp(3.2rem, 7vw, 5.8rem);
+    background: var(--sp-yellow);
+    padding: 0.02em 0.22em 0.04em 0.12em;
+    margin-top: -0.02em;
+    box-shadow: 5px 5px 0 #000;
+    transform: skewX(var(--sp-skew));
     letter-spacing: 0.04em;
-    color: var(--p5-white);
-    transform: skewX(-14deg);
-    display: inline-block;
-    z-index: 2;
-    text-shadow: 4px 4px 0px #000;
 }
 
-.stage-sub-ribbon {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: #0a0a0a;
-    border-left: 5px solid var(--p5-red);
-    border-top: 1px solid #333;
-    border-bottom: 1px solid #333;
-    padding: 4px 14px;
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--p5-offwhite);
-    letter-spacing: 0.08em;
-    transform: skewX(-10deg);
-}
-
-.ribbon-dot {
-    color: var(--p5-yellow);
-    animation: p5RadarPulse 1s infinite alternate;
-}
-
-/* 5. Menu de Commandes Asymétrique JRPG (Monumental Typography) */
-.p5-game-commands {
+/* 4. COMMANDES ============================================================= */
+.mm-nav {
+    order: 2;
     position: relative;
     z-index: 5;
     display: flex;
     flex-direction: column;
-    gap: 32px;
-    width: fit-content;
-    max-width: 680px;
-    margin: 28px 0 28px 24px;
+    gap: clamp(20px, 4.5vh, 36px);
+    margin: clamp(28px, 6vh, 56px) 0 0;
 }
 
-/* Pointeur de Sélection Dynamique Flottant */
-.p5-command-pointer {
-    position: absolute;
-    left: -65px;
-    top: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: var(--p5-yellow);
-    color: #000;
-    border: 2px solid #000;
-    box-shadow: 4px 4px 0px var(--p5-red);
-    padding: 6px 14px;
-    transform: skewX(-14deg) scale(1);
-    z-index: 20;
-    pointer-events: none;
-    transition: top 0.24s cubic-bezier(0.16, 1, 0.3, 1),
-                left 0.24s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.24s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.pointer-star {
-    font-size: 1.2rem;
-    color: #000;
-    animation: p5StarSpin 1s infinite linear;
-}
-
-.pointer-slash {
-    font-size: 1.1rem;
-    font-weight: 900;
-}
-
-.pointer-tag {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    letter-spacing: 0.08em;
-    font-weight: 900;
-}
-
-/* Éléments de Commande Individuels */
-.p5-cmd-item {
+.mm-cmd {
+    --f: clamp(3.2rem, 19vw, 7.5rem); /* corps de texte de la commande */
+    --slab: #000;
+    --slab-sel: var(--sp-red);
+    --ink: var(--sp-white);
+    --ink-sel: var(--sp-white);
+    --shade: #000;
+    --shade-sel: #000;
+    --clip: polygon(0 8%, 97% 0, 100% 90%, 3% 100%);
     position: relative;
-    cursor: pointer;
+    isolation: isolate;
+    display: block;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0.16em 0.5em 0.24em 0.34em;
+    font-size: var(--f);
+    color: var(--ink);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
     outline: none;
-    user-select: none;
-    transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-                filter 0.26s ease,
-                opacity 0.26s ease;
+    transform: translate(calc(var(--rel, 0) * 0.2em), 0) rotate(var(--r, 0deg));
+    transition: transform 260ms var(--sp-ease-snap), opacity 200ms ease-out;
+    will-change: transform;
 }
+.mm-cmd:nth-of-type(1) { z-index: 3; }
+.mm-cmd:nth-of-type(2) { z-index: 2; }
+.mm-cmd:nth-of-type(3) { z-index: 1; }
 
-.cmd-inner {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    position: relative;
+/* Dalle : contour blanc (::before) + remplissage (::after), ombre dure portée */
+.mm-slab {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    filter: drop-shadow(0.06em 0.07em 0 #000);
 }
+.mm-slab::before,
+.mm-slab::after { content: ''; position: absolute; clip-path: var(--clip); }
+.mm-slab::before { inset: -0.045em; background: var(--sp-white); }
+.mm-slab::after { inset: 0; background: var(--slab); transition: background-color 200ms ease-out; }
 
-.cmd-text-stack {
-    display: flex;
-    align-items: baseline;
-    flex-wrap: wrap;
-    gap: 12px;
-    line-height: 0.88;
-}
-
-.cmd-text-huge {
+.mm-num {
+    position: absolute;
+    top: -0.28em;
+    left: -0.08em;
+    padding: 0.05em 0.28em;
+    background: var(--sp-yellow);
+    color: #000;
     font-family: var(--font-display);
-    letter-spacing: 0.04em;
-    line-height: 0.9;
-    display: inline-block;
-    transition: color 0.2s ease, text-shadow 0.2s ease, background 0.2s ease;
+    font-size: 0.26em;
+    line-height: 1;
+    letter-spacing: 0.06em;
+    border: 0.09em solid #000;
+    transform: rotate(-6deg);
 }
 
-/* Commande 01 : DASHBOARD SALARY */
-.cmd-dashboard {
-    transform: rotate(-3.5deg) skewX(-10deg);
+.mm-label { display: block; font-family: var(--font-display); text-transform: uppercase; line-height: 0.86; }
+.mm-l1, .mm-l2 {
+    display: block;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    -webkit-text-stroke: 0.035em #000;
+    paint-order: stroke fill;
+    text-shadow: 0.05em 0.05em 0 var(--shade);
+    transition: color 200ms ease-out;
 }
+.mm-l2 { font-size: 1.28em; margin-left: 0.32em; }
 
-.text-dashboard {
-    font-size: clamp(3rem, 6vw, 4.6rem);
-    color: var(--p5-white);
-    -webkit-text-stroke: 3px #000;
-    text-shadow: 4px 4px 0px #000;
-    transform: skewX(-10deg);
-}
-
-.text-salary {
-    font-size: clamp(3.2rem, 6.5vw, 5rem);
-    color: var(--p5-yellow);
-    background: #000;
-    padding: 3px 16px;
-    border: 3px solid var(--p5-white);
-    transform: skewX(-10deg);
-    box-shadow: 6px 6px 0px var(--p5-red);
-}
-
-/* Commande 02 : CALENDRIER */
-.cmd-calendar {
-    transform: rotate(2deg) skewX(-8deg);
-    margin-left: 36px;
-}
-
-.text-calendar {
-    font-size: clamp(2.8rem, 5.5vw, 4.2rem);
-    color: #000;
-    background: var(--p5-white);
-    padding: 3px 18px;
-    border: 3px solid #000;
-    transform: skewX(-8deg);
-    box-shadow: 6px 6px 0px #00e5ff;
-}
-
-/* Commande 03 : GTA 6 COUNTDOWN */
-.cmd-gta {
-    transform: rotate(-2.5deg) skewX(-10deg);
-    margin-left: 18px;
-}
-
-.text-gta {
-    font-size: clamp(2.8rem, 5.5vw, 4.2rem);
-    color: #00e5ff;
-    background: #050505;
-    padding: 3px 14px;
-    border: 2px solid #00e5ff;
-    transform: skewX(-10deg);
-    box-shadow: 4px 4px 0px #ff2a85;
-}
-
-.text-countdown {
-    font-size: clamp(2.4rem, 5vw, 3.8rem);
-    color: var(--p5-white);
-    background: #ff2a85;
-    padding: 3px 16px;
-    transform: skewX(-10deg);
-    box-shadow: 6px 6px 0px #000;
-    border: 2px solid var(--p5-white);
-}
-
-/* Puces d'Information Flottantes */
-.cmd-meta-chips {
+.mm-meta {
     display: flex;
-    align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 2px;
+    gap: 0.2em 0.35em;
+    margin-top: 0.14em;
+    font-size: 0.17em;
 }
-
-.cmd-chip {
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
-    font-weight: 800;
-    padding: 3px 10px;
-    transform: skewX(-8deg);
-    box-shadow: 2px 2px 0px #000;
-}
-
-.chip-status {
-    background: var(--p5-red);
-    color: #fff;
-}
-
-.chip-rate {
-    background: #000;
-    color: var(--p5-white);
-    border: 1px solid #444;
-}
-
-.chip-cadence {
-    background: var(--p5-yellow);
-    color: #000;
-}
-
-.chip-schedule {
-    background: #00e5ff;
-    color: #000;
-}
-
-.chip-prep {
-    background: #222;
-    color: var(--p5-yellow);
-    border: 1px solid var(--p5-yellow);
-}
-
-.chip-vice {
-    background: #ff2a85;
-    color: #fff;
-}
-
-.chip-clock {
-    background: #110916;
-    color: #00e5ff;
-    border: 1px solid #ff2a85;
-}
-
-/* ==========================================================================
-   6. COMPORTEMENT DE SÉLECTION DU JEU (CALIBRATION PRÉCISE)
-   ========================================================================== */
-
-/* Commande Sélectionnée */
-.p5-cmd-item.is-selected {
-    z-index: 15 !important;
-}
-
-.cmd-dashboard.is-selected {
-    transform: translate(-16px, -6px) rotate(-1.5deg) scale(1.10);
-    filter: drop-shadow(8px 8px 0px var(--p5-yellow)) drop-shadow(14px 14px 0px #000);
-}
-
-.cmd-calendar.is-selected {
-    transform: translate(-14px, -5px) rotate(3.2deg) scale(1.10);
-    filter: drop-shadow(8px 8px 0px var(--p5-yellow)) drop-shadow(14px 14px 0px #000);
-}
-
-.cmd-gta.is-selected {
-    transform: translate(-14px, -5px) rotate(-1deg) scale(1.10);
-    filter: drop-shadow(8px 8px 0px #ff2a85) drop-shadow(14px 14px 0px #000);
-}
-
-.p5-cmd-item.is-selected .text-salary {
-    background: var(--p5-yellow);
-    color: #000;
-    box-shadow: 6px 6px 0px var(--p5-red), 12px 12px 0px #000;
-}
-
-.p5-cmd-item.is-selected .text-calendar {
-    background: var(--p5-white);
-    color: #000;
-    border-color: #000;
-    box-shadow: 6px 6px 0px #00e5ff, 12px 12px 0px #000;
-}
-
-.p5-cmd-item.is-selected .text-gta {
-    background: #00e5ff;
-    color: #000;
-    box-shadow: 6px 6px 0px #ff2a85, 12px 12px 0px #000;
-}
-
-/* Commandes Non Sélectionnées (Recul Subtil sans Perte de Lisibilité) */
-.p5-cmd-item.is-dimmed {
-    opacity: 0.82;
-    filter: grayscale(20%);
-}
-
-.cmd-dashboard.is-dimmed {
-    transform: rotate(-3.5deg) skewX(-10deg) scale(0.96);
-}
-
-.cmd-calendar.is-dimmed {
-    transform: rotate(2deg) skewX(-8deg) scale(0.96);
-}
-
-.cmd-gta.is-dimmed {
-    transform: rotate(-2.5deg) skewX(-10deg) scale(0.96);
-}
-
-/* Animation d'Impact au Lancement du Module (Launch Sequence P5R) */
-.p5-cmd-item.is-launching {
-    animation: p5CommandLaunch 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-    z-index: 100 !important;
-}
-
-@keyframes p5CommandLaunch {
-    0% {
-        transform: scale(1.10) translate(-14px, -5px);
-        filter: brightness(1.2);
-    }
-    45% {
-        transform: scale(2.2) translate(-32px, -14px);
-        filter: brightness(2.5) contrast(1.6);
-        opacity: 0.9;
-    }
-    100% {
-        transform: scale(3.6) translate(-70px, -30px);
-        opacity: 0;
-        filter: brightness(3);
-    }
-}
-
-/* 7. Barre HUD d'Aide en Bas de l'Écran */
-.p5-stage-hud-help {
-    position: relative;
-    z-index: 4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 14px;
-    background: #090909;
-    border: 2px solid var(--p5-white);
-    box-shadow: 4px 4px 0px #000;
-    padding: 10px 18px;
-    width: fit-content;
-    margin: 8px auto 0;
-}
-
-.help-chip {
+.mm-chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    letter-spacing: 0.06em;
-    color: var(--p5-offwhite);
-}
-
-.chip-key {
-    background: var(--p5-red);
-    color: var(--p5-white);
-    font-family: var(--font-mono);
-    font-size: 0.74rem;
+    gap: 0.5em;
+    padding: 0.28em 0.8em;
+    background: var(--sp-yellow);
+    color: #000;
+    border: 0.14em solid #000;
+    font-family: var(--font-body);
     font-weight: 800;
-    padding: 2px 7px;
-    transform: skewX(-10deg);
-    box-shadow: 2px 2px 0px #000;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    transform: skewX(var(--sp-skew));
+    white-space: nowrap;
+}
+.mm-chip-alt { background: #000; color: var(--sp-yellow); border-color: var(--sp-yellow); }
+.mm-chip-live { background: #000; color: var(--sp-white); border-color: var(--sp-white); }
+.mm-dot { width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--sp-gray); }
+.mm-chip-live.is-live .mm-dot { background: var(--sp-red); box-shadow: 0 0 0 0.2em rgba(229, 9, 20, 0.35); animation: mmLive 1.2s ease-in-out infinite alternate; }
+@keyframes mmLive { to { transform: scale(1.35); } }
+
+/* — Dashboard : monument rouge, sticker de taux en étoile — */
+.mm-dashboard {
+    --f: clamp(3.4rem, 17vw, 7.2rem);
+    --slab-sel: var(--sp-red);
+    --shade-sel: #000;
+}
+.mm-rate-sticker {
+    position: absolute;
+    top: -1.05em;
+    right: -0.5em;
+    width: 1.4em;
+    height: 1.4em;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    color: #000;
+    background: var(--sp-yellow);
+    font-family: var(--font-display);
+    line-height: 0.85;
+    clip-path: polygon(50.0% 0.0%,58.5% 13.0%,71.7% 5.0%,73.7% 20.3%,89.1% 18.8%,84.2% 33.5%,98.7% 38.9%,88.0% 50.0%,98.7% 61.1%,84.2% 66.5%,89.1% 81.2%,73.7% 79.7%,71.7% 95.0%,58.5% 87.0%,50.0% 100.0%,41.5% 87.0%,28.3% 95.0%,26.3% 79.7%,10.9% 81.2%,15.8% 66.5%,1.3% 61.1%,12.0% 50.0%,1.3% 38.9%,15.8% 33.5%,10.9% 18.8%,26.3% 20.3%,28.3% 5.0%,41.5% 13.0%);
+    transform: rotate(14deg);
+    transition: transform 260ms var(--sp-ease-snap);
+    z-index: 2;
+}
+.mm-rate-sticker b { font-size: 0.42em; font-weight: 400; }
+.mm-rate-sticker i { font-size: 0.24em; font-style: normal; letter-spacing: 0.1em; }
+
+/* — Calendrier : plaque blanche inclinée, ruban « chantier » — */
+.mm-calendar {
+    --f: clamp(2.6rem, 12.5vw, 5.2rem);
+    --slab: var(--sp-white);
+    --slab-sel: var(--sp-yellow);
+    --ink: #050505;
+    --ink-sel: #050505;
+    --shade: var(--sp-red);
+    --shade-sel: var(--sp-red);
+    --clip: polygon(4% 0, 100% 9%, 96% 100%, 0 91%);
+    margin-left: 12vw;
+}
+.mm-calendar .mm-l1 { -webkit-text-stroke: 0; text-shadow: 0.045em 0.045em 0 var(--shade); }
+.mm-tape {
+    position: absolute;
+    left: -0.2em;
+    right: -0.5em;
+    bottom: -0.32em;
+    overflow: hidden;
+    padding: 0.05em 0;
+    background: repeating-linear-gradient(-45deg, var(--sp-yellow) 0 0.5em, #000 0.5em 1em);
+    color: #000;
+    font-family: var(--font-body);
+    font-weight: 800;
+    font-size: 0.13em;
+    letter-spacing: 0.2em;
+    white-space: nowrap;
+    border: 0.18em solid #000;
+    transform: rotate(-3deg);
+    z-index: 2;
+}
+.mm-tape::before { content: ''; position: absolute; inset: 0; background: var(--sp-yellow); z-index: -1; }
+
+/* — GTA 6 : bloc noir, lecture inversée à la sélection — */
+.mm-gta {
+    --f: clamp(2.8rem, 14vw, 5.6rem);
+    --slab-sel: var(--sp-white);
+    --ink-sel: var(--sp-red);
+    --shade-sel: #000;
+    --clip: polygon(0 0, 100% 7%, 94% 100%, 3% 93%);
+    margin-left: 4vw;
+}
+.mm-l2 { margin-left: 0; }
+.mm-gta .mm-l2 { font-size: 0.8em; }
+.mm-dashboard .mm-l2 { margin-left: 0.5em; }
+
+/* Pointeur de sélection : étoile jaune cerclée, glisse vers la commande active */
+.mm-pointer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 30;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(var(--px, 0), var(--py, 0), 0);
+    filter: drop-shadow(3px 3px 0 #000);
+}
+.mm-pointer.is-ready {
+    opacity: 1;
+    transition: transform 260ms var(--sp-ease-snap), opacity 120ms;
+}
+.mm-pointer-star {
+    width: 100%;
+    height: 100%;
+    background: var(--sp-yellow);
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    animation: mmSpin 6s linear infinite;
+}
+.mm-pointer::after {
+    content: '';
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    background: var(--sp-red);
+    border-radius: 50%;
+    border: 3px solid #000;
+}
+@keyframes mmSpin { to { transform: rotate(360deg); } }
+
+/* 5. ÉTATS & LANCEMENT ===================================================== */
+.mm-cmd { opacity: 0.86; }
+
+.mm-cmd.is-selected,
+.mm-cmd:focus-visible {
+    opacity: 1;
+    z-index: 6;
+    color: var(--ink-sel);
+    transform: translate(0.16em, -0.04em) rotate(calc(var(--r, 0deg) + 1.5deg)) scale(1.07);
+}
+.mm-cmd.is-selected .mm-slab::after,
+.mm-cmd:focus-visible .mm-slab::after { background: var(--slab-sel); }
+.mm-cmd.is-selected .mm-l1,
+.mm-cmd.is-selected .mm-l2 { color: var(--ink-sel); text-shadow: 0.06em 0.06em 0 var(--shade-sel); }
+.mm-cmd.is-selected .mm-rate-sticker { transform: rotate(-6deg) scale(1.15); }
+.mm-cmd:focus-visible .mm-slab::before { background: var(--sp-yellow); inset: -0.09em; }
+
+/* Impact puis expansion : la commande choisie frappe, les autres s'évacuent */
+.mm-cmd.is-launching { animation: mmImpact 150ms ease-out forwards; z-index: 40; }
+@keyframes mmImpact {
+    0% { transform: translate(0.16em, -0.04em) rotate(calc(var(--r, 0deg) + 1.5deg)) scale(1.07); }
+    45% { transform: translate(0, 0) rotate(var(--r, 0deg)) scale(0.96); }
+    100% { transform: translate(0.3em, -0.1em) rotate(calc(var(--r, 0deg) + 2deg)) scale(1.14); }
+}
+.is-launching .mm-cmd:not(.is-launching) {
+    opacity: 0;
+    transform: translate(calc(var(--rel, 0) * 3em), 0) rotate(var(--r, 0deg));
+}
+.is-launching .mm-pointer { opacity: 0; }
+
+/* 6. COMPOSITION LARGE : plein écran, asymétrique, superposée =============== */
+@media (min-width: 820px) and (min-aspect-ratio: 5/4) {
+    .mm { height: 100vh; height: 100dvh; overflow: hidden; }
+
+    .mm-stage { display: block; height: 100dvh; min-height: 0; padding: 0; overflow: hidden; }
+
+    .mm-hud { position: absolute; inset: 0 0 auto 0; padding: 2.6vh 2vw 0; z-index: 20; pointer-events: none; }
+    .mm-hud > * { pointer-events: auto; }
+    .mm-hud .sp-date-hud-sticker { --hud-fs: clamp(11px, calc(var(--u) * 1.25), 19px); }
+    .mm-hud .hud-status-wrapper { display: flex; }
+    .mm-rate-sticker { right: -1.05em; }
+
+    .mm-figure {
+        right: 2vw;
+        bottom: 0;
+        height: 90vh;
+        opacity: 1;
+        filter: drop-shadow(10px 10px 0 rgba(0, 0, 0, 0.55));
+        transform: translate3d(calc(var(--sel) * -0.6vw), 0, 0);
+        transition: transform var(--sp-t-slow) var(--sp-ease-out);
+    }
+
+    .mm-brand {
+        position: absolute;
+        left: 3vw;
+        bottom: 4.5vh;
+        margin: 0;
+        padding: 0;
+        gap: 0.8vh;
+    }
+    .mm-brand-kicker { font-size: clamp(0.65rem, calc(var(--u) * 0.9), 1rem); }
+    .mm-b1 { font-size: calc(var(--u) * 5.2); }
+    .mm-b2 { font-size: calc(var(--u) * 6.8); box-shadow: calc(var(--u) * 0.5) calc(var(--u) * 0.5) 0 #000; }
+
+    .mm-nav { position: absolute; inset: 0; display: block; margin: 0; pointer-events: none; }
+    .mm-cmd { position: absolute; pointer-events: auto; margin: 0; }
+
+    .mm-dashboard { --f: calc(var(--u) * 9.2); left: 6vw; top: 22vh; }
+    .mm-calendar { --f: calc(var(--u) * 6); left: 36vw; top: 69vh; margin: 0; }
+    .mm-gta { --f: calc(var(--u) * 7.2); right: 7vw; left: auto; top: 39vh; margin: 0; }
+
+    /* mouvement des autres commandes : elles s'écartent de la sélection */
+    .mm-cmd { transform: translate(calc(var(--rel, 0) * -0.5vw), calc(var(--rel, 0) * 1.2vh)) rotate(var(--r, 0deg)); }
+    .mm-cmd.is-selected,
+    .mm-cmd:focus-visible { transform: translate(1.4vw, -0.6vh) rotate(calc(var(--r, 0deg) + 1.5deg)) scale(1.08); }
+    @keyframes mmImpact {
+        0% { transform: translate(1.4vw, -0.6vh) rotate(calc(var(--r, 0deg) + 1.5deg)) scale(1.08); }
+        45% { transform: translate(0, 0) rotate(var(--r, 0deg)) scale(0.97); }
+        100% { transform: translate(2vw, -1vh) rotate(calc(var(--r, 0deg) + 2deg)) scale(1.16); }
+    }
+    .is-launching .mm-cmd:not(.is-launching) { transform: translate(calc(var(--rel, 0) * -8vw), calc(var(--rel, 0) * 8vh)) rotate(var(--r, 0deg)); }
+
+    .mm-pointer { width: calc(var(--u) * 4.6); height: calc(var(--u) * 4.6); }
+
+    .mm-help {
+        position: absolute;
+        right: 2vw;
+        bottom: 3vh;
+        z-index: 20;
+        display: flex;
+        gap: var(--sp-s4);
+        padding: 6px 14px;
+        background: #000;
+        border: 2px solid var(--sp-white);
+        box-shadow: 4px 4px 0 var(--sp-red);
+        font-family: var(--font-body);
+        font-weight: 800;
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        transform: skewX(var(--sp-skew));
+    }
+    .mm-help kbd {
+        display: inline-block;
+        margin-right: 4px;
+        padding: 0 6px;
+        background: var(--sp-yellow);
+        color: #000;
+        font: inherit;
+    }
 }
 
-/* 8. Responsive Spécifique au Main Menu */
-@media (max-width: 950px) {
-    .p5-menu-figure-stage {
-        width: 360px;
-        height: 500px;
-        opacity: 0.35;
-        right: -20px;
-        z-index: 1;
-    }
-    .p5-game-commands {
-        max-width: 100%;
-        margin-left: 12px;
-        gap: 26px;
-    }
+/* Écrans très larges : le figure ne dépasse pas, la marque respire */
+@media (min-width: 820px) and (min-aspect-ratio: 5/4) and (min-aspect-ratio: 21/9) {
+    .mm-dashboard { left: 10vw; }
+    .mm-figure { right: 10vw; }
 }
 
-@media (max-width: 650px) {
-    .p5-game-stage {
-        padding: 4px 0 10px;
-        min-height: auto;
-    }
-    .p5-menu-figure-stage {
-        width: 240px;
-        height: 340px;
-        opacity: 0.20;
-        right: -40px;
-        top: 40%;
-    }
-    .p5-game-commands {
-        gap: 22px;
-        margin-left: 0;
-        width: 100%;
-    }
-    .cmd-dashboard, .cmd-calendar, .cmd-gta {
-        margin-left: 0 !important;
-    }
-    .p5-command-pointer {
-        display: none;
-    }
-    .p5-stage-hud-help {
-        flex-direction: column;
-        align-items: flex-start;
-        width: 100%;
-        gap: 8px;
-    }
+/* Tablette portrait & mobile : commandes plus généreuses */
+@media (max-width: 819px), (max-aspect-ratio: 5/4) {
+    .mm-cmd { transform: translate(calc(var(--rel, 0) * 0.1em), 0) rotate(var(--r, 0deg)); }
+    .mm-cmd.is-selected,
+    .mm-cmd:focus-visible { transform: translate(0.12em, -0.04em) rotate(calc(var(--r, 0deg) + 1.2deg)) scale(1.05); }
+    .mm-dashboard { --f: clamp(3.4rem, 17vw, 9rem); }
+    .mm-calendar { --f: clamp(2.6rem, 12.5vw, 6.4rem); }
+    .mm-gta { --f: clamp(2.8rem, 14vw, 7rem); }
+}
+@media (max-width: 360px) {
+    .mm-hud .sp-date-hud-sticker { --hud-fs: 10.5px; }
+    .mm-hud .sp-btn-audio-header { padding: 5px 8px; }
+    .mm-meta { font-size: 0.15em; }
+    .mm-calendar { margin-left: 6vw; }
 }
 
+/* 7. ACCESSIBILITÉ ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+    .mm-ecg path { animation: none; stroke-dashoffset: 0; opacity: 0.6; }
+    .mm-pointer-star { animation: none; }
+    .mm-cmd { transition-duration: 0.01ms; }
+}
