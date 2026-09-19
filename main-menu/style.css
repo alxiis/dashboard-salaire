@@ -35,7 +35,7 @@
 .mm-halftone {
     background:
         radial-gradient(circle, rgba(0, 0, 0, 0.55) 2.4px, transparent 3px) 0 0 / 15px 15px,
-        radial-gradient(circle, rgba(245, 213, 71, 0.35) 2px, transparent 2.6px) 0 0 / 17px 17px;
+        radial-gradient(circle, rgba(245, 245, 240, 0.35) 2px, transparent 2.6px) 0 0 / 17px 17px;
     -webkit-mask-image: linear-gradient(to left, #000 8%, transparent 62%), linear-gradient(to top right, #000 0%, transparent 34%);
     mask-image: linear-gradient(to left, #000 8%, transparent 62%), linear-gradient(to top right, #000 0%, transparent 34%);
 }
@@ -54,7 +54,7 @@
     transition: transform var(--sp-t-slow) var(--sp-ease-out);
 }
 .mm-diag::before { left: 44%; width: 1.4vw; background: var(--sp-white); transform: skewX(-24deg) translateX(calc(var(--sel) * -1vw)); }
-.mm-diag::after { left: 47%; width: 0.4vw; background: var(--sp-yellow); transform: skewX(-24deg) translateX(calc(var(--sel) * -1.4vw)); }
+.mm-diag::after { left: 47%; width: 0.4vw; background: var(--sp-white); transform: skewX(-24deg) translateX(calc(var(--sel) * -1.4vw)); }
 
 /* Couche 5 : lignes de mouvement rayonnantes */
 .mm-burst {
@@ -70,8 +70,8 @@
 .mm-geo { width: 100%; height: 100%; }
 .mm-euro {
     font-family: var(--font-display);
-    fill: rgba(245, 213, 71, 0.14);
-    stroke: rgba(245, 213, 71, 0.5);
+    fill: rgba(245, 245, 240, 0.14);
+    stroke: rgba(245, 245, 240, 0.5);
     stroke-width: 3;
 }
 
@@ -169,7 +169,7 @@
     font-weight: 800;
     font-size: 0.72rem;
     letter-spacing: 0.22em;
-    color: var(--sp-yellow);
+    color: var(--sp-white);
     background: #000;
     padding: 3px 10px;
     transform: skewX(var(--sp-skew));
@@ -186,7 +186,7 @@
 .mm-b2 {
     font-size: clamp(3.4rem, 17vw, 5.6rem);
     color: #000;
-    background: var(--sp-yellow);
+    background: var(--sp-white);
     padding: 0.02em 0.22em 0.04em 0.12em;
     margin-top: -0.02em;
     box-shadow: 5px 5px 0 #000;
@@ -250,7 +250,7 @@
     top: -0.28em;
     left: -0.08em;
     padding: 0.05em 0.28em;
-    background: var(--sp-yellow);
+    background: var(--sp-white);
     color: #000;
     font-family: var(--font-display);
     font-size: 0.26em;
@@ -284,7 +284,7 @@
     align-items: center;
     gap: 0.5em;
     padding: 0.28em 0.8em;
-    background: var(--sp-yellow);
+    background: var(--sp-white);
     color: #000;
     border: 0.14em solid #000;
     font-family: var(--font-body);
@@ -294,7 +294,7 @@
     transform: skewX(var(--sp-skew));
     white-space: nowrap;
 }
-.mm-chip-alt { background: #000; color: var(--sp-yellow); border-color: var(--sp-yellow); }
+.mm-chip-alt { background: #000; color: var(--sp-white); border-color: var(--sp-white); }
 .mm-chip-live { background: #000; color: var(--sp-white); border-color: var(--sp-white); }
 .mm-dot { width: 0.7em; height: 0.7em; border-radius: 50%; background: var(--sp-gray); }
 .mm-chip-live.is-live .mm-dot { background: var(--sp-red); box-shadow: 0 0 0 0.2em rgba(229, 9, 20, 0.35); animation: mmLive 1.2s ease-in-out infinite alternate; }
@@ -316,7 +316,7 @@
     place-content: center;
     text-align: center;
     color: #000;
-    background: var(--sp-yellow);
+    background: var(--sp-white);
     font-family: var(--font-display);
     line-height: 0.85;
     clip-path: polygon(50.0% 0.0%,58.5% 13.0%,71.7% 5.0%,73.7% 20.3%,89.1% 18.8%,84.2% 33.5%,98.7% 38.9%,88.0% 50.0%,98.7% 61.1%,84.2% 66.5%,89.1% 81.2%,73.7% 79.7%,71.7% 95.0%,58.5% 87.0%,50.0% 100.0%,41.5% 87.0%,28.3% 95.0%,26.3% 79.7%,10.9% 81.2%,15.8% 66.5%,1.3% 61.1%,12.0% 50.0%,1.3% 38.9%,15.8% 33.5%,10.9% 18.8%,26.3% 20.3%,28.3% 5.0%,41.5% 13.0%);
@@ -331,11 +331,11 @@
 .mm-calendar {
     --f: clamp(2.6rem, 12.5vw, 5.2rem);
     --slab: var(--sp-white);
-    --slab-sel: var(--sp-yellow);
+    --slab-sel: var(--sp-red);
     --ink: #050505;
-    --ink-sel: #050505;
+    --ink-sel: var(--sp-white);
     --shade: var(--sp-red);
-    --shade-sel: var(--sp-red);
+    --shade-sel: #000;
     --clip: polygon(4% 0, 100% 9%, 96% 100%, 0 91%);
     margin-left: 12vw;
 }
@@ -347,7 +347,7 @@
     bottom: -0.32em;
     overflow: hidden;
     padding: 0.05em 0;
-    background: repeating-linear-gradient(-45deg, var(--sp-yellow) 0 0.5em, #000 0.5em 1em);
+    background: repeating-linear-gradient(-45deg, var(--sp-white) 0 0.5em, #000 0.5em 1em);
     color: #000;
     font-family: var(--font-body);
     font-weight: 800;
@@ -358,7 +358,7 @@
     transform: rotate(-3deg);
     z-index: 2;
 }
-.mm-tape::before { content: ''; position: absolute; inset: 0; background: var(--sp-yellow); z-index: -1; }
+.mm-tape::before { content: ''; position: absolute; inset: 0; background: var(--sp-white); z-index: -1; }
 
 /* — GTA 6 : bloc noir, lecture inversée à la sélection — */
 .mm-gta {
@@ -395,7 +395,7 @@
 .mm-pointer-star {
     width: 100%;
     height: 100%;
-    background: var(--sp-yellow);
+    background: var(--sp-white);
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
     animation: mmSpin 6s linear infinite;
 }
@@ -425,7 +425,7 @@
 .mm-cmd.is-selected .mm-l1,
 .mm-cmd.is-selected .mm-l2 { color: var(--ink-sel); text-shadow: 0.06em 0.06em 0 var(--shade-sel); }
 .mm-cmd.is-selected .mm-rate-sticker { transform: rotate(-6deg) scale(1.15); }
-.mm-cmd:focus-visible .mm-slab::before { background: var(--sp-yellow); inset: -0.09em; }
+.mm-cmd:focus-visible .mm-slab::before { background: var(--sp-white); inset: -0.09em; }
 
 /* Impact puis expansion : la commande choisie frappe, les autres s'évacuent */
 .mm-cmd.is-launching { animation: mmImpact 150ms ease-out forwards; z-index: 40; }
@@ -515,7 +515,7 @@
         display: inline-block;
         margin-right: 4px;
         padding: 0 6px;
-        background: var(--sp-yellow);
+        background: var(--sp-white);
         color: #000;
         font: inherit;
     }

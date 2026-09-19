@@ -9,40 +9,44 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/shared.css">
+    <link rel="stylesheet" href="gta.css">
 </head>
-<body data-sp-page="gta" data-sp-hud="auto" style="--module-accent: var(--sp-red)">
+<body data-sp-page="gta" data-sp-hud="auto">
     <div class="sp-app-container">
         <header class="sp-header" data-sp-header="module"></header>
 
-        <main class="sp-module-main">
-            <section class="sp-hero-banner-slab">
-                <div class="slab-tag">MODULE 03 // COUNTDOWN</div>
-                <h1 class="slab-title">GTA 6 <span class="alt">COUNTDOWN</span></h1>
-                <div class="slab-sub">COMPTE À REBOURS // EN ATTENTE DE DATE</div>
-            </section>
+        <main class="gta-main">
+            <!-- Calling card -->
+            <article class="gta-card" id="gtaCard" aria-labelledby="gtaTitle">
+                <div class="gta-stamp" aria-hidden="true">★</div>
+                <p class="gta-tag">AVIS DE PASSAGE // <span id="gtaTitleState">SORTIE FRANCE</span></p>
 
-            <section class="sp-module-card" aria-labelledby="gtaStatus">
-                <div class="sp-status-sticker" id="gtaStatus"><span aria-hidden="true">◆</span><span>PROTOCOLE EN ATTENTE</span></div>
+                <h1 class="gta-title" id="gtaTitle" data-ransom>GTA 6</h1>
 
-                <p class="sp-lead">
-                    Ce module sera activé dès qu'une date de lancement confirmée sera renseignée. Aucune date n'est codée en dur pour préserver l'intégrité du système.
-                </p>
+                <p class="gta-message" id="gtaMessage">VICE CITY VA CHANGER DE MAINS. ON VOLE VOTRE TEMPS LIBRE JUSQU'AU JOUR J.</p>
 
-                <div class="gta-countdown-slots" role="group" aria-label="Compte à rebours : aucune date définie">
-                    <div class="countdown-slot-box"><span class="slot-digit">--</span><span class="slot-unit">JOURS</span></div>
-                    <span class="countdown-sep" aria-hidden="true">:</span>
-                    <div class="countdown-slot-box"><span class="slot-digit">--</span><span class="slot-unit">HEURES</span></div>
-                    <span class="countdown-sep" aria-hidden="true">:</span>
-                    <div class="countdown-slot-box"><span class="slot-digit">--</span><span class="slot-unit">MINUTES</span></div>
-                    <span class="countdown-sep" aria-hidden="true">:</span>
-                    <div class="countdown-slot-box"><span class="slot-digit">--</span><span class="slot-unit">SECONDES</span></div>
+                <div class="gta-timer" role="timer" aria-label="Temps restant avant la sortie de GTA 6">
+                    <div class="gta-unit"><b id="gtaDays">--</b><span>JOURS</span></div>
+                    <i class="gta-sep" aria-hidden="true">/</i>
+                    <div class="gta-unit"><b id="gtaHours">--</b><span>HEURES</span></div>
+                    <i class="gta-sep" aria-hidden="true">/</i>
+                    <div class="gta-unit"><b id="gtaMinutes">--</b><span>MINUTES</span></div>
+                    <i class="gta-sep" aria-hidden="true">/</i>
+                    <div class="gta-unit gta-unit--sec"><b id="gtaSeconds" class="sp-glitch">--</b><span>SECONDES</span></div>
                 </div>
 
-                <a href="../main-menu/" class="sp-btn-return" data-sp-back><span aria-hidden="true">◀</span><span>MENU PRINCIPAL [ESC]</span></a>
-            </section>
+                <p class="gta-sign"><span>SORTIE FRANCE</span> <b id="gtaDate">—</b></p>
+            </article>
+
+            <a href="../main-menu/" class="gta-back sp-slab sp-slab--white" data-sp-back><span aria-hidden="true">◀</span> MENU PRINCIPAL [ESC]</a>
         </main>
     </div>
 
+    <div class="gta-flash" id="gtaFlash" aria-hidden="true"></div>
+
     <script src="../shared/shared.js" defer></script>
+    <script src="config.js" defer></script>
+    <script src="countdown-engine.js" defer></script>
+    <script src="gta-ui.js" defer></script>
 </body>
 </html>

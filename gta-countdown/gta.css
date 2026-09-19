@@ -1,0 +1,141 @@
+/* ==========================================================================
+   GTA 6 COUNTDOWN // « calling card » : carte noire déchirée, titre en lettres découpées,
+   compte à rebours au centre, impact (flash rouge + tremblement) à chaque seconde.
+   ========================================================================== */
+
+.gta-main { display: grid; gap: var(--sp-s6, 32px); justify-items: center; padding: var(--sp-s4) 0 var(--sp-s5); }
+
+/* Carte */
+.gta-card {
+    position: relative;
+    isolation: isolate;
+    width: min(100%, 980px);
+    display: grid;
+    justify-items: center;
+    gap: var(--sp-s4);
+    padding: 54px clamp(20px, 6vw, 70px) 76px;
+    text-align: center;
+    transform: rotate(-2deg);
+    filter: drop-shadow(14px 14px 0 var(--sp-red)) drop-shadow(24px 24px 0 #000);
+}
+.gta-card::before,
+.gta-card::after { content: ''; position: absolute; clip-path: polygon(0 3%, 6% 0, 100% 2%, 98% 46%, 100% 97%, 94% 100%, 0 96%, 2% 50%); }
+.gta-card::before {
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(circle, rgba(229, 9, 20, 0.3) 2px, transparent 2.6px) 0 0 / 14px 14px,
+        linear-gradient(112deg, #050505 0 58%, #14000a 58% 100%);
+}
+.gta-card::after { inset: -5px; z-index: -2; background: var(--sp-white); }
+
+/* Diagonale rouge derrière le compte à rebours */
+.gta-timer::before {
+    content: '';
+    position: absolute;
+    inset: -14px -3% -18px;
+    z-index: -1;
+    background: var(--sp-red);
+    clip-path: var(--clip-torn);
+    transform: rotate(1.5deg);
+}
+
+.gta-stamp {
+    position: absolute;
+    top: -26px;
+    right: 6%;
+    display: grid;
+    place-items: center;
+    width: 84px;
+    height: 84px;
+    background: var(--sp-red);
+    color: var(--sp-white);
+    font-size: 2.6rem;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    transform: rotate(14deg);
+    animation: gtaSpin 9s linear infinite;
+}
+@keyframes gtaSpin { to { transform: rotate(374deg); } }
+
+.gta-tag { padding: 4px 22px 4px 16px; background: var(--sp-white); color: #000; font-family: var(--font-mono); font-size: 0.8rem; font-weight: 800; letter-spacing: 0.16em; clip-path: var(--clip-para); transform: rotate(-1.5deg); }
+
+.gta-title { font-size: clamp(3.6rem, 15vw, 9rem); transform: rotate(1.5deg); }
+
+.gta-message {
+    max-width: 640px;
+    padding: 8px 26px 10px;
+    background: var(--sp-red);
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 3vw, 1.7rem);
+    line-height: 1.15;
+    letter-spacing: 0.05em;
+    clip-path: var(--clip-slab-b);
+    transform: rotate(-1deg);
+}
+
+/* Compte à rebours */
+.gta-timer {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--sp-s3) var(--sp-s2);
+    margin: var(--sp-s4) 0;
+    padding: 26px 4px;
+}
+.gta-unit {
+    display: grid;
+    min-width: clamp(84px, 16vw, 158px);
+    padding: 8px 10px 10px;
+    background: var(--sp-white);
+    color: #000;
+    clip-path: var(--clip-slab-a);
+    transition: transform 120ms;
+}
+.gta-unit:nth-of-type(even) { background: #000; color: var(--sp-white); clip-path: var(--clip-slab-c); }
+.gta-unit b { font-family: var(--font-display); font-weight: 400; font-size: clamp(3rem, 10vw, 6.6rem); line-height: 0.95; font-variant-numeric: tabular-nums; }
+.gta-unit span { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.16em; }
+.gta-unit--sec { background: var(--sp-white); }
+.gta-unit--sec b { color: var(--sp-red); }
+.gta-sep { font-family: var(--font-display); font-style: normal; font-size: clamp(2rem, 6vw, 4rem); color: var(--sp-white); text-shadow: 3px 3px 0 #000; }
+
+.gta-sign { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.08em; transform: rotate(-1.5deg); }
+.gta-sign span { padding: 2px 12px; background: var(--sp-white); color: #000; clip-path: var(--clip-para); }
+.gta-sign b { font-weight: 400; color: var(--sp-red); margin-left: 6px; }
+
+/* Impact à chaque seconde */
+.gta-card.is-hit { animation: gtaShake 130ms steps(4); }
+@keyframes gtaShake {
+    0% { transform: rotate(-2deg) translate(0, 0); }
+    25% { transform: rotate(-2.4deg) translate(-5px, 2px); }
+    50% { transform: rotate(-1.7deg) translate(6px, -3px); }
+    75% { transform: rotate(-2.2deg) translate(-3px, 1px); }
+    100% { transform: rotate(-2deg) translate(0, 0); }
+}
+.gta-unit.is-slam { animation: gtaSlam 260ms var(--sp-ease-out); }
+@keyframes gtaSlam { 0% { transform: scale(1.22) rotate(3deg); background: var(--sp-red); } 100% { transform: scale(1) rotate(0); } }
+
+.gta-flash { position: fixed; inset: 0; z-index: 900; pointer-events: none; background: var(--sp-red); opacity: 0; mix-blend-mode: normal; }
+.gta-flash.is-flash { animation: gtaFlash 220ms ease-out; }
+@keyframes gtaFlash { 0% { opacity: 0.32; } 100% { opacity: 0; } }
+
+/* Sortie effective */
+.gta-card.is-released .gta-title { animation: gtaSpin2 1.2s steps(2) infinite; }
+@keyframes gtaSpin2 { 50% { transform: rotate(-1deg) scale(1.03); } }
+
+.gta-back { --slab-clip: var(--clip-para); --slab-shadow: 6px 6px 0 var(--sp-red); display: inline-flex; gap: 12px; padding: 12px 34px 12px 26px; color: #000; font-family: var(--font-display); font-size: 1.3rem; letter-spacing: 0.06em; text-decoration: none; transform: rotate(1deg); transition: transform var(--sp-snap); }
+.gta-back:hover { transform: rotate(0) translateY(-3px); }
+
+@media (max-width: 560px) {
+    .gta-card { padding: 46px 14px 64px; transform: rotate(-1deg); }
+    .gta-timer { gap: 8px 4px; }
+    .gta-unit { min-width: 0; flex: 1 1 38%; }
+    .gta-sep { display: none; }
+    .gta-stamp { width: 64px; height: 64px; font-size: 2rem; right: 4%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gta-stamp, .gta-card.is-hit, .gta-flash.is-flash, .gta-unit.is-slam { animation: none; }
+}
