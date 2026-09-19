@@ -1,8 +1,9 @@
 /* ==========================================================================
    DASHBOARD SALARY // blocs asymétriques superposés
    Toutes les surfaces sont des dalles découpées (clip-path) : voir .sp-slab dans shared.css.
-   1. Onglets   2. Compteur   3. Barres HP   4. Chips & panneaux
-   5. Sections  6. Analyse    7. Contrat     8. Actions & footer   9. Responsive
+   1. Onglets   2. Compteur   4. Chips & panneaux   5. Sections
+   6. Analyse   7. Contrat    8. Actions & footer   9. Responsive
+   (les barres HP .sp-hp vivent dans shared.css)
    ========================================================================== */
 
 .sp-dashboard-container { display: flex; flex-direction: column; gap: 56px; padding-bottom: var(--sp-s5); }
@@ -150,71 +151,6 @@
     80% { transform: rotate(-0.8deg) translate(2px, 2px); }
 }
 
-/* 3. BARRES « HP / SOCIAL STATS » ========================================== */
-.sp-hp {
-    --segs: 7;
-    position: relative;
-    display: grid;
-    gap: 6px;
-    padding-top: 26px;
-}
-.hp-label {
-    position: absolute;
-    top: -6px;
-    left: -12px;
-    z-index: 3;
-    font-family: var(--font-display);
-    font-size: 1.7rem;
-    letter-spacing: 0.05em;
-    line-height: 1;
-    color: var(--sp-white);
-    -webkit-text-stroke: 3px #000;
-    paint-order: stroke fill;
-    text-shadow: 3px 3px 0 var(--sp-red);
-    transform: rotate(-3deg);
-}
-.hp-label em { font-style: normal; padding: 0 8px; margin-left: 4px; background: var(--sp-red); color: var(--sp-white); -webkit-text-stroke: 0; text-shadow: none; clip-path: var(--clip-para); }
-
-.hp-track {
-    position: relative;
-    height: 38px;
-    background: var(--sp-white);
-    clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
-}
-.hp-track::before { content: ''; position: absolute; inset: 3px; background: #000; clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%); }
-.hp-fill {
-    position: absolute;
-    inset: 6px;
-    background: linear-gradient(180deg, #ff4650 0%, var(--sp-red) 45%, #8f0008 100%);
-    clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
-    transform: scaleX(var(--p, 0));
-    transform-origin: left center;
-    transition: transform 700ms cubic-bezier(0.2, 0.9, 0.3, 1.1);
-}
-.hp-fill::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 30%; background: rgba(255, 255, 255, 0.35); }
-.hp-ticks {
-    position: absolute;
-    inset: 3px;
-    background: repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--segs) - 3px), #000 calc(100% / var(--segs) - 3px) calc(100% / var(--segs)));
-}
-.hp-value {
-    position: absolute;
-    right: -6px;
-    top: 0;
-    z-index: 3;
-    display: flex;
-    align-items: baseline;
-    gap: var(--sp-s2);
-    padding: 2px 16px 2px 20px;
-    background: #000;
-    color: var(--sp-white);
-    clip-path: var(--clip-para);
-    transform: rotate(-2deg);
-}
-.hp-value b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.04em; }
-.hp-value i { font-style: normal; font-family: var(--font-mono); font-size: 0.72rem; color: var(--sp-gray); }
-.sp-hp--main { margin-top: var(--sp-s2); }
-
 /* 4. CHIPS & PANNEAUX SUPERPOSÉS =========================================== */
 .sp-cadence-grid { display: flex; flex-wrap: wrap; gap: var(--sp-s3) var(--sp-s4); margin: -26px 0 0 clamp(0px, 4vw, 48px); position: relative; z-index: 3; }
 .sp-chip { display: grid; gap: 2px; padding: 12px 34px 14px 22px; }
@@ -280,16 +216,26 @@
 .sp-svg-canvas .axis-label { fill: #ddd; font-size: 14px; }
 .sp-svg-canvas .axis-end { fill: var(--sp-red); font-size: 16px; }
 .sp-svg-canvas .axis-target { fill: var(--sp-white); font-family: var(--font-mono); font-size: 11px; font-weight: 700; }
-.sp-svg-canvas .axis-lunch { fill: #888; font-size: 12px; }
-.sp-svg-canvas .mark { fill: var(--sp-white); stroke: var(--sp-red); stroke-width: 3; }
-.sp-svg-canvas .mark-key { fill: var(--sp-red); stroke: var(--sp-white); }
+.sp-svg-canvas .axis-now { fill: var(--sp-white); font-size: 18px; }
 
-.sp-slots-analysis-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 46px 28px; padding-top: 8px; }
+/* Bandes de jours : entreprise = rouge, école = noir hachuré, week-end / férié = blanc cassé */
+.sp-svg-canvas .band { stroke: rgba(0, 0, 0, 0.6); stroke-width: 1; }
+.sp-svg-canvas .band-company { fill: rgba(229, 9, 20, 0.22); }
+.sp-svg-canvas .band-school { fill: url(#spSchoolHatch); }
+.sp-svg-canvas .band-weekend, .sp-svg-canvas .band-holiday { fill: rgba(245, 245, 240, 0.12); }
+.sp-svg-canvas .band-outside { fill: rgba(0, 0, 0, 0.5); }
+
+.chart-legend-types { display: inline-flex; align-items: center; gap: 8px; background: #000; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; padding: 5px 20px; }
+.lg { display: inline-block; width: 14px; height: 14px; margin-left: 8px; clip-path: var(--clip-para); }
+.lg-company { background: var(--sp-red); }
+.lg-school { background: repeating-linear-gradient(-45deg, #555 0 3px, #111 3px 6px); }
+.lg-weekend { background: var(--sp-white); }
+
+.sp-slots-analysis-grid { display: grid; grid-template-columns: 1fr; gap: 46px 28px; padding-top: 8px; }
 .slot-card .hp-label { font-size: 1.35rem; }
 .slot-card .hp-value b { font-size: 1.4rem; }
 .slot-footer-text { font-family: var(--font-mono); font-size: 0.74rem; color: var(--sp-gray); margin-top: 4px; }
-.slot-card:nth-child(1) { --segs: 4; }
-.slot-card:nth-child(2) { --segs: 3; transform: translateY(14px) rotate(0.6deg); }
+.slot-card { --segs: 8; }
 
 /* 7. CONTRAT =============================================================== */
 .sp-contract-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp-s5) var(--sp-s4); }
@@ -370,6 +316,7 @@
     .sp-dashboard-container { gap: 44px; }
     .sp-hero-card { padding: 26px 20px 50px; min-height: 0; }
     .hero-net { top: 12px; right: 12px; }
+    .hero-pause { right: 14px; bottom: 100px; }
     .hero-torn { width: 90%; height: 50%; }
     .sp-tab-btn { font-size: 1.1rem; padding: 8px 20px 8px 16px; }
     .sp-cadence-grid { margin: -18px 0 0; }
@@ -389,3 +336,22 @@
 @media (prefers-reduced-motion: reduce) {
     .sp-huge-digits.is-rolling, .sp-hero-card.sp-gain-flash { animation: none; }
 }
+
+/* Acquisition en pause : le cumul est figé, la dalle passe en noir hachuré */
+.hero-pause {
+    position: absolute !important;
+    right: 44px;
+    bottom: 104px;
+    z-index: 4 !important;
+    display: grid;
+    padding: 6px 22px 8px 16px;
+    background: var(--sp-white);
+    color: #000;
+    clip-path: var(--clip-para);
+    transform: rotate(-3deg);
+}
+.hero-pause[hidden] { display: none; }
+.hero-pause b { font-family: var(--font-display); font-weight: 400; font-size: clamp(1.3rem, 3vw, 2rem); letter-spacing: 0.06em; line-height: 1; }
+.hero-pause span { font-family: var(--font-mono); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; color: var(--sp-red); }
+.sp-hero-card.is-paused .hero-torn { background: repeating-linear-gradient(-45deg, #2b2b2b 0 8px, #0d0d0d 8px 16px); }
+.sp-hero-card.is-paused .sp-huge-digits { text-shadow: 7px 7px 0 #333, 12px 12px 0 #000; }

@@ -1,21 +1,19 @@
 /**
  * CALENDRIER // moteur (window.CalendarEngine)
- * Fonctions pures : aucune lecture du DOM, aucune horloge implicite (la date « aujourd'hui »
- * est toujours passée en paramètre) — donc testable et indépendant de l'affichage.
+ * Fonctions pures : aucune lecture du DOM, aucune horloge implicite (« aujourd'hui » est un paramètre).
+ * Le type de chaque jour (entreprise / école / week-end / férié) vient de window.Schedule
+ * (shared/schedule-engine.js, alimenté par shared/scheduleConfig.js).
  */
 (function () {
     'use strict';
 
+    const S = window.Schedule;
     const JOURS = ['DIMANCHE', 'LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI', 'SAMEDI'];
     const MOIS = ['JANVIER', 'FÉVRIER', 'MARS', 'AVRIL', 'MAI', 'JUIN', 'JUILLET', 'AOÛT', 'SEPTEMBRE', 'OCTOBRE', 'NOVEMBRE', 'DÉCEMBRE'];
-    // En-têtes de colonnes : la semaine commence le lundi
-    const JOURS_COURTS = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
+    const MOIS_COURTS = ['JAN', 'FÉV', 'MAR', 'AVR', 'MAI', 'JUIN', 'JUIL', 'AOÛ', 'SEP', 'OCT', 'NOV', 'DÉC'];
 
-    const pad2 = (n) => String(n).padStart(2, '0');
-    const cle = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
-    const minuitLocal = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const cle = S.cle;
     const memeJour = (a, b) => cle(a) === cle(b);
-    const estWeekend = (d) => d.getDay() === 0 || d.getDay() === 6;
 
     /** Décale (année, mois) de `delta` mois. */
     function shiftMonth(year, month, delta) {
@@ -23,48 +21,61 @@
         return { year: d.getFullYear(), month: d.getMonth() };
     }
 
-    /**
-     * Grille d'un mois : toujours 6 semaines × 7 jours (lundi → dimanche).
-     * contrat = { debut: Date } — les jours avant la prise d'effet ne sont pas travaillés.
-     */
-    function buildMonthGrid(year, month, today, contrat) {
-        const premier = new Date(year, month, 1);
-        const decalage = (premier.getDay() + 6) % 7; // lundi = 0
-        const debutContrat = contrat && contrat.debut ? minuitLocal(contrat.debut) : null;
-        const cells = [];
+    /** Une case de calendrier. */
+    function cellFor(date, month, today) {
+        const type = S.dayType(date);
+        return {
+            date,
+            key: cle(date),
+            day: date.getDate(),
+            inMonth: date.getMonth() === month,
+            isToday: memeJour(date, today),
+            type, // 'company' | 'school' | 'weekend' | 'holiday' | 'outside'
+            isPaid: S.isPaidDay(date),
+            holiday: S.holidayName(date)
+        };
+    }
 
-        for (let i = 0; i < 42; i++) {
-            const date = new Date(year, month, 1 - decalage + i);
-            const avantContrat = Boolean(debutContrat) && date < debutContrat;
-            cells.push({
-                date,
-                key: cle(date),
-                day: date.getDate(),
-                inMonth: date.getMonth() === month,
-                isToday: memeJour(date, today),
-                isWeekend: estWeekend(date),
-                beforeContract: avantContrat,
-                isContractStart: Boolean(debutContrat) && memeJour(date, debutContrat),
-                isWorkday: !estWeekend(date) && !avantContrat
-            });
-        }
+    /** Grille d'un mois : toujours 6 semaines × 7 jours (lundi → dimanche). */
+    function buildMonthGrid(year, month, today) {
+        const decalage = (new Date(year, month, 1).getDay() + 6) % 7; // lundi = 0
+        const cells = [];
+        for (let i = 0; i < 42; i++) cells.push(cellFor(new Date(year, month, 1 - decalage + i), month, today));
         const weeks = [];
         for (let w = 0; w < 6; w++) weeks.push(cells.slice(w * 7, w * 7 + 7));
         return { year, month, weeks, cells };
     }
 
-    /** Jours ouvrés du mois affiché et rémunération maximale correspondante. */
-    function summarizeMonth(grid, tauxHoraire, heuresParJour) {
-        const workdays = grid.cells.filter((c) => c.inMonth && c.isWorkday).length;
-        return { workdays, hours: workdays * heuresParJour, amount: workdays * heuresParJour * tauxHoraire };
+    /** Mois couverts par l'alternance (pour la vue « Année »). */
+    function alternanceMonths() {
+        const mois = [];
+        for (let d = new Date(S.START.getFullYear(), S.START.getMonth(), 1); d <= S.END; d = new Date(d.getFullYear(), d.getMonth() + 1, 1)) {
+            mois.push({ year: d.getFullYear(), month: d.getMonth() });
+        }
+        return mois;
     }
 
-    /** Nature d'un jour : sert à l'affichage du détail et de l'état sous le jour actuel. */
+    /** Décompte d'un mois : jours par type, jours payés et salaire acquis sur le mois. */
+    function summarizeMonth(grid) {
+        const count = { company: 0, school: 0, weekend: 0, holiday: 0, outside: 0 };
+        grid.cells.forEach((c) => { if (c.inMonth) count[c.type]++; });
+        const paid = S.paidDaysInMonth(grid.year, grid.month).length;
+        return { count, paid, amount: paid * S.dailyRate(grid.year, grid.month), daily: S.dailyRate(grid.year, grid.month) };
+    }
+
+    const LIBELLES = {
+        company: { label: 'JOUR ENTREPRISE // SAS NOOUS', short: 'ENTREPRISE' },
+        school: { label: 'JOUR ÉCOLE // IGENSIA', short: 'ÉCOLE' },
+        weekend: { label: 'WEEK-END // AUCUN SALAIRE', short: 'WEEK-END' },
+        holiday: { label: 'JOUR FÉRIÉ', short: 'FÉRIÉ' },
+        outside: { label: 'HORS ALTERNANCE', short: 'HORS PÉRIODE' }
+    };
+
+    /** Description d'un jour pour le panneau de détail. */
     function describeDay(cell) {
-        if (cell.isContractStart) return { kind: 'start', label: 'PRISE D\'EFFET DU CONTRAT', worked: true };
-        if (cell.isWorkday) return { kind: 'work', label: 'JOUR OUVRÉ', worked: true };
-        if (cell.beforeContract && !cell.isWeekend) return { kind: 'before', label: 'AVANT LE CONTRAT', worked: false };
-        return { kind: 'rest', label: cell.isWeekend ? 'REPOS // WEEK-END' : 'REPOS', worked: false };
+        const l = LIBELLES[cell.type];
+        const label = cell.type === 'holiday' && cell.holiday ? `JOUR FÉRIÉ // ${cell.holiday.toUpperCase()}` : l.label;
+        return { kind: cell.type, label, short: l.short, paid: cell.isPaid };
     }
 
     function formatLong(date) {
@@ -72,7 +83,7 @@
     }
 
     window.CalendarEngine = {
-        JOURS, MOIS, JOURS_COURTS,
-        buildMonthGrid, summarizeMonth, describeDay, shiftMonth, formatLong, cle, minuitLocal
+        JOURS, MOIS, MOIS_COURTS, LIBELLES,
+        buildMonthGrid, alternanceMonths, summarizeMonth, describeDay, shiftMonth, formatLong, cle
     };
 })();

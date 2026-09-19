@@ -1,12 +1,10 @@
 /* ==========================================================================
    SALARY PULSE // DESIGN SYSTEM
-   Grammaire : noir + rouge + blanc + jaune · collage · diagonales · hard shadows
+   Grammaire : noir + rouge + blanc · collage · diagonales · hard shadows
    Fichier partagé par tous les modules (menu, dashboard, calendrier, GTA 6).
 
-   1. Tokens          5. Boutons & stickers génériques
-   2. Base            6. Transition « module access »
-   3. Fond            7. Briques P5 : dalles découpées, lettres « anonymes », glitch
-   4. HUD / header    8. Responsive & accessibilité
+   1. Tokens   2. Base   3. Fond   4. HUD / header   5. Boutons   6. Transition
+   7. Briques P5 (dalles, lettres, glitch)   8. Barres HP   9. Responsive & accessibilité
    ========================================================================== */
 
 /* 1. TOKENS ================================================================ */
@@ -600,7 +598,99 @@ a { color: inherit; }
 @keyframes spGlitchA { 0%, 100% { opacity: 0; } 20% { opacity: 1; transform: translate(-6px, 0); } 60% { opacity: 1; transform: translate(4px, -2px); } }
 @keyframes spGlitchB { 0%, 100% { opacity: 0; } 30% { opacity: 1; transform: translate(6px, 1px); } 70% { opacity: 1; transform: translate(-4px, 2px); } }
 
-/* 8. RESPONSIVE & ACCESSIBILITÉ ============================================ */
+/* 8. BARRES « SOCIAL STATS / HP » ==========================================
+   .sp-hp > .hp-label + .hp-track(> .hp-fill + .hp-ticks) + .hp-value
+   Le remplissage suit --p (0..1, posé sur .hp-track) ; le bord d'attaque est oblique et pointu.
+   Variantes : .sp-hp--white (hachures, école) · .sp-hp--mix (rouge → blanc, total) */
+@property --p { syntax: '<number>'; inherits: true; initial-value: 0; }
+
+.sp-hp {
+    --segs: 7;
+    --tip: 16px;
+    position: relative;
+    display: grid;
+    gap: 6px;
+    padding-top: 26px;
+}
+.hp-label {
+    position: absolute;
+    top: -6px;
+    left: -12px;
+    z-index: 3;
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: var(--sp-white);
+    -webkit-text-stroke: 3px #000;
+    paint-order: stroke fill;
+    text-shadow: 3px 3px 0 var(--sp-red);
+    transform: rotate(-3deg);
+}
+.hp-label em { font-style: normal; padding: 0 8px; margin-left: 4px; background: var(--sp-red); color: var(--sp-white); -webkit-text-stroke: 0; text-shadow: none; clip-path: var(--clip-para); }
+
+.hp-track {
+    position: relative;
+    height: 38px;
+    background: var(--sp-white);
+    clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%);
+    transition: --p 1100ms cubic-bezier(0.2, 0.9, 0.3, 1.12);
+}
+.hp-track::before { content: ''; position: absolute; inset: 3px; background: #000; clip-path: polygon(3% 0, 100% 0, 97% 100%, 0 100%); }
+.hp-fill {
+    position: absolute;
+    inset: 6px;
+    background: linear-gradient(180deg, #ff4650 0%, var(--sp-red) 45%, #8f0008 100%);
+    /* bord d'attaque : le haut avance plus loin que le bas → pointe oblique */
+    clip-path: polygon(0 0, calc(var(--p) * 100% + var(--tip) * var(--p)) 0, calc(var(--p) * 100% - var(--tip) * (1 - var(--p))) 100%, 0 100%);
+}
+.hp-fill::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-60deg, rgba(255, 255, 255, 0.16) 0 8px, transparent 8px 18px); background-size: 26px 100%; animation: spHpFlow 900ms linear infinite; }
+.hp-fill::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 30%; background: rgba(255, 255, 255, 0.35); }
+@keyframes spHpFlow { to { background-position: 26px 0; } }
+
+/* étincelle blanche sur le bord d'attaque */
+.hp-track::after {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    top: 3px;
+    bottom: 3px;
+    width: 5px;
+    left: calc(6px + (100% - 12px) * var(--p) - 3px);
+    background: var(--sp-white);
+    transform: skewX(-24deg);
+    filter: drop-shadow(0 0 5px var(--sp-white));
+}
+.hp-ticks {
+    position: absolute;
+    inset: 3px;
+    background: repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--segs) - 3px), #000 calc(100% / var(--segs) - 3px) calc(100% / var(--segs)));
+}
+.hp-value {
+    position: absolute;
+    right: -6px;
+    top: 0;
+    z-index: 3;
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-s2);
+    padding: 2px 16px 2px 20px;
+    background: #000;
+    color: var(--sp-white);
+    clip-path: var(--clip-para);
+    transform: rotate(-2deg);
+}
+.hp-value b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.04em; }
+.hp-value i { font-style: normal; font-family: var(--font-mono); font-size: 0.72rem; color: var(--sp-gray); }
+.sp-hp--main { margin-top: var(--sp-s2); }
+
+.sp-hp--white .hp-fill { background: repeating-linear-gradient(-45deg, #f5f5f0 0 9px, #cfcfc8 9px 18px); }
+.sp-hp--white .hp-fill::before, .sp-hp--white .hp-fill::after { display: none; }
+.sp-hp--white .hp-label em { background: #000; }
+.sp-hp--mix .hp-fill { background: linear-gradient(90deg, #8f0008 0%, var(--sp-red) 55%, #f5f5f0 100%); }
+.sp-hp--mix .hp-label em { background: var(--sp-white); color: #000; }
+
+/* 9. RESPONSIVE & ACCESSIBILITÉ ============================================ */
 @media (max-width: 950px) {
     .sp-header { flex-direction: column; align-items: flex-start; gap: var(--sp-s4); transform: none; }
     .sp-header-right-group { width: 100%; justify-content: space-between; }
@@ -625,4 +715,6 @@ a { color: inherit; }
         scroll-behavior: auto !important;
     }
     .sp-transition-wipe { display: none !important; }
+    .hp-fill::before { animation: none; }
+    .hp-track { transition: none; }
 }

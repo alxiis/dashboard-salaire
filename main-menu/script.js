@@ -6,7 +6,7 @@
 (function () {
     'use strict';
 
-    const { CONFIG, audio, nav, hud, work, onTick } = window.SP;
+    const { CONFIG, audio, nav, hud, work, onTick, Schedule } = window.SP;
 
     const commandes = Array.from(document.querySelectorAll('.mm-cmd'));
     const pointeur = document.getElementById('mmPointer');
@@ -104,8 +104,9 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(placerPointeur);
 
     /* ---------- données vivantes (taux issus du moteur, jamais hardcodés) ---------- */
-    document.getElementById('mmRate').textContent = CONFIG.TAUX_HORAIRE_NET.toFixed(2);
-    document.getElementById('mmMinute').textContent = `+${CONFIG.TAUX_MINUTE.toFixed(4)} € / MIN`;
+    document.getElementById('mmRate').textContent = String(CONFIG.MONTHLY_NET);
+    const maj = new Date();
+    document.getElementById('mmMinute').textContent = `+${(Schedule.dailyRate(maj.getFullYear(), maj.getMonth()) / CONFIG.MAX_MINUTES_JOUR).toFixed(4)} € / MIN`;
 
     const live = document.getElementById('mmGtaCount');
     const liveEl = document.getElementById('mmLive');

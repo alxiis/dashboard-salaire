@@ -56,13 +56,22 @@
     }
 
     /* ---------- montants & jauges ---------- */
-    function setAmounts({ jour, mois, total }) {
-        roll($('jour'), jour, 4);
+    function setAmounts({ mois, jour, total }) {
         roll($('mois'), mois, 2);
+        roll($('jour'), jour, 2);
         roll($('total'), total, 2);
     }
 
-    const setGauge = (barId, ratio) => $(barId).style.setProperty('--p', Math.min(1, Math.max(0, ratio)).toFixed(4));
+    /** Bandeau « acquisition en pause » : `raison` = texte, ou null pour le masquer. */
+    function setPause(raison) {
+        const bandeau = $('heroPause');
+        const enPause = Boolean(raison);
+        bandeau.hidden = !enPause;
+        $('mainHeroCard').classList.toggle('is-paused', enPause);
+        if (enPause) afficher($('heroPauseReason'), raison);
+    }
+
+    const setGauge = (barId, ratio) => $(barId).parentElement.style.setProperty('--p', Math.min(1, Math.max(0, ratio)).toFixed(4));
 
     function setProgress({ ratio, pctTexte, heuresTexte, sessions }) {
         setGauge('progressBarFill', ratio);
@@ -82,23 +91,22 @@
         return n;
     }
 
-    function buildChart({ ligne, aire, pause, marks }) {
+    /** Courbe du mois : bandes de jours (par type), ligne cumulée, repères de dates. */
+    function buildChart({ ligne, aire, bandes, marks }) {
         $('chartLine').setAttribute('points', ligne);
         $('chartFill').setAttribute('points', aire);
         $('chartFillDots').setAttribute('points', aire);
-        $('chartLunch').setAttribute('x', pause.x.toFixed(1));
-        $('chartLunch').setAttribute('width', pause.largeur.toFixed(1));
-        const label = $('chartLunchLabel');
-        label.setAttribute('x', (pause.x + 14).toFixed(1));
-        label.setAttribute('transform', `rotate(-90 ${(pause.x + 14).toFixed(1)} 115)`);
+
+        const fond = $('chartBands');
+        fond.textContent = '';
+        bandes.forEach(({ x, largeur, type }) => {
+            fond.append(el('rect', { x: x.toFixed(1), y: 35, width: largeur.toFixed(1), height: 150, class: `band band-${type}` }));
+        });
 
         const groupe = $('chartMarks');
         groupe.textContent = '';
         marks.forEach(({ x, y, texte, cle, fin }) => {
-            groupe.append(
-                el('circle', { cx: x.toFixed(1), cy: y.toFixed(1), r: fin ? 8 : 5, class: cle ? 'mark mark-key' : 'mark' }),
-                el('text', { x: x.toFixed(1), y: 214, 'text-anchor': 'middle', class: fin ? 'axis-label axis-end' : 'axis-label' }, texte)
-            );
+            groupe.append(el('text', { x: x.toFixed(1), y, 'text-anchor': 'middle', class: `axis-label${cle ? ' axis-now' : ''}${fin ? ' axis-end' : ''}` }, texte));
         });
     }
 
@@ -132,7 +140,7 @@
         }
         rejouer($('mainAmountWrap'), 'minute-tick', 450);
         rejouer($('mainHeroCard'), 'sp-gain-flash', 450);
-        window.SP.ui.glitch($('jour'));
+        window.SP.ui.glitch($('mois'));
     }
 
     /* ---------- boutons & onglets ---------- */
@@ -159,5 +167,5 @@
         Object.entries(map).forEach(([id, texte]) => afficher($(id), texte));
     }
 
-    window.SalaryUI = { setAmounts, setProgress, buildChart, moveCursor, playGain, setDemo, setAudio, setActiveTab, setStaticTexts };
+    window.SalaryUI = { setAmounts, setPause, setProgress, buildChart, moveCursor, playGain, setDemo, setAudio, setActiveTab, setStaticTexts };
 })();
