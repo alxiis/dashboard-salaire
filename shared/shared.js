@@ -88,10 +88,11 @@
         const memeJour = dateJour === jourCle();
         return {
             creditedMinutes: memeJour ? entierBorne(data.creditedMinutes, CONFIG.MAX_MINUTES_JOUR) : 0,
-            bonusSimuleMinutes: memeJour ? entierBorne(data.bonusSimuleMinutes, CONFIG.MAX_MINUTES_JOUR) : 0,
+            // La simulation (bouton +1 min, démo) n'est jamais relue : elle disparaît au rechargement
+            bonusSimuleMinutes: 0,
             dateJour: memeJour ? dateJour : null,
             audioActif: data.audioActif === true,
-            modeDemo: memeJour && data.modeDemo === true
+            modeDemo: false
         };
     }
 
