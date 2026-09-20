@@ -1,0 +1,91 @@
+/* ==========================================================================
+   MES SITES // grandes dalles cliquables (une par site de sites-config.js)
+   ========================================================================== */
+
+.sites-main { display: grid; gap: 40px; padding: var(--sp-s4) 0 var(--sp-s5); }
+
+.sites-title { font-size: clamp(1.8rem, 5vw, 3.4rem); transform: rotate(-1.5deg); }
+.sites-lead { max-width: 640px; font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; color: var(--sp-offwhite); transform: rotate(-0.5deg); }
+
+.sites-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 56px 44px; padding: 8px 6px; }
+
+.site-card {
+    --slab-clip: var(--clip-slab-a);
+    --slab-shadow: 12px 12px 0 var(--sp-red), 20px 20px 0 #000;
+    position: relative;
+    display: grid;
+    gap: 14px;
+    align-content: start;
+    padding: 34px 34px 40px;
+    min-height: 300px;
+    color: var(--sp-white);
+    text-decoration: none;
+    transform: rotate(-1.5deg);
+    transition: transform var(--sp-snap);
+}
+.site-card::before { background-image: radial-gradient(circle, rgba(229, 9, 20, 0.28) 2px, transparent 2.6px); background-size: 13px 13px; }
+.site-card:nth-child(even) { --slab-clip: var(--clip-slab-b); --slab-bg: var(--sp-white); --slab-edge: #000; --slab-shadow: 12px 12px 0 #000, 20px 20px 0 var(--sp-red); color: #000; transform: rotate(1.4deg) translateY(14px); }
+.site-card:nth-child(even)::before { background-image: radial-gradient(circle, rgba(0, 0, 0, 0.12) 2px, transparent 2.6px); }
+
+.site-card:hover, .site-card:focus-visible { transform: rotate(0) translateY(-6px) scale(1.03); }
+.site-card:focus-visible { outline: 3px solid var(--sp-white); outline-offset: 6px; }
+
+.site-num {
+    position: absolute;
+    top: -16px;
+    left: 18px;
+    padding: 2px 12px;
+    background: var(--sp-red);
+    color: var(--sp-white);
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+    clip-path: var(--clip-para);
+    transform: rotate(-4deg);
+}
+
+.site-title { display: grid; font-family: var(--font-display); text-transform: uppercase; line-height: 0.86; }
+.site-t1 { font-size: clamp(3.4rem, 9vw, 5.8rem); -webkit-text-stroke: 3px #000; paint-order: stroke fill; text-shadow: 5px 5px 0 var(--sp-red); }
+.site-t2 { font-size: clamp(1.8rem, 5vw, 3rem); margin-left: 0.8em; color: var(--sp-red); }
+.site-card:nth-child(even) .site-t1 { text-shadow: 5px 5px 0 var(--sp-red); }
+.site-card:nth-child(even) .site-t2 { color: #000; }
+
+.site-desc { max-width: 40ch; font-family: var(--font-body); font-weight: 600; font-size: 1.05rem; line-height: 1.35; }
+
+.site-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.site-tag { padding: 2px 14px 2px 10px; background: #000; color: var(--sp-white); font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; clip-path: var(--clip-para); }
+.site-card:nth-child(even) .site-tag { background: var(--sp-red); }
+
+.site-url { font-family: var(--font-mono); font-size: 0.78rem; font-weight: 700; opacity: 0.85; word-break: break-all; }
+
+.site-open {
+    justify-self: start;
+    margin-top: 6px;
+    padding: 8px 30px 8px 22px;
+    background: var(--sp-white);
+    color: #000;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    clip-path: var(--clip-para);
+    transition: background-color var(--sp-t-fast), color var(--sp-t-fast), transform var(--sp-snap);
+}
+.site-card:nth-child(even) .site-open { background: #000; color: var(--sp-white); }
+.site-card:hover .site-open, .site-card:focus-visible .site-open { background: var(--sp-red); color: var(--sp-white); transform: translateX(6px); }
+
+.sites-empty { font-family: var(--font-mono); font-weight: 800; letter-spacing: 0.08em; }
+
+.sites-back { justify-self: start; }
+.sites-back a { display: inline-flex; gap: 10px; padding: 10px 30px 10px 22px; background: var(--sp-white); color: #000; font-family: var(--font-display); font-size: 1.3rem; letter-spacing: 0.06em; text-decoration: none; clip-path: var(--clip-para); transition: background-color var(--sp-t-fast), color var(--sp-t-fast); }
+.sites-back a:hover { background: var(--sp-red); color: var(--sp-white); }
+
+@media (max-width: 650px) {
+    .site-card { padding: 30px 20px 34px; min-height: 0; }
+    .site-card:nth-child(even) { transform: rotate(1deg); }
+    .sites-list { gap: 48px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-card, .site-card:nth-child(even) { transform: none; }
+    .site-card:hover, .site-card:focus-visible { transform: none; }
+}
