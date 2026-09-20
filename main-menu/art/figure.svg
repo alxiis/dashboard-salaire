@@ -1,48 +1,86 @@
-<!-- Silhouette originale (placeholder). Remplacer ce fichier, ou changer le src de .mm-figure, pour intégrer une illustration finale. -->
-<svg viewBox="0 0 500 700" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <defs>
-                            <linearGradient id="coatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" stop-color="#141414" />
-                                <stop offset="60%" stop-color="#050505" />
-                                <stop offset="100%" stop-color="#E50914" />
-                            </linearGradient>
-                            <linearGradient id="redFlare" x1="0%" y1="100%" x2="100%" y2="0%">
-                                <stop offset="0%" stop-color="#990000" />
-                                <stop offset="50%" stop-color="#E50914" />
-                                <stop offset="100%" stop-color="#f5f5f0" />
-                            </linearGradient>
-                            <pattern id="coatDots" width="12" height="12" patternUnits="userSpaceOnUse">
-                                <circle cx="2" cy="2" r="1.5" fill="rgba(229,9,20,0.3)" />
-                            </pattern>
-                        </defs>
-                        
-                        <!-- Halo & Étoile d'Arrière-Plan -->
-                        <polygon points="250,60 280,180 400,180 305,250 340,370 250,295 160,370 195,250 100,180 220,180" fill="rgba(229,9,20,0.22)" transform="scale(1.2) translate(-40, 40)" />
-                        <circle cx="270" cy="280" r="190" fill="url(#coatDots)" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 700" fill="none">
+  <!-- Silhouette originale « voleur d'élite » (placeholder d'illustration).
+       Remplacer ce fichier, ou changer le src de .mm-figure, pour intégrer une illustration finale. -->
+  <defs>
+    <pattern id="dots" width="9" height="9" patternUnits="userSpaceOnUse">
+      <circle cx="2.5" cy="2.5" r="1.3" fill="#ffffff" fill-opacity=".16"/>
+    </pattern>
 
-                        <!-- Manteau Long Volant (Pans arrière rouge vif découpés) -->
-                        <path d="M120 420 L40 680 L180 620 L160 480 Z" fill="url(#redFlare)" stroke="#000" stroke-width="4" />
-                        <path d="M360 440 L480 670 L340 590 L320 460 Z" fill="url(#redFlare)" stroke="#000" stroke-width="4" />
+    <!-- Toutes les formes noires : servent au contour blanc, à l'ombre dure et au remplissage -->
+    <g id="sil">
+      <!-- pans de manteau qui volent vers l'arrière -->
+      <path d="M214 425 L150 436 L58 492 L112 500 L36 592 L124 556 L112 650 L196 540 L226 566 Z"/>
+      <path d="M226 425 L302 425 L326 486 L298 528 L262 474 L238 530 L214 470 Z"/>
+      <!-- jambes en foulée -->
+      <path d="M236 470 L272 470 L262 560 L236 648 L194 648 L216 560 Z"/>
+      <path d="M186 646 L240 642 L246 672 L162 678 Z"/>
+      <path d="M268 465 L314 470 L338 560 L376 636 L340 652 L296 572 Z"/>
+      <path d="M336 634 L392 628 L402 660 L326 668 Z"/>
+      <!-- torse + cols relevés -->
+      <path d="M176 242 L236 228 L284 222 L334 246 L340 302 L324 424 L214 432 L190 332 Z"/>
+      <path d="M176 242 L142 208 L204 226 Z"/>
+      <path d="M334 246 L378 214 L332 226 Z"/>
+      <!-- bras gauche (main sur la hanche) -->
+      <path d="M180 248 L216 244 L198 300 L170 340 L204 380 L186 398 L138 346 Z"/>
+      <!-- bras tendu qui présente la pièce -->
+      <path d="M326 252 L362 264 L424 262 L474 234 L486 262 L424 298 L354 302 L326 290 Z"/>
+      <!-- cou + tête -->
+      <path d="M238 214 L274 208 L280 244 L234 250 Z"/>
+      <path d="M212 150 L218 196 L252 224 L290 202 L302 150 L282 132 L240 130 Z"/>
+      <!-- cheveux en épines -->
+      <path d="M194 158 L182 120 L206 112 L192 74 L232 92 L246 50 L270 88 L306 62 L298 104 L334 116 L310 142 L302 162 L282 128 L240 126 L214 162 Z"/>
+    </g>
+  </defs>
 
-                        <!-- Silhouette Corps Principal (Trenchcoat Noir Élégant) -->
-                        <path d="M220 180 L290 185 L350 310 L390 530 L320 690 L240 690 L180 540 L160 310 Z" fill="url(#coatGrad)" stroke="#FFFFFF" stroke-width="3" />
-                        
-                        <!-- Revers & Col Haut Stylisé -->
-                        <path d="M190 195 L250 290 L200 380 L160 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
-                        <path d="M310 195 L250 290 L300 380 L340 240 Z" fill="#0A0A0A" stroke="#E50914" stroke-width="3" />
-                        <polygon points="250,210 262,280 250,330 238,280" fill="#E50914" stroke="#FFF" stroke-width="2" />
-                        <polygon points="250,195 268,225 250,240 232,225" fill="#FFFFFF" stroke="#000" stroke-width="2" />
+  <!-- ombre portée dure -->
+  <use href="#sil" transform="translate(16 16)" fill="#000" fill-opacity=".55"/>
+  <!-- contour « autocollant » blanc -->
+  <use href="#sil" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="20" stroke-linejoin="round"/>
+  <!-- remplissage noir -->
+  <use href="#sil" fill="#050505"/>
 
-                        <!-- Tête, Masque Angulaire & Regard Flamboyant -->
-                        <path d="M210 145 L250 85 L290 145 L270 195 L230 195 Z" fill="#050505" stroke="#FFF" stroke-width="3" />
-                        <path d="M190 130 L160 170 L210 160 L180 200 L230 180 L250 70 L285 100 L320 130 L290 165 L330 185 L280 185" fill="#000000" stroke="#E50914" stroke-width="3" />
-                        <path d="M215 135 Q250 160 285 135 Q270 175 250 180 Q230 175 215 135 Z" fill="#FFFFFF" stroke="#000" stroke-width="3" />
-                        <polygon points="228,146 242,152 232,156" fill="#f5f5f0" />
-                        <polygon points="272,146 258,152 268,156" fill="#f5f5f0" />
+  <!-- trame sur le manteau -->
+  <path d="M176 242 L236 228 L284 222 L334 246 L340 302 L324 424 L214 432 L190 332 Z" fill="url(#dots)"/>
+  <path d="M214 425 L150 436 L58 492 L112 500 L36 592 L124 556 L112 650 L196 540 L226 566 Z" fill="url(#dots)"/>
 
-                        <!-- Gants Blancs & Étoile Tenue -->
-                        <path d="M150 280 L90 410 L130 430 L180 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
-                        <path d="M350 280 L410 400 L370 425 L320 320 Z" fill="#111" stroke="#FFF" stroke-width="3" />
-                        <ellipse cx="85" cy="425" rx="20" ry="16" fill="#FFF" stroke="#000" stroke-width="3" transform="rotate(-15 85 425)" />
-                        <polygon points="85,385 92,405 112,405 96,418 102,438 85,425 68,438 74,418 58,405 78,405" fill="#f5f5f0" stroke="#000" stroke-width="2" />
-                    </svg>
+  <!-- doublure rouge des pans -->
+  <path d="M178 452 L90 502 L128 510 L70 574 L152 546 L206 500 Z" fill="#e50914"/>
+  <path d="M256 470 L282 526 L298 500 L312 486 L296 470 Z" fill="#e50914"/>
+
+  <!-- écharpe rouge qui flotte -->
+  <path d="M236 228 L154 240 L76 212 L38 244 L112 266 L196 266 Z" fill="#e50914" stroke="#050505" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M112 266 L84 296 L136 282 Z" fill="#e50914" stroke="#050505" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- chemise blanche + revers -->
+  <path d="M242 230 L268 232 L262 318 L246 302 Z" fill="#f5f5f0"/>
+  <path d="M236 228 L216 262 L232 336 L250 300 Z" fill="#e50914"/>
+  <path d="M286 224 L266 232 L262 318 L284 340 L312 300 L332 250 Z" fill="#e50914"/>
+  <path d="M236 228 L216 262 L232 336 M286 224 L310 296 L284 340" stroke="#f5f5f0" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- gants blancs -->
+  <path d="M472 232 L494 248 L486 272 L462 262 Z" fill="#f5f5f0" stroke="#050505" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M176 384 L204 380 L208 404 L184 412 Z" fill="#f5f5f0" stroke="#050505" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- pièce lancée : étoile blanche à cœur rouge -->
+  <g transform="translate(478 196) rotate(14)">
+    <polygon points="0,-34 9,-11 34,-11 14,4 21,29 0,14 -21,29 -14,4 -34,-11 -9,-11" fill="#f5f5f0" stroke="#050505" stroke-width="4" stroke-linejoin="round"/>
+    <circle r="9" fill="#e50914" stroke="#050505" stroke-width="3"/>
+  </g>
+
+  <!-- visage -->
+  <path d="M214 156 L220 196 L252 222 L288 200 L300 156 Z" fill="#f5f5f0"/>
+  <!-- masque rouge angulaire + fentes -->
+  <path d="M206 152 L304 148 L298 182 L270 174 L252 190 L234 174 L212 184 Z" fill="#e50914" stroke="#050505" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M220 158 L246 163 L240 173 L222 170 Z" fill="#f5f5f0"/>
+  <path d="M264 164 L292 158 L289 170 L268 173 Z" fill="#f5f5f0"/>
+  <!-- sourire en biais -->
+  <path d="M238 202 L272 196 L266 206 L248 208 Z" fill="#050505"/>
+  <!-- reflets de cheveux -->
+  <path d="M200 150 L192 118 M236 118 L246 74 M276 112 L306 78" stroke="#f5f5f0" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- lumière de contour sur le manteau et les jambes -->
+  <path d="M180 250 L194 332 L216 428 M336 254 L340 302 L326 420" stroke="#f5f5f0" stroke-width="3" stroke-linecap="round" stroke-opacity=".8"/>
+  <path d="M242 480 L236 560 L214 640 M318 480 L338 556 L372 630" stroke="#f5f5f0" stroke-width="3" stroke-linecap="round" stroke-opacity=".6"/>
+  <!-- semelles rouges -->
+  <path d="M164 674 L246 668 L246 672 L162 678 Z M328 664 L402 656 L402 660 L326 668 Z" fill="#e50914"/>
+</svg>

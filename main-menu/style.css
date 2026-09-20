@@ -478,8 +478,8 @@
     .mm-cmd { position: absolute; pointer-events: auto; margin: 0; }
 
     .mm-dashboard { --f: calc(var(--u) * 9.2); left: 6vw; top: 22vh; }
-    .mm-calendar { --f: calc(var(--u) * 6); left: 36vw; top: 69vh; margin: 0; }
-    .mm-gta { --f: calc(var(--u) * 7.2); right: 7vw; left: auto; top: 39vh; margin: 0; }
+    .mm-calendar { --f: calc(var(--u) * 6); left: 30vw; top: 66vh; margin: 0; }
+    .mm-gta { --f: calc(var(--u) * 6.4); left: 58vw; right: auto; top: 68vh; margin: 0; } /* sous la ceinture du personnage : torse, tête et bras restent visibles */
 
     /* mouvement des autres commandes : elles s'écartent de la sélection */
     .mm-cmd { transform: translate(calc(var(--rel, 0) * -0.5vw), calc(var(--rel, 0) * 1.2vh)) rotate(var(--r, 0deg)); }
