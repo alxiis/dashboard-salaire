@@ -373,6 +373,19 @@
 .mm-gta .mm-l2 { font-size: 0.8em; }
 .mm-dashboard .mm-l2 { margin-left: 0.5em; }
 
+/* — Mes sites : dalle rouge (inversée à la sélection), petite et décalée — */
+.mm-sites {
+    --f: clamp(2.4rem, 11vw, 4.8rem);
+    --slab: var(--sp-red);
+    --slab-sel: #000;
+    --ink: var(--sp-white);
+    --ink-sel: var(--sp-white);
+    --shade: #000;
+    --shade-sel: var(--sp-red);
+    --clip: polygon(3% 0, 100% 8%, 96% 100%, 0 92%);
+    margin-left: 10vw;
+}
+.mm-cmd:nth-of-type(4) { z-index: 1; }
 /* Pointeur de sélection : étoile jaune cerclée, glisse vers la commande active */
 .mm-pointer {
     position: absolute;
@@ -480,6 +493,7 @@
     .mm-dashboard { --f: calc(var(--u) * 9.2); left: 6vw; top: 22vh; }
     .mm-calendar { --f: calc(var(--u) * 6); left: 30vw; top: 66vh; margin: 0; }
     .mm-gta { --f: calc(var(--u) * 6.4); left: 58vw; right: auto; top: 68vh; margin: 0; } /* sous la ceinture du personnage : torse, tête et bras restent visibles */
+    .mm-sites { --f: calc(var(--u) * 4.6); left: 33vw; top: 83vh; margin: 0; }
 
     /* mouvement des autres commandes : elles s'écartent de la sélection */
     .mm-cmd { transform: translate(calc(var(--rel, 0) * -0.5vw), calc(var(--rel, 0) * 1.2vh)) rotate(var(--r, 0deg)); }
@@ -535,6 +549,7 @@
     .mm-dashboard { --f: clamp(3.4rem, 17vw, 9rem); }
     .mm-calendar { --f: clamp(2.6rem, 12.5vw, 6.4rem); }
     .mm-gta { --f: clamp(2.8rem, 14vw, 7rem); }
+    .mm-sites { --f: clamp(2.4rem, 11vw, 5.2rem); }
 }
 @media (max-width: 360px) {
     .mm-hud .sp-date-hud-sticker { --hud-fs: 10.5px; }

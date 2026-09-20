@@ -44,7 +44,8 @@
     const MODULES = Object.freeze([
         { id: 'dashboard', url: '../dashboard-salary/', title: 'DASHBOARD', sub: 'SALARY', kicker: 'MODULE ACCESS // 01' },
         { id: 'calendar', url: '../calendar/', title: 'CALENDRIER', sub: '', kicker: 'MODULE ACCESS // 02' },
-        { id: 'gta', url: '../gta-countdown/', title: 'GTA 6', sub: 'COUNTDOWN', kicker: 'MODULE ACCESS // 03' }
+        { id: 'gta', url: '../gta-countdown/', title: 'GTA 6', sub: 'COUNTDOWN', kicker: 'MODULE ACCESS // 03' },
+        { id: 'sites', url: '../sites/', title: 'MES SITES', sub: '', kicker: 'MODULE ACCESS // 04' }
     ]);
     const MENU_URL = '../main-menu/';
 

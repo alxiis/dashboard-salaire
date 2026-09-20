@@ -18,7 +18,8 @@ dashboard-salaire/
 ├── main-menu/              écran de sélection plein écran (art/figure.svg remplaçable)
 ├── dashboard-salary/       script.js (moteur) · salary-ui.js (affichage) · style.css
 ├── calendar/               calendar-engine.js (pur) · calendar-ui.js · calendar.css
-└── gta-countdown/          config.js (date de sortie) · countdown-engine.js · gta-ui.js · gta.css
+├── gta-countdown/          config.js (date de sortie) · countdown-engine.js · gta-ui.js · gta.css
+└── sites/                  sites-config.js (liste des sites) · sites-ui.js · sites.css
 ```
 
 Chaque page module déclare `<body data-sp-page="…">` et un `<header data-sp-header="module">` : le shell
@@ -46,7 +47,7 @@ puis http://localhost:8000.
 | Entrée / Espace | ouvrir le module sélectionné |
 | Échap | retour au menu depuis un module |
 
-Souris, tactile et clavier partagent le même état : `selectedModuleIndex` (0 Dashboard · 1 Calendrier · 2 GTA 6).
+Souris, tactile et clavier partagent le même état : `selectedModuleIndex` (0 Dashboard · 1 Calendrier · 2 GTA 6 · 3 Mes sites).
 
 ## Planning et calcul du salaire
 
@@ -64,6 +65,10 @@ Tout se règle dans **`shared/scheduleConfig.js`** ; les calculs sont dans `shar
 
 - **Calendrier** : vues **Mois** et **Année** (bascule en haut), jours colorés par type (entreprise = rouge, école = noir hachuré, week-end / férié = blanc cassé / hachuré), trois barres de progression (entreprise, école, alternance totale), navigation ‹ › / PageUp-PageDown / flèches, jour actuel monumental, intro « changement de jour » (ignorée avec `prefers-reduced-motion`).
 - **GTA 6** : compte à rebours vers `RELEASE_DATE`. **Pour changer la date, modifier uniquement `gta-countdown/config.js`** (19 novembre 2026, sortie France). Flash rouge et tremblement à chaque seconde (coupés en reduced-motion).
+
+## Mes sites
+
+Le module « MES SITES » liste les autres sites (portfolio, suivi d'alternance…). **Pour en ajouter un, copier un bloc dans `sites/sites-config.js`** (titre, url, description, tags) : aucun autre fichier à modifier. Les liens s'ouvrent dans un nouvel onglet.
 
 ## Persistance
 
