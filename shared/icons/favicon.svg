@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Icône Salary Pulse : dalle rouge découpée, contour blanc, étoile -->
+  <polygon points="1,8 62,1 63,57 4,63" fill="#050505"/>
+  <polygon points="3,10 60,4 61,54 6,60" fill="#f5f5f0"/>
+  <polygon points="7,13 56,8 57,50 10,56" fill="#e50914"/>
+  <polygon points="32,12 37.3,26.7 52,27.5 40.6,36.8 44.3,51 32,43 19.7,51 23.4,36.8 12,27.5 26.7,26.7" fill="#050505" transform="translate(2 2)"/>
+  <polygon points="32,12 37.3,26.7 52,27.5 40.6,36.8 44.3,51 32,43 19.7,51 23.4,36.8 12,27.5 26.7,26.7" fill="#f5f5f0"/>
+</svg>
