@@ -69,8 +69,22 @@
         return total;
     }
 
-    /** Taux journalier du mois : MONTHLY_NET / jours payés. */
+    /** Montant réel versé pour un mois (ACTUAL_MONTHLY_NET), ou null s'il n'est pas renseigné / invalide. */
+    function actualAmount(year, month) {
+        const v = (C.ACTUAL_MONTHLY_NET || {})[`${year}-${pad2(month + 1)}`];
+        return typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null;
+    }
+
+    /**
+     * Taux journalier du mois. Mois avec montant réel : réel ÷ jours payés de la période.
+     * Sinon : MONTHLY_NET ÷ jours payés (mois complet si PRORATE_FIRST_MONTH).
+     */
     function dailyRate(year, month) {
+        const reel = actualAmount(year, month);
+        if (reel !== null) {
+            const nb = paidDaysInMonth(year, month).length;
+            return nb > 0 ? reel / nb : 0;
+        }
         const n = paidDaysForRate(year, month);
         return n > 0 ? C.MONTHLY_NET / n : 0;
     }

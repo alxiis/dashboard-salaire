@@ -11,7 +11,13 @@ window.SCHEDULE_CONFIG = Object.freeze({
     // --- Contrat -------------------------------------------------------------
     ALTERNANCE_START: '2026-09-14',   // 1er jour en entreprise
     ALTERNANCE_END: '2027-09-15',     // dernier jour (examens / soutenance)
-    MONTHLY_NET: 1170,                // salaire net mensuel (€), réparti sur les jours payés du mois
+    MONTHLY_NET: 1130,                // salaire net mensuel (€), réparti sur les jours payés du mois
+
+    // Montants RÉELS déjà versés (fiche de paie) : ils remplacent le calcul pour le mois concerné.
+    // Format 'AAAA-MM': montant net en €. Le mois en cours reste calculé tant qu'il n'est pas terminé.
+    ACTUAL_MONTHLY_NET: {
+        '2026-09': 712.44             // septembre 2026 (14 -> 30 septembre)
+    },
 
     // Heures de bureau : le compteur ne monte que dans ces plages, les jours payés.
     // Pour une pause déjeuner : [['08:30', '12:30'], ['13:30', '16:30']]

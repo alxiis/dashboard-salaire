@@ -53,10 +53,10 @@ Souris, tactile et clavier partagent le même état : `selectedModuleIndex` (0 D
 
 Tout se règle dans **`shared/scheduleConfig.js`** ; les calculs sont dans `shared/schedule-engine.js`.
 
-- **Salaire** : `MONTHLY_NET` (1 170 €) réparti sur les **jours payés** du mois → `taux journalier = 1 170 / nombre de jours payés`.
+- **Salaire** : `MONTHLY_NET` (1 130 €) réparti sur les **jours payés** du mois → `taux journalier = 1 170 / nombre de jours payés`.
 - **Jours payés** : `PAID_DAY_TYPES` (par défaut entreprise, école et fériés ; **jamais le week-end**). Retirer `'school'` pour geler le salaire les jours d'école.
 - **Horaires** : `WORK_HOURS` (08:30 → 16:30). Le compteur monte à la **minute entière** pendant ces heures.
-- **Week-end / jour non payé** : cumul figé, bandeau « ACQUISITION EN PAUSE ».
+- **Montants réels** : `ACTUAL_MONTHLY_NET` (ex. septembre 2026 = 712,44 €) remplace le calcul pour un mois déjà payé ; le taux journalier de ce mois devient montant réel ÷ jours payés.`n- **Week-end / jour non payé** : cumul figé, bandeau « ACQUISITION EN PAUSE ».
 - **Premier mois** (`PRORATE_FIRST_MONTH`) : taux calculé sur le mois complet, seuls les jours à partir du 14/09/2026 comptent (septembre 2026 ≈ 691 €).
 - **Jours d'école** : 71 jours (24/09/2026 → 15/09/2027), extraits du planning ASRS 2026-2027 et listés par mois.
 - Tous les autres jours de semaine sont des **jours d'entreprise** (SAS NOOUS).
