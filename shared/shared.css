@@ -14,7 +14,7 @@
     --sp-dark: #0f0f0f;
     --sp-card-bg: #141414;
     --sp-dark-gray: #242424;
-    --sp-gray: #8a8a8a;
+    --sp-gray: #9a9a9a;
     --sp-offwhite: #dcdcd7;
     --sp-white: #f5f5f0;
     --sp-red: #e50914;
@@ -31,6 +31,10 @@
     --sp-s3: 12px;
     --sp-s4: 16px;
     --sp-s5: 24px;
+    --sp-s6: 32px;
+
+    /* Taille minimale du texte secondaire (mono, étiquettes) : lisible sur mobile */
+    --fs-micro: 0.8rem;
 
     /* Bordures & angles */
     --sp-bw: 3px;
@@ -241,7 +245,7 @@ a { color: inherit; }
 
 .sp-tag-ribbon { display: flex; gap: var(--sp-s2); margin-top: 6px; }
 .sp-pill-black, .sp-pill-red {
-    font-size: 0.75rem;
+    font-size: var(--fs-micro);
     font-weight: 800;
     letter-spacing: 0.08em;
     padding: 3px 8px;
@@ -264,9 +268,9 @@ a { color: inherit; }
 }
 .sp-status-radar { font-size: 0.8rem; animation: spRadarPulse 1s infinite alternate; }
 .sp-status-text-block { display: flex; align-items: center; gap: 5px; }
-.status-prefix { font-family: var(--font-mono); font-size: 0.72rem; color: var(--sp-gray); font-weight: 700; }
+.status-prefix { font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--sp-gray); font-weight: 700; }
 .status-main { font-family: var(--font-display); font-size: 1.15rem; letter-spacing: 0.06em; }
-.hud-status-caption { font-size: 0.78rem; color: var(--sp-gray); font-family: var(--font-mono); }
+.hud-status-caption { font-size: var(--fs-micro); color: var(--sp-gray); font-family: var(--font-mono); }
 
 .sp-status-badge.status-working { border-color: var(--sp-red); box-shadow: 3px 3px 0 var(--sp-red); }
 .sp-status-badge.status-working .sp-status-radar { color: var(--sp-white); }
@@ -452,7 +456,7 @@ a { color: inherit; }
     color: var(--sp-white);
     border: 1px solid var(--sp-white);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: var(--fs-micro);
     padding: 1px 5px;
 }
 
@@ -460,12 +464,30 @@ a { color: inherit; }
     border-color: var(--sp-gray);
     box-shadow: none;
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: var(--fs-micro);
     font-weight: 700;
     color: var(--sp-offwhite);
 }
 .sp-btn-audio-header:hover { border-color: var(--sp-white); box-shadow: 3px 3px 0 var(--sp-red); transform: skewX(var(--sp-skew)) translateY(-2px); }
 .sp-btn-audio-header[aria-pressed="true"] { background: var(--sp-red); color: #fff; border-color: var(--sp-white); box-shadow: 3px 3px 0 var(--sp-white); }
+
+/* Lien « retour au menu » en bas de page (Mes sites, GTA 6, Grille RNCP) */
+.sp-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 32px 12px 24px;
+    background: var(--sp-white);
+    color: #000;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    clip-path: var(--clip-para);
+    transition: background-color var(--sp-t-fast), color var(--sp-t-fast), transform var(--sp-snap);
+}
+.sp-back-link:hover { background: var(--sp-red); color: var(--sp-white); transform: translateY(-2px); }
+.sp-back-link:focus-visible { clip-path: none; }
 
 /* 6. TRANSITION « MODULE ACCESS » =========================================
    4 panneaux diagonaux (noir, blanc, rouge, jaune) qui balaient l'écran.
@@ -681,7 +703,7 @@ a { color: inherit; }
     transform: rotate(-2deg);
 }
 .hp-value b { font-family: var(--font-display); font-weight: 400; font-size: 1.9rem; letter-spacing: 0.04em; }
-.hp-value i { font-style: normal; font-family: var(--font-mono); font-size: 0.72rem; color: var(--sp-gray); }
+.hp-value i { font-style: normal; font-family: var(--font-mono); font-size: var(--fs-micro); color: var(--sp-gray); }
 .sp-hp--main { margin-top: var(--sp-s2); }
 
 .sp-hp--white .hp-fill { background: repeating-linear-gradient(-45deg, #f5f5f0 0 9px, #cfcfc8 9px 18px); }
@@ -701,7 +723,8 @@ a { color: inherit; }
     .sp-date-hud-sticker { --hud-fs: 13px; }
     .sp-header { padding: var(--sp-s3); }
     .sp-header-right-group { flex-wrap: nowrap; align-items: stretch; gap: var(--sp-s3); }
-    .sp-btn-back { flex: 1; justify-content: center; }
+    .sp-btn-back { flex: 1; justify-content: center; white-space: nowrap; }
+    .sp-btn-back .back-kbd { display: none; } /* pas de clavier sur mobile */
     .sp-btn-audio-header { justify-content: center; }
     .sp-brand-block, .hud-status-wrapper { display: none; } /* le HUD date suffit sur mobile */
 }

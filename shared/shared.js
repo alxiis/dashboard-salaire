@@ -11,7 +11,7 @@
  *   SP.nav      transition « module access » + retour ESC
  *   SP.onTick   horloge unique (1 Hz, alignée sur la seconde)
  *
- * Les pages déclarent <body data-sp-page="menu|dashboard|calendar|gta"> et
+ * Les pages déclarent <body data-sp-page="menu|dashboard|calendar|gta|sites|rncp"> et
  * un <header data-sp-header> ; le shell (fond, header, transition) est monté ici.
  * ==========================================================================
  */
@@ -45,7 +45,8 @@
         { id: 'dashboard', url: '../dashboard-salary/', title: 'DASHBOARD', sub: 'SALARY', kicker: 'MODULE ACCESS // 01' },
         { id: 'calendar', url: '../calendar/', title: 'CALENDRIER', sub: '', kicker: 'MODULE ACCESS // 02' },
         { id: 'gta', url: '../gta-countdown/', title: 'GTA 6', sub: 'COUNTDOWN', kicker: 'MODULE ACCESS // 03' },
-        { id: 'sites', url: '../sites/', title: 'MES SITES', sub: '', kicker: 'MODULE ACCESS // 04' }
+        { id: 'sites', url: '../sites/', title: 'MES SITES', sub: '', kicker: 'MODULE ACCESS // 04' },
+        { id: 'rncp', url: '../rncp/', title: 'GRILLE', sub: 'RNCP', kicker: 'MODULE ACCESS // 05' }
     ]);
     const MENU_URL = '../main-menu/';
 

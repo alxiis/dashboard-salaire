@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#050505">
+    <link rel="icon" type="image/svg+xml" href="../shared/icons/favicon.svg?v=20261115c">
+    <link rel="icon" type="image/png" sizes="32x32" href="../shared/icons/favicon-32.png?v=20261115c">
+    <link rel="apple-touch-icon" href="../shared/icons/apple-touch-icon.png?v=20261115c">
+    <title>Salary Pulse — Grille RNCP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/shared.css?v=20261115c">
+    <link rel="stylesheet" href="rncp.css?v=20261115c">
+</head>
+<body data-sp-page="rncp" data-sp-hud="auto">
+    <div class="sp-app-container" id="rnApp">
+        <header class="sp-header" data-sp-header="module"></header>
+
+        <main class="rn-main">
+            <!-- Titre -->
+            <div class="rn-intro">
+                <p class="rn-kicker">RNCP 41996 · NIVEAU 6 · ASRS</p>
+                <h1 class="rn-title" data-ransom>GRILLE RNCP</h1>
+                <p class="rn-lead">Les 63 compétences du titre, pour le mémoire de fin d'alternance : ce qui reste à faire, ce qui a été fait. Clique sur une compétence pour voir les preuves rattachées.</p>
+            </div>
+
+            <!-- Avancement global -->
+            <section class="rn-summary" aria-label="Avancement global">
+                <div class="rn-bars">
+                    <div class="sp-hp sp-hp--red" id="rnBarCovered">
+                        <span class="hp-label">COMPÉTENCES <em>COUVERTES</em></span>
+                        <div class="hp-track"><div class="hp-fill"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                        <span class="hp-value"><b data-bar-pct>0 %</b><i data-bar-count>0 / 63</i></span>
+                    </div>
+                    <div class="sp-hp sp-hp--white" id="rnBarValidated">
+                        <span class="hp-label">COMPÉTENCES <em>VALIDÉES</em></span>
+                        <div class="hp-track"><div class="hp-fill"></div><div class="hp-ticks" aria-hidden="true"></div></div>
+                        <span class="hp-value"><b data-bar-pct>0 %</b><i data-bar-count>0 / 63</i></span>
+                    </div>
+                </div>
+
+                <dl class="rn-stats">
+                    <div class="rn-stat rn-stat--todo"><dt>À FAIRE</dt><dd id="rnCountTodo">0</dd></div>
+                    <div class="rn-stat rn-stat--doing"><dt>EN COURS</dt><dd id="rnCountDoing">0</dd></div>
+                    <div class="rn-stat rn-stat--done"><dt>VALIDÉES</dt><dd id="rnCountDone">0</dd></div>
+                </dl>
+
+                <div class="rn-facts">
+                    <p class="rn-fact" id="rnFactUpdate" data-late="false"><span class="rn-fact-tag">DERNIÈRE MISE À JOUR</span><b id="rnUpdateText">—</b><span id="rnUpdateSub">—</span></p>
+                    <p class="rn-fact"><span class="rn-fact-tag">FIN D'ALTERNANCE</span><b id="rnEndText">—</b><span id="rnEndSub">—</span></p>
+                </div>
+            </section>
+
+            <!-- Filtres -->
+            <section class="rn-toolbar" aria-label="Filtres de la grille">
+                <div class="rn-filter" role="group" aria-label="Filtrer par statut" id="rnStatusFilter">
+                    <button type="button" class="rn-chip is-active" data-status="all" aria-pressed="true">TOUTES</button>
+                    <button type="button" class="rn-chip" data-status="a-faire" aria-pressed="false">À FAIRE</button>
+                    <button type="button" class="rn-chip" data-status="en-cours" aria-pressed="false">EN COURS</button>
+                    <button type="button" class="rn-chip" data-status="validee" aria-pressed="false">VALIDÉES</button>
+                </div>
+                <div class="rn-filter" role="group" aria-label="Filtrer par bloc de compétences" id="rnBlocFilter"></div>
+                <label class="rn-search">
+                    <span class="sp-sr-only">Rechercher une compétence</span>
+                    <input type="search" id="rnSearch" placeholder="RECHERCHER (ex. VPN, sauvegarde, PSSI…)" autocomplete="off" spellcheck="false">
+                </label>
+                <p class="rn-result" id="rnResult" role="status" aria-live="polite"></p>
+            </section>
+
+            <!-- Grille -->
+            <div class="rn-board" id="rnBoard"></div>
+
+            <!-- Journal hebdomadaire -->
+            <section class="rn-section" id="rnJournalSection" aria-labelledby="rnJournalTitle">
+                <h2 class="rn-h2" id="rnJournalTitle"><span class="sec-num" aria-hidden="true">02</span><span data-ransom>JOURNAL HEBDO</span></h2>
+                <ol class="rn-weeks" id="rnWeeks"></ol>
+            </section>
+
+            <!-- Mise à jour hebdomadaire -->
+            <section class="rn-section" id="rnUpdateSection" aria-labelledby="rnUpdateTitle">
+                <h2 class="rn-h2" id="rnUpdateTitle"><span class="sec-num" aria-hidden="true">03</span><span data-ransom>MISE À JOUR HEBDO</span></h2>
+
+                <ol class="rn-steps">
+                    <li><b>COPIE</b> le prompt ci-dessous.</li>
+                    <li><b>COLLE-LE</b> dans Claude Chat, dans le projet de l'entreprise (NOOUS).</li>
+                    <li><b>COLLE ICI</b> le JSON qu'il renvoie, puis clique sur IMPORTER.</li>
+                    <li><b>PUBLIE</b> (facultatif) : « COPIER LE JSON FUSIONNÉ » → à coller à la place du bloc <code>window.RNCP_PROGRESS = …</code> de <code>rncp/rncp-progress.js</code>.</li>
+                </ol>
+
+                <div class="rn-update-grid">
+                    <div class="rn-box">
+                        <label class="rn-box-title" for="rnPrompt">PROMPT HEBDO POUR CLAUDE CHAT</label>
+                        <textarea id="rnPrompt" class="rn-textarea" rows="10" readonly></textarea>
+                        <div class="rn-actions"><button type="button" class="rn-btn" id="rnCopyPrompt">COPIER LE PROMPT</button></div>
+                    </div>
+                    <div class="rn-box">
+                        <label class="rn-box-title" for="rnImport">JSON DE CLAUDE CHAT</label>
+                        <textarea id="rnImport" class="rn-textarea" rows="10" placeholder='{ "maj": "2026-11-15", "competences": { "BC01-01": { "statut": "en-cours", "preuves": [ … ] } } }' spellcheck="false"></textarea>
+                        <div class="rn-actions">
+                            <button type="button" class="rn-btn rn-btn--red" id="rnImportBtn">IMPORTER</button>
+                            <button type="button" class="rn-btn" id="rnExportBtn">COPIER LE JSON FUSIONNÉ</button>
+                            <button type="button" class="rn-btn rn-btn--ghost" id="rnResetBtn">EFFACER L'IMPORT LOCAL</button>
+                        </div>
+                        <p class="rn-msg" id="rnMsg" role="status" aria-live="polite"></p>
+                    </div>
+                </div>
+                <p class="rn-note">L'import est gardé dans ce navigateur (localStorage) et fusionné avec <code>rncp-progress.js</code> : aucune donnée n'est envoyée nulle part.</p>
+            </section>
+
+            <p class="rn-back"><a href="../main-menu/" class="sp-back-link" data-sp-back><span aria-hidden="true">◀</span> MENU PRINCIPAL [ESC]</a></p>
+        </main>
+    </div>
+
+    <!-- Fiche d'une compétence -->
+    <div class="rn-backdrop" id="rnBackdrop" hidden></div>
+    <aside class="rn-panel" id="rnPanel" role="dialog" aria-modal="true" aria-labelledby="rnPanelTitle" tabindex="-1" hidden>
+        <button type="button" class="rn-panel-close" id="rnPanelClose" aria-label="Fermer la fiche"><span aria-hidden="true">✕</span> FERMER <kbd>ESC</kbd></button>
+        <div class="rn-panel-body" id="rnPanelBody"></div>
+    </aside>
+
+    <script src="../shared/scheduleConfig.js?v=20261115c" defer></script>
+    <script src="../shared/schedule-engine.js?v=20261115c" defer></script>
+    <script src="../shared/shared.js?v=20261115c" defer></script>
+    <script src="rncp-data.js?v=20261115c" defer></script>
+    <script src="rncp-progress.js?v=20261115c" defer></script>
+    <script src="rncp-ui.js?v=20261115c" defer></script>
+</body>
+</html>

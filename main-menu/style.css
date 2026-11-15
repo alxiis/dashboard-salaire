@@ -167,7 +167,7 @@
 .mm-brand-kicker {
     font-family: var(--font-body);
     font-weight: 800;
-    font-size: 0.72rem;
+    font-size: var(--fs-micro);
     letter-spacing: 0.22em;
     color: var(--sp-white);
     background: #000;
@@ -386,6 +386,22 @@
     margin-left: 10vw;
 }
 .mm-cmd:nth-of-type(4) { z-index: 1; }
+
+/* — Grille RNCP : plaque blanche penchée à l'opposé du calendrier, lecture inversée à la sélection — */
+.mm-rncp {
+    --f: clamp(2.6rem, 12vw, 5rem);
+    --slab: var(--sp-white);
+    --slab-sel: var(--sp-red);
+    --ink: #050505;
+    --ink-sel: var(--sp-white);
+    --shade: var(--sp-red);
+    --shade-sel: #000;
+    --clip: polygon(0 6%, 96% 0, 100% 94%, 4% 100%);
+    margin-left: 3vw;
+}
+.mm-rncp .mm-l1, .mm-rncp .mm-l2 { -webkit-text-stroke: 0; text-shadow: 0.045em 0.045em 0 var(--shade); }
+.mm-rncp .mm-l2 { font-size: 1em; margin-left: 0.5em; }
+.mm-cmd:nth-of-type(5) { z-index: 1; }
 /* Pointeur de sélection : étoile jaune cerclée, glisse vers la commande active */
 .mm-pointer {
     position: absolute;
@@ -494,6 +510,7 @@
     .mm-calendar { --f: calc(var(--u) * 6); left: 30vw; top: 66vh; margin: 0; }
     .mm-gta { --f: calc(var(--u) * 6.4); left: 58vw; right: auto; top: 68vh; margin: 0; } /* sous la ceinture du personnage : torse, tête et bras restent visibles */
     .mm-sites { --f: calc(var(--u) * 4.6); left: 33vw; top: 83vh; margin: 0; }
+    .mm-rncp { --f: calc(var(--u) * 5); left: 51vw; top: 36vh; margin: 0; }
 
     /* mouvement des autres commandes : elles s'écartent de la sélection */
     .mm-cmd { transform: translate(calc(var(--rel, 0) * -0.5vw), calc(var(--rel, 0) * 1.2vh)) rotate(var(--r, 0deg)); }
@@ -550,6 +567,7 @@
     .mm-calendar { --f: clamp(2.6rem, 12.5vw, 6.4rem); }
     .mm-gta { --f: clamp(2.8rem, 14vw, 7rem); }
     .mm-sites { --f: clamp(2.4rem, 11vw, 5.2rem); }
+    .mm-rncp { --f: clamp(2.6rem, 12vw, 5.6rem); }
 }
 @media (max-width: 360px) {
     .mm-hud .sp-date-hud-sticker { --hud-fs: 10.5px; }

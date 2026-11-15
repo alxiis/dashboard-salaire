@@ -84,7 +84,7 @@
 
 /* Détail du jour sélectionné */
 .cal-detail { --slab-clip: var(--clip-slab-c); --slab-shadow: 8px 8px 0 var(--sp-red); display: grid; gap: 6px; padding: 22px 26px 28px; transform: rotate(1.2deg); }
-.cal-detail-tag { justify-self: start; padding: 1px 12px 1px 8px; background: var(--sp-red); font-family: var(--font-mono); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.1em; clip-path: var(--clip-para); }
+.cal-detail-tag { justify-self: start; padding: 1px 12px 1px 8px; background: var(--sp-red); font-family: var(--font-mono); font-size: var(--fs-micro); font-weight: 800; letter-spacing: 0.1em; clip-path: var(--clip-para); }
 .cal-detail-date { font-family: var(--font-display); font-size: 1.9rem; line-height: 1; letter-spacing: 0.04em; }
 .cal-detail-kind { font-family: var(--font-body); font-weight: 800; letter-spacing: 0.1em; color: var(--sp-red); }
 .cal-detail[data-kind="rest"] .cal-detail-kind, .cal-detail[data-kind="before"] .cal-detail-kind { color: var(--sp-gray); }
@@ -124,7 +124,7 @@
 .cal-switch-btn.is-active { background: var(--sp-red); transform: scale(1.06); z-index: 1; position: relative; }
 
 /* Légende : mêmes textures que les cases */
-.cal-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; font-family: var(--font-mono); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.08em; }
+.cal-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; list-style: none; font-family: var(--font-mono); font-size: var(--fs-micro); font-weight: 800; letter-spacing: 0.08em; }
 .cal-legend li { display: inline-flex; align-items: center; gap: 8px; }
 .lg { display: inline-block; width: 22px; height: 16px; clip-path: var(--clip-para); }
 
@@ -208,7 +208,7 @@ body:not(.cal-ready) .cal-day { opacity: 0; }
 .cal-stat:nth-child(2) { clip-path: var(--clip-para); transform: translateY(6px); }
 .cal-stat:nth-child(3) { clip-path: var(--clip-slab-c); }
 .cal-stat b { font-family: var(--font-display); font-weight: 400; font-size: 2rem; line-height: 1; }
-.cal-stat span { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; color: var(--sp-gray); }
+.cal-stat span { font-family: var(--font-mono); font-size: var(--fs-micro); font-weight: 800; letter-spacing: 0.1em; color: var(--sp-gray); }
 .cal-stat--red { background: var(--sp-red); }
 .cal-stat--red span { color: var(--sp-white); }
 
