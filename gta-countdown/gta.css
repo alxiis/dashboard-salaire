@@ -96,14 +96,14 @@
 }
 .gta-unit:nth-of-type(even) { background: #000; color: var(--sp-white); clip-path: var(--clip-slab-c); }
 .gta-unit b { font-family: var(--font-display); font-weight: 400; font-size: clamp(3rem, 10vw, 6.6rem); line-height: 0.95; font-variant-numeric: tabular-nums; }
-.gta-unit span { font-family: var(--font-mono); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.16em; }
+.gta-unit span { font-family: var(--font-mono); font-size: var(--fs-micro); font-weight: 800; letter-spacing: 0.16em; }
 .gta-unit--sec { background: var(--sp-white); }
 .gta-unit--sec b { color: var(--sp-red); }
 .gta-sep { font-family: var(--font-display); font-style: normal; font-size: clamp(2rem, 6vw, 4rem); color: var(--sp-white); text-shadow: 3px 3px 0 #000; }
 
 .gta-sign { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.08em; transform: rotate(-1.5deg); }
 .gta-sign span { padding: 2px 12px; background: var(--sp-white); color: #000; clip-path: var(--clip-para); }
-.gta-sign b { font-weight: 400; color: var(--sp-red); margin-left: 6px; }
+.gta-sign b { font-weight: 400; color: var(--sp-white); text-shadow: 2px 2px 0 var(--sp-red); margin-left: 6px; } /* blanc : le rouge seul se perdait sur la carte */
 
 /* Impact à chaque seconde */
 .gta-card.is-hit { animation: gtaShake 130ms steps(4); }
@@ -124,9 +124,6 @@
 /* Sortie effective */
 .gta-card.is-released .gta-title { animation: gtaSpin2 1.2s steps(2) infinite; }
 @keyframes gtaSpin2 { 50% { transform: rotate(-1deg) scale(1.03); } }
-
-.gta-back { --slab-clip: var(--clip-para); --slab-shadow: 6px 6px 0 var(--sp-red); display: inline-flex; gap: 12px; padding: 12px 34px 12px 26px; color: #000; font-family: var(--font-display); font-size: 1.3rem; letter-spacing: 0.06em; text-decoration: none; transform: rotate(1deg); transition: transform var(--sp-snap); }
-.gta-back:hover { transform: rotate(0) translateY(-3px); }
 
 @media (max-width: 560px) {
     .gta-card { padding: 46px 14px 64px; transform: rotate(-1deg); }

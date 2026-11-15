@@ -27,7 +27,7 @@ window.SCHEDULE_CONFIG = Object.freeze({
     // (le week-end ne rapporte jamais). Retirer 'school' pour geler le salaire les jours d'école.
     PAID_DAY_TYPES: ['company', 'school', 'holiday'],
 
-    // true  : 1 170 € est divisé par les jours payés du MOIS COMPLET, seuls les jours
+    // true  : 1 130 € est divisé par les jours payés du MOIS COMPLET, seuls les jours
     //         à partir de ALTERNANCE_START comptent (le 1er mois est proratisé).
     // false : on divise par les seuls jours payés à partir de ALTERNANCE_START.
     PRORATE_FIRST_MONTH: true,
