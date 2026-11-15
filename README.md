@@ -30,7 +30,7 @@ Chaque page module déclare `<body data-sp-page="…">` et un `<header data-sp-h
 ## Déploiement (GitHub Pages)
 
 Pages sert les fichiers avec `Cache-Control: max-age=600`. Tous les scripts et feuilles de style portent donc un `?v=VERSION`
-(dans chaque `index.html`, version actuelle `20261115c`) : **changer cette version à chaque mise en ligne** pour qu'aucun navigateur ne mélange d'anciens et de nouveaux fichiers.
+(dans chaque `index.html`, version actuelle `20261115d`) : **changer cette version à chaque mise en ligne** pour qu'aucun navigateur ne mélange d'anciens et de nouveaux fichiers.
 En cas d'affichage incomplet (« -- », « undefined »), recharger avec Ctrl+F5.
 
 ## Lancer
