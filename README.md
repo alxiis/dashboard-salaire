@@ -15,7 +15,7 @@ dashboard-salaire/
 │   ├── shared.js           window.SP : config, storage, audio, statut, HUD, navigation
 │   ├── scheduleConfig.js   ← planning, salaire, horaires, jours d'école (À MODIFIER ICI)
 │   └── schedule-engine.js  window.Schedule : types de jour, taux journalier, progression
-├── main-menu/              écran de sélection plein écran (art/figure.svg remplaçable)
+├── main-menu/              écran de sélection plein écran (art/figure.svg : personnage maison, pose « le vent », remplaçable)
 ├── dashboard-salary/       script.js (moteur) · salary-ui.js (affichage) · style.css
 ├── calendar/               calendar-engine.js (pur) · calendar-ui.js · calendar.css
 ├── gta-countdown/          config.js (date de sortie) · countdown-engine.js · gta-ui.js · gta.css
@@ -30,7 +30,7 @@ Chaque page module déclare `<body data-sp-page="…">` et un `<header data-sp-h
 ## Déploiement (GitHub Pages)
 
 Pages sert les fichiers avec `Cache-Control: max-age=600`. Tous les scripts et feuilles de style portent donc un `?v=VERSION`
-(dans chaque `index.html`, version actuelle `20261115d`) : **changer cette version à chaque mise en ligne** pour qu'aucun navigateur ne mélange d'anciens et de nouveaux fichiers.
+(dans chaque `index.html`, version actuelle `20261116b`) : **changer cette version à chaque mise en ligne** pour qu'aucun navigateur ne mélange d'anciens et de nouveaux fichiers.
 En cas d'affichage incomplet (« -- », « undefined »), recharger avec Ctrl+F5.
 
 ## Lancer

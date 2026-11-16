@@ -1,86 +1,45 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 700" fill="none">
-  <!-- Silhouette originale « voleur d'élite » (placeholder d'illustration).
-       Remplacer ce fichier, ou changer le src de .mm-figure, pour intégrer une illustration finale. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="60 20 700 762" fill="none">
+  <!-- « Le voleur de temps » : personnage maison, pose « le vent », tête mi-ombre.
+       Aplats noir / blanc / rouge, membres en traits épais, manteau et écharpe en courbes.
+       Aucun tracé repris d'une œuvre existante. Pour le remplacer : changer ce fichier,
+       ou le src de .mm-figure dans main-menu/index.html. -->
   <defs>
-    <pattern id="dots" width="9" height="9" patternUnits="userSpaceOnUse">
-      <circle cx="2.5" cy="2.5" r="1.3" fill="#ffffff" fill-opacity=".16"/>
-    </pattern>
-
-    <!-- Toutes les formes noires : servent au contour blanc, à l'ombre dure et au remplissage -->
-    <g id="sil">
-      <!-- pans de manteau qui volent vers l'arrière -->
-      <path d="M214 425 L150 436 L58 492 L112 500 L36 592 L124 556 L112 650 L196 540 L226 566 Z"/>
-      <path d="M226 425 L302 425 L326 486 L298 528 L262 474 L238 530 L214 470 Z"/>
-      <!-- jambes en foulée -->
-      <path d="M236 470 L272 470 L262 560 L236 648 L194 648 L216 560 Z"/>
-      <path d="M186 646 L240 642 L246 672 L162 678 Z"/>
-      <path d="M268 465 L314 470 L338 560 L376 636 L340 652 L296 572 Z"/>
-      <path d="M336 634 L392 628 L402 660 L326 668 Z"/>
-      <!-- torse + cols relevés -->
-      <path d="M176 242 L236 228 L284 222 L334 246 L340 302 L324 424 L214 432 L190 332 Z"/>
-      <path d="M176 242 L142 208 L204 226 Z"/>
-      <path d="M334 246 L378 214 L332 226 Z"/>
-      <!-- bras gauche (main sur la hanche) -->
-      <path d="M180 248 L216 244 L198 300 L170 340 L204 380 L186 398 L138 346 Z"/>
-      <!-- bras tendu qui présente la pièce -->
-      <path d="M326 252 L362 264 L424 262 L474 234 L486 262 L424 298 L354 302 L326 290 Z"/>
-      <!-- cou + tête -->
-      <path d="M238 214 L274 208 L280 244 L234 250 Z"/>
-      <path d="M212 150 L218 196 L252 224 L290 202 L302 150 L282 132 L240 130 Z"/>
-      <!-- cheveux en épines -->
-      <path d="M194 158 L182 120 L206 112 L192 74 L232 92 L246 50 L270 88 L306 62 L298 104 L334 116 L310 142 L302 162 L282 128 L240 126 L214 162 Z"/>
-    </g>
-  </defs>
-
-  <!-- ombre portée dure -->
-  <use href="#sil" transform="translate(16 16)" fill="#000" fill-opacity=".55"/>
-  <!-- contour « autocollant » blanc -->
-  <use href="#sil" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="20" stroke-linejoin="round"/>
-  <!-- remplissage noir -->
-  <use href="#sil" fill="#050505"/>
-
-  <!-- trame sur le manteau -->
-  <path d="M176 242 L236 228 L284 222 L334 246 L340 302 L324 424 L214 432 L190 332 Z" fill="url(#dots)"/>
-  <path d="M214 425 L150 436 L58 492 L112 500 L36 592 L124 556 L112 650 L196 540 L226 566 Z" fill="url(#dots)"/>
-
-  <!-- doublure rouge des pans -->
-  <path d="M178 452 L90 502 L128 510 L70 574 L152 546 L206 500 Z" fill="#e50914"/>
-  <path d="M256 470 L282 526 L298 500 L312 486 L296 470 Z" fill="#e50914"/>
-
-  <!-- écharpe rouge qui flotte -->
-  <path d="M236 228 L154 240 L76 212 L38 244 L112 266 L196 266 Z" fill="#e50914" stroke="#050505" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M112 266 L84 296 L136 282 Z" fill="#e50914" stroke="#050505" stroke-width="3" stroke-linejoin="round"/>
-
-  <!-- chemise blanche + revers -->
-  <path d="M242 230 L268 232 L262 318 L246 302 Z" fill="#f5f5f0"/>
-  <path d="M236 228 L216 262 L232 336 L250 300 Z" fill="#e50914"/>
-  <path d="M286 224 L266 232 L262 318 L284 340 L312 300 L332 250 Z" fill="#e50914"/>
-  <path d="M236 228 L216 262 L232 336 M286 224 L310 296 L284 340" stroke="#f5f5f0" stroke-width="3" stroke-linejoin="round"/>
-
-  <!-- gants blancs -->
-  <path d="M472 232 L494 248 L486 272 L462 262 Z" fill="#f5f5f0" stroke="#050505" stroke-width="3" stroke-linejoin="round"/>
-  <path d="M176 384 L204 380 L208 404 L184 412 Z" fill="#f5f5f0" stroke="#050505" stroke-width="3" stroke-linejoin="round"/>
-
-  <!-- pièce lancée : étoile blanche à cœur rouge -->
-  <g transform="translate(478 196) rotate(14)">
-    <polygon points="0,-34 9,-11 34,-11 14,4 21,29 0,14 -21,29 -14,4 -34,-11 -9,-11" fill="#f5f5f0" stroke="#050505" stroke-width="4" stroke-linejoin="round"/>
-    <circle r="9" fill="#e50914" stroke="#050505" stroke-width="3"/>
+    <filter id="f-sh" x="-10%" y="-10%" width="125%" height="125%"><feDropShadow dx="14" dy="14" stdDeviation="0" flood-color="#000" flood-opacity=".5"/></filter>
+    <pattern id="f-dots" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><circle cx="3" cy="3" r="1.5" fill="#f5f5f0" fill-opacity=".16"/></pattern>
+    <pattern id="f-dd" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-18)"><circle cx="2.5" cy="2.5" r="1.6" fill="#050505" fill-opacity=".28"/></pattern></defs>
+  <g>
+  <path d="M90 250 H190 M70 420 H170 M110 600 H210 M580 120 H720" stroke="#f5f5f0" stroke-width="5" stroke-linecap="round" stroke-opacity=".55"/>
+  <g filter="url(#f-sh)">
+    <path d="M250 222 L356 218 C380 300 380 360 372 420 C460 440 560 400 680 300 C640 420 560 500 470 520 C540 540 620 540 700 500 C640 600 540 640 440 610 C470 660 520 700 560 760 C470 730 380 660 330 560 L300 470 L262 520 C240 440 236 320 250 222 Z" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="13" stroke-linejoin="round"/><path d="M250 222 L356 218 C380 300 380 360 372 420 C460 440 560 400 680 300 C640 420 560 500 470 520 C540 540 620 540 700 500 C640 600 540 640 440 610 C470 660 520 700 560 760 C470 730 380 660 330 560 L300 470 L262 520 C240 440 236 320 250 222 Z" fill="#050505"/><path d="M250 222 L356 218 C380 300 380 360 372 420 C460 440 560 400 680 300 C640 420 560 500 470 520 C540 540 620 540 700 500 C640 600 540 640 440 610 C470 660 520 700 560 760 C470 730 380 660 330 560 L300 470 L262 520 C240 440 236 320 250 222 Z" fill="url(#f-dots)"/>
+    <path d="M420 446 C500 450 590 410 664 326 C630 410 560 474 478 496 Z" fill="#e50914"/><path d="M420 446 C500 450 590 410 664 326 C630 410 560 474 478 496 Z" fill="url(#f-dd)"/>
+    <path d="M470 540 C540 556 620 552 686 516 C640 580 560 608 478 592 Z" fill="#e50914"/><path d="M470 540 C540 556 620 552 686 516 C640 580 560 608 478 592 Z" fill="url(#f-dd)"/>
+    <path d="M440 630 C472 676 510 712 546 746 C480 716 420 664 384 600 Z" fill="#e50914"/><path d="M440 630 C472 676 510 712 546 746 C480 716 420 664 384 600 Z" fill="url(#f-dd)"/>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M290 432 Q282 520 274 590" stroke="#f5f5f0" stroke-width="55"/><path d="M274 590 Q266 660 256 722" stroke="#f5f5f0" stroke-width="43"/><path d="M290 432 Q282 520 274 590" stroke="#050505" stroke-width="44"/><path d="M274 590 Q266 660 256 722" stroke="#050505" stroke-width="32"/></g>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M322 432 Q336 520 346 590" stroke="#f5f5f0" stroke-width="55"/><path d="M346 590 Q360 660 370 722" stroke="#f5f5f0" stroke-width="43"/><path d="M322 432 Q336 520 346 590" stroke="#050505" stroke-width="44"/><path d="M346 590 Q360 660 370 722" stroke="#050505" stroke-width="32"/></g>
+    <path d="M234 716 L272 716 L276 752 L208 752 Z" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="13" stroke-linejoin="round"/><path d="M234 716 L272 716 L276 752 L208 752 Z" fill="#050505"/><path d="M354 716 L392 716 L418 752 L352 752 Z" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="13" stroke-linejoin="round"/><path d="M354 716 L392 716 L418 752 L352 752 Z" fill="#050505"/>
+    <path d="M210 750 L274 750 M354 750 L416 750" stroke="#e50914" stroke-width="5" stroke-linecap="round"/>
+    <path d="M252 226 L354 222 C372 300 372 360 364 430 L300 470 L266 430 C246 360 242 300 252 226 Z" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="13" stroke-linejoin="round"/><path d="M252 226 L354 222 C372 300 372 360 364 430 L300 470 L266 430 C246 360 242 300 252 226 Z" fill="#050505"/><path d="M252 226 L354 222 C372 300 372 360 364 430 L300 470 L266 430 C246 360 242 300 252 226 Z" fill="url(#f-dots)"/>
+    <path d="M282 226 L324 226 L304 310 Z" fill="#f5f5f0"/><path d="M297 230 L311 230 L305 290 Z" fill="#e50914"/>
+    <path d="M282 226 L304 310 L324 226" stroke="#f5f5f0" stroke-width="3" stroke-linejoin="round"/>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M254 236 Q226 290 232 340" stroke="#f5f5f0" stroke-width="41"/><path d="M232 340 Q240 380 258 408" stroke="#f5f5f0" stroke-width="34"/><path d="M254 236 Q226 290 232 340" stroke="#050505" stroke-width="30"/><path d="M232 340 Q240 380 258 408" stroke="#050505" stroke-width="23"/></g>
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M356 234 Q386 290 380 340" stroke="#f5f5f0" stroke-width="41"/><path d="M380 340 Q370 380 352 406" stroke="#f5f5f0" stroke-width="34"/><path d="M356 234 Q386 290 380 340" stroke="#050505" stroke-width="30"/><path d="M380 340 Q370 380 352 406" stroke="#050505" stroke-width="23"/></g>
+    <path d="M326 200 C420 150 480 222 560 170 C610 140 660 162 706 128 L698 174 C650 198 610 182 570 208 C490 258 420 198 338 236 Z" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="11" stroke-linejoin="round"/><path d="M326 200 C420 150 480 222 560 170 C610 140 660 162 706 128 L698 174 C650 198 610 182 570 208 C490 258 420 198 338 236 Z" fill="#e50914" stroke="#050505" stroke-width="4" stroke-linejoin="round"/><path d="M326 200 C420 150 480 222 560 170 C610 140 660 162 706 128 L698 174 C650 198 610 182 570 208 C490 258 420 198 338 236 Z" fill="url(#f-dd)"/>
+    <path d="M264 228 L282 190 L332 190 L348 224 Z" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="13" stroke-linejoin="round"/><path d="M264 228 L282 190 L332 190 L348 224 Z" fill="#050505"/>
+  <g transform="translate(229 92) scale(0.78)">
+    <path d="M50 96 L60 40 C84 10 130 8 150 34 L196 24 L168 52 L214 62 L170 78 L200 108 L160 104 L170 140 L140 122 L134 96 L132 62 L118 84 L110 58 L96 88 L88 56 L74 84 L70 58 Z M62 60 L58 100 L66 128 L90 156 L104 156 L126 132 L134 96 L132 60 Z M82 140 L116 140 L120 178 L84 178 Z" fill="#f5f5f0" stroke="#f5f5f0" stroke-width="10" stroke-linejoin="round"/>
+    <path d="M82 140 L116 140 L120 178 L84 178 Z" fill="#f5f5f0"/>
+    <path d="M82 146 L90 156 L104 156 L118 142 L120 168 L84 168 Z" fill="#050505"/>
+    <path d="M62 60 L58 100 L66 128 L90 156 L104 156 L126 132 L134 96 L132 60 Z" fill="#f5f5f0"/>
+    <path d="M113 60 L132 60 L134 96 L126 132 L104 156 L99 156 L106 118 Z" fill="#050505"/>
+    <path d="M63 91 L90 96" stroke="#050505" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M66 98 L88 102 L86 107 L70 106 Z" fill="#050505"/><circle cx="79" cy="103" r="2.4" fill="#e50914"/>
+    <path d="M111 102 L129 97 L127 105 L113 108 Z" fill="#f5f5f0"/><circle cx="120" cy="102.5" r="2.6" fill="#e50914"/>
+    <path d="M96 108 L91 124 L97 126" stroke="#050505" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M78 138 L94 140 L101 136" stroke="#050505" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M50 96 L60 40 C84 10 130 8 150 34 L196 24 L168 52 L214 62 L170 78 L200 108 L160 104 L170 140 L140 122 L134 96 L132 62 L118 84 L110 58 L96 88 L88 56 L74 84 L70 58 Z" fill="#050505"/>
+    <path d="M92 22 L142 22 L98 32 Z M146 58 L196 62 L150 68 Z" fill="#f5f5f0" fill-opacity=".9"/>
   </g>
-
-  <!-- visage -->
-  <path d="M214 156 L220 196 L252 222 L288 200 L300 156 Z" fill="#f5f5f0"/>
-  <!-- masque rouge angulaire + fentes -->
-  <path d="M206 152 L304 148 L298 182 L270 174 L252 190 L234 174 L212 184 Z" fill="#e50914" stroke="#050505" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M220 158 L246 163 L240 173 L222 170 Z" fill="#f5f5f0"/>
-  <path d="M264 164 L292 158 L289 170 L268 173 Z" fill="#f5f5f0"/>
-  <!-- sourire en biais -->
-  <path d="M238 202 L272 196 L266 206 L248 208 Z" fill="#050505"/>
-  <!-- reflets de cheveux -->
-  <path d="M200 150 L192 118 M236 118 L246 74 M276 112 L306 78" stroke="#f5f5f0" stroke-width="3" stroke-linecap="round"/>
-
-  <!-- lumière de contour sur le manteau et les jambes -->
-  <path d="M180 250 L194 332 L216 428 M336 254 L340 302 L326 420" stroke="#f5f5f0" stroke-width="3" stroke-linecap="round" stroke-opacity=".8"/>
-  <path d="M242 480 L236 560 L214 640 M318 480 L338 556 L372 630" stroke="#f5f5f0" stroke-width="3" stroke-linecap="round" stroke-opacity=".6"/>
-  <!-- semelles rouges -->
-  <path d="M164 674 L246 668 L246 672 L162 678 Z M328 664 L402 656 L402 660 L326 668 Z" fill="#e50914"/>
+  </g>
+  <g transform="translate(170 150) rotate(-12) scale(0.8)"><polygon points="0,-34 9,-11 34,-11 14,4 21,29 0,14 -21,29 -14,4 -34,-11 -9,-11" fill="#f5f5f0" stroke="#050505" stroke-width="4" stroke-linejoin="round"/><circle r="9" fill="#e50914" stroke="#050505" stroke-width="3"/></g><g transform="translate(640 680) rotate(10) scale(0.6)"><polygon points="0,-34 9,-11 34,-11 14,4 21,29 0,14 -21,29 -14,4 -34,-11 -9,-11" fill="#e50914" stroke="#050505" stroke-width="4" stroke-linejoin="round"/></g>
+  </g>
 </svg>
