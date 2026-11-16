@@ -478,16 +478,9 @@
         <div class="sp-header-right-group">
             <a href="${MENU_URL}" id="btnBackToMenu" class="sp-btn-back" aria-keyshortcuts="Escape">
                 <span class="back-arrow" aria-hidden="true">◀</span>
-                <span class="back-text">MENU PRINCIPAL</span>
+                <span class="back-text">MENU</span>
                 <kbd class="back-kbd">ESC</kbd>
             </a>
-            <div class="sp-brand-block" aria-hidden="true">
-                <div class="sp-logo-icon"><span class="sp-star">★</span></div>
-                <div class="sp-brand-text">
-                    <div class="sp-brand-title"><span class="title-main">SALARY</span><span class="title-sub">PULSE</span></div>
-                    <div class="sp-tag-ribbon"><span class="sp-pill-black">SYSTEM // V3</span><span class="sp-pill-red">PULSE OS</span></div>
-                </div>
-            </div>
             ${statusMarkup()}
             ${audioButtonMarkup()}
         </div>`;
@@ -501,7 +494,7 @@
             const bg = document.createElement('div');
             bg.className = 'sp-bg-overlay';
             bg.setAttribute('aria-hidden', 'true');
-            bg.innerHTML = '<div class="sp-stripe-band"></div><div class="sp-halftone"></div><div class="sp-action-slash slash-1"></div><div class="sp-action-slash slash-2"></div>';
+            bg.innerHTML = '<div class="sp-bg-star"><i></i></div><div class="sp-halftone"></div><div class="sp-action-slash slash-1"></div><div class="sp-action-slash slash-2"></div><div class="sp-bg-shard"></div><div class="sp-stripe-band"></div>';
             document.body.prepend(bg);
         }
 

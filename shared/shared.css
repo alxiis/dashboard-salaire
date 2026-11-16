@@ -1,7 +1,7 @@
 /* ==========================================================================
    SALARY PULSE // DESIGN SYSTEM
    Grammaire : noir + rouge + blanc · collage · diagonales · hard shadows
-   Fichier partagé par tous les modules (menu, dashboard, calendrier, GTA 6).
+   Fichier partagé par tous les modules (menu, dashboard, calendrier, GTA 6, sites, grille RNCP).
 
    1. Tokens   2. Base   3. Fond   4. HUD / header   5. Boutons   6. Transition
    7. Briques P5 (dalles, lettres, glitch)   8. Barres HP   9. Responsive & accessibilité
@@ -165,6 +165,37 @@ a { color: inherit; }
     z-index: 2;
 }
 
+/* Étoiles concentriques : grande étoile qui tourne très lentement dans le coin haut-droit */
+.sp-bg-star {
+    --star: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    position: absolute;
+    top: -34vmin;
+    right: -30vmin;
+    width: 120vmin;
+    height: 120vmin;
+    background: rgba(229, 9, 20, 0.2);
+    clip-path: var(--star);
+    animation: spStarTurn 140s linear infinite;
+}
+.sp-bg-star::before,
+.sp-bg-star::after { content: ''; position: absolute; clip-path: var(--star); }
+.sp-bg-star::before { inset: 11%; background: var(--sp-black); }
+.sp-bg-star::after { inset: 24%; background: rgba(229, 9, 20, 0.26); }
+.sp-bg-star i { position: absolute; inset: 35%; background: var(--sp-black); clip-path: var(--star); }
+@keyframes spStarTurn { to { transform: rotate(360deg); } }
+
+/* Éclat noir déchiré en bas de page */
+.sp-bg-shard {
+    position: absolute;
+    left: -4vw;
+    right: -4vw;
+    bottom: -2vh;
+    height: 16vh;
+    background: #000;
+    clip-path: polygon(0 62%, 6% 38%, 11% 58%, 19% 22%, 26% 52%, 34% 30%, 41% 60%, 50% 18%, 57% 50%, 66% 34%, 72% 62%, 81% 26%, 88% 54%, 95% 36%, 100% 58%, 100% 100%, 0 100%);
+    opacity: 0.85;
+}
+
 /* 4. HUD & HEADER ========================================================== */
 .sp-app-container {
     position: relative;
@@ -181,78 +212,24 @@ a { color: inherit; }
 
 .sp-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: var(--sp-s5);
-    padding: 18px 24px;
-    background: var(--sp-dark);
-    border: var(--sp-bw) solid var(--sp-white);
-    box-shadow: var(--sp-shadow-red);
+    gap: var(--sp-s4) var(--sp-s5);
+    padding: 6px 4px 0 10px;
     position: relative;
-    transform: rotate(-0.5deg);
-}
-.sp-header::before {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    width: 18px;
-    height: 18px;
-    background: var(--sp-white);
-    clip-path: polygon(0 0, 100% 0, 0 100%);
+    z-index: 5;
 }
 
 .sp-header-right-group {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 18px;
-}
-
-.sp-brand-block { display: flex; align-items: center; gap: var(--sp-s4); }
-
-.sp-logo-icon {
-    width: 50px;
-    height: 50px;
     display: grid;
-    place-items: center;
-    background: var(--sp-red);
-    border: var(--sp-bw) solid var(--sp-white);
-    box-shadow: var(--sp-shadow-black);
-    transform: rotate(-6deg);
-    font-size: 1.8rem;
+    grid-template-columns: auto auto;
+    justify-content: end;
+    justify-items: end;
+    align-items: center;
+    gap: 12px 14px;
 }
-.sp-star { color: var(--sp-white); }
-
-.sp-brand-title {
-    display: flex;
-    align-items: baseline;
-    gap: var(--sp-s2);
-    font-family: var(--font-display);
-    font-size: 2.4rem;
-    line-height: 0.92;
-    letter-spacing: 0.04em;
-}
-.sp-brand-title .title-main { text-shadow: 3px 3px 0 var(--sp-red); }
-.sp-brand-title .title-sub {
-    color: var(--sp-white);
-    background: #000;
-    padding: 2px 8px;
-    transform: skewX(var(--sp-skew));
-}
-
-.sp-tag-ribbon { display: flex; gap: var(--sp-s2); margin-top: 6px; }
-.sp-pill-black, .sp-pill-red {
-    font-size: var(--fs-micro);
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    padding: 3px 8px;
-    transform: skewX(var(--sp-skew));
-}
-.sp-pill-black { background: #000; border: 1px solid var(--sp-gray); }
-.sp-pill-red { background: var(--sp-red); }
+.sp-header-right-group .hud-status-wrapper { grid-column: 1 / -1; grid-row: 2; }
 
 /* Statut de travail */
 .hud-status-wrapper { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
@@ -439,34 +416,45 @@ a { color: inherit; }
     display: inline-flex;
     align-items: center;
     gap: var(--sp-s2);
-    background: #000;
-    border: 2px solid var(--sp-white);
-    box-shadow: 4px 4px 0 var(--sp-red);
-    padding: 7px 14px;
     text-decoration: none;
-    transform: skewX(var(--sp-skew));
-    transition: transform var(--sp-snap), background-color var(--sp-t-fast), box-shadow var(--sp-t-fast);
+    transition: transform var(--sp-snap), background-color var(--sp-t-fast), color var(--sp-t-fast);
 }
-.sp-btn-back { font-family: var(--font-display); font-size: 1.15rem; letter-spacing: 0.06em; }
-.sp-btn-back:hover { background: var(--sp-red); transform: skewX(var(--sp-skew)) translateY(-2px); box-shadow: 6px 6px 0 #000; }
-.sp-btn-back:active { transform: skewX(var(--sp-skew)) translateY(2px); box-shadow: 2px 2px 0 #000; }
-.sp-btn-back .back-arrow { color: var(--sp-white); }
+.sp-btn-back {
+    position: relative;
+    isolation: isolate;
+    padding: 9px 30px 9px 24px;
+    color: #000;
+    font-family: var(--font-display);
+    font-size: 1.45rem;
+    letter-spacing: 0.06em;
+    line-height: 1;
+    transform: rotate(-3deg);
+    filter: drop-shadow(5px 5px 0 var(--sp-red)) drop-shadow(4px 4px 0 #000);
+}
+.sp-btn-back::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--sp-white); clip-path: polygon(6% 0, 100% 8%, 95% 100%, 0 90%); transition: background-color var(--sp-t-fast); }
+.sp-btn-back:hover { color: var(--sp-white); transform: rotate(-1deg) translate(-3px, -2px) scale(1.05); }
+.sp-btn-back:hover::before { background: var(--sp-red); }
+.sp-btn-back:active { transform: rotate(-3deg) translateY(2px); }
+.sp-btn-back .back-arrow { font-size: 0.8em; }
 .sp-btn-back .back-kbd {
-    background: #222;
+    padding: 2px 6px;
+    background: #000;
     color: var(--sp-white);
-    border: 1px solid var(--sp-white);
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
-    padding: 1px 5px;
+    font-weight: 800;
+    letter-spacing: 0;
 }
 
 .sp-btn-audio-header {
-    border-color: var(--sp-gray);
-    box-shadow: none;
+    padding: 7px 14px;
+    background: #000;
+    border: 2px solid var(--sp-gray);
     font-family: var(--font-mono);
     font-size: var(--fs-micro);
     font-weight: 700;
     color: var(--sp-offwhite);
+    transform: skewX(var(--sp-skew));
 }
 .sp-btn-audio-header:hover { border-color: var(--sp-white); box-shadow: 3px 3px 0 var(--sp-red); transform: skewX(var(--sp-skew)) translateY(-2px); }
 .sp-btn-audio-header[aria-pressed="true"] { background: var(--sp-red); color: #fff; border-color: var(--sp-white); box-shadow: 3px 3px 0 var(--sp-white); }
@@ -609,6 +597,11 @@ a { color: inherit; }
 .sp-ransom .l:nth-child(5n+4) { background: var(--sp-white); color: var(--sp-red); font-size: 1.08em; transform: rotate(5deg); clip-path: var(--clip-slab-c); }
 .sp-ransom .l:nth-child(5n) { background: #000; color: var(--sp-white); font-size: 0.96em; transform: rotate(-3deg) translateY(-0.03em); clip-path: var(--clip-para-r); box-shadow: inset 0 0 0 2px var(--sp-white); }
 
+/* Vraie lettre anonyme : les tuiles alternent trois polices (grotesque, didone, compacte) */
+.sp-ransom .l:nth-child(5n+2) { font-family: 'Abril Fatface', Georgia, 'Times New Roman', serif; font-size: 1.02em; padding-bottom: 0.08em; }
+.sp-ransom .l:nth-child(5n+4) { font-family: 'Anton', Impact, sans-serif; font-size: 0.98em; }
+.sp-ransom .w:nth-child(even) .l:nth-child(5n+1) { font-family: 'Abril Fatface', Georgia, serif; font-size: 0.94em; background: var(--sp-red); color: var(--sp-white); }
+
 /* Glitch nerveux (titres) : deux copies décalées via data-text */
 .sp-glitch { position: relative; display: inline-block; }
 .sp-glitch::before,
@@ -713,20 +706,15 @@ a { color: inherit; }
 .sp-hp--mix .hp-label em { background: var(--sp-white); color: #000; }
 
 /* 9. RESPONSIVE & ACCESSIBILITÉ ============================================ */
-@media (max-width: 950px) {
-    .sp-header { flex-direction: column; align-items: flex-start; gap: var(--sp-s4); transform: none; }
-    .sp-header-right-group { width: 100%; justify-content: space-between; }
-}
-
 @media (max-width: 650px) {
     .sp-app-container { padding: var(--sp-s3) var(--sp-s3) 36px; gap: var(--sp-s5); }
-    .sp-date-hud-sticker { --hud-fs: 13px; }
-    .sp-header { padding: var(--sp-s3); }
-    .sp-header-right-group { flex-wrap: nowrap; align-items: stretch; gap: var(--sp-s3); }
-    .sp-btn-back { flex: 1; justify-content: center; white-space: nowrap; }
+    .sp-date-hud-sticker { --hud-fs: 12px; }
+    .sp-header { padding: 4px 0 0 6px; gap: var(--sp-s3); }
+    .sp-header-right-group { gap: 10px; }
+    .sp-btn-back { font-size: 1.2rem; padding: 8px 22px 8px 18px; white-space: nowrap; }
     .sp-btn-back .back-kbd { display: none; } /* pas de clavier sur mobile */
-    .sp-btn-audio-header { justify-content: center; }
-    .sp-brand-block, .hud-status-wrapper { display: none; } /* le HUD date suffit sur mobile */
+    .hud-status-wrapper { display: none; } /* le HUD date porte déjà le statut */
+    .sp-bg-star { width: 150vmin; height: 150vmin; top: -40vmin; right: -70vmin; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -738,6 +726,6 @@ a { color: inherit; }
         scroll-behavior: auto !important;
     }
     .sp-transition-wipe { display: none !important; }
-    .hp-fill::before { animation: none; }
+    .hp-fill::before, .sp-bg-star { animation: none; }
     .hp-track { transition: none; }
 }

@@ -138,11 +138,11 @@
 .mm-figure {
     position: absolute;
     z-index: -1;
-    right: -14vw;
+    right: -34vw;
     bottom: 0;
     height: 62%;
     width: auto;
-    opacity: 0.4;
+    opacity: 0.45;
     pointer-events: none;
     user-select: none;
     filter: drop-shadow(8px 8px 0 rgba(0, 0, 0, 0.6));
@@ -482,14 +482,17 @@
     .mm-rate-sticker { right: -1.05em; }
 
     .mm-figure {
-        right: 2vw;
+        right: -3vw;
         bottom: 0;
-        height: 90vh;
+        height: 94vh;
         opacity: 1;
-        filter: drop-shadow(10px 10px 0 rgba(0, 0, 0, 0.55));
-        transform: translate3d(calc(var(--sel) * -0.6vw), 0, 0);
+        filter: none; /* l'ombre dure est dessinée dans le SVG */
+        transform: translate3d(calc(var(--sel) * -0.5vw), 0, 0) rotate(calc(var(--sel) * 0.35deg));
+        transform-origin: 50% 100%;
         transition: transform var(--sp-t-slow) var(--sp-ease-out);
+        animation: mmFigureIn 620ms var(--sp-ease-out) both;
     }
+    @keyframes mmFigureIn { from { opacity: 0; translate: 9vw 4vh; } to { opacity: 1; translate: 0 0; } }
 
     .mm-brand {
         position: absolute;
@@ -555,7 +558,7 @@
 /* Écrans très larges : le figure ne dépasse pas, la marque respire */
 @media (min-width: 820px) and (min-aspect-ratio: 5/4) and (min-aspect-ratio: 21/9) {
     .mm-dashboard { left: 10vw; }
-    .mm-figure { right: 10vw; }
+    .mm-figure { right: 4vw; }
 }
 
 /* Tablette portrait & mobile : commandes plus généreuses */
@@ -579,6 +582,6 @@
 /* 7. ACCESSIBILITÉ ========================================================= */
 @media (prefers-reduced-motion: reduce) {
     .mm-ecg path { animation: none; stroke-dashoffset: 0; opacity: 0.6; }
-    .mm-pointer-star { animation: none; }
+    .mm-pointer-star, .mm-figure { animation: none; }
     .mm-cmd { transition-duration: 0.01ms; }
 }
